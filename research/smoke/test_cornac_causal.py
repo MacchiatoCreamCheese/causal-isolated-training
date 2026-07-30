@@ -93,6 +93,21 @@ def main():
         check("cornac NeuMF.fit", train_set.counterfactual_rate,
               expect_zero, failures)
 
+        # 4. Same for LightGCN, which reaches the loader by the other route.
+        #    Needs dgl, so it is skipped rather than failed where dgl is absent
+        #    (notably native Windows — see the environment note in README.md).
+        try:
+            import dgl  # noqa: F401
+        except ImportError:
+            print("  [SKIP] cornac LightGCN.fit: dgl not installed")
+        else:
+            from cornac.models import LightGCN
+            train_set.reset_counterfactual_counters()
+            LightGCN(num_epochs=1, batch_size=1024, emb_size=64, num_layers=3,
+                     seed=42, verbose=False).fit(train_set)
+            check("cornac LightGCN.fit", train_set.counterfactual_rate,
+                  expect_zero, failures)
+
     print()
     if failures:
         print(f"FAILED: {len(failures)} check(s): {failures}")

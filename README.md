@@ -45,8 +45,22 @@ model = cornac.models.LightGCN(...)      # completely unmodified
 print(em.train_set.counterfactual_rate)  # -> 0.0
 ```
 
-Both arms use the same no-rejection draw, so they differ in exactly one thing:
-the item pool.
+Both arms draw the same way and reject collisions the same way, so they differ
+in exactly one thing: the item pool.
+
+**Collision rejection.** A negative drawn at random is occasionally an item the
+user actually interacted with — a positive masquerading as a negative. Rendle
+2009 excludes these by definition (`j ∈ I \ I_u⁺`) and cornac's samplers reject
+them too, so we do as well. It matters more here than usual: the causal pool is
+smaller than the full catalog, so without rejection the causal arm would collide
+~1.5× more often than uniform purely as an artefact of pool size, confounding
+the comparison. Measured on musical, rejection takes uniform from 264 collisions
+to **0** and causal from 404 to **1**.
+
+That last **1** is not a bug and cannot be fixed. The earliest interaction in the
+log has a causal pool of exactly one item — itself — so no valid negative
+exists. This is why rejection is a *bounded* vectorized retry rather than
+cornac's unbounded `while`, which would spin forever on that row.
 
 **BPR is the exception.** cornac's BPR extracts `train_set.matrix` — a CSR
 carrying no timestamps — and samples inside a compiled OpenMP loop, so the rule
@@ -57,13 +71,32 @@ means ρ comes off the **model** for BPR (`model.counterfactual_rate`) but off t
 
 ## Quickstart
 
+Everything runs under **WSL**, in one of two conda envs (both Python 3.12,
+torch 2.4.1+cu121 with CUDA, dgl 2.4.0+cu121). LightGCN needs dgl, which is why
+the environment is WSL and not native Windows.
+
+| Env | cornac | Use it for |
+|---|---|---|
+| `leakage` | 2.3.5, editable from `../cornac` | the working env |
+| `leakage24` | 2.6.0 from PyPI | checking the repo stands alone |
+
+`leakage24` exists to prove the code depends only on cornac's public API. The
+smoke test passes 8/8 there, so `TimestampSplit` and both negative-sampling
+entry points are present in released cornac — the `cornac>=2.4.0` pin is real,
+not an artifact of the local fork.
+
 ```bash
-pip install -r requirements.txt          # LightGCN also needs: pip install -e ".[lightgcn]"
+wsl
+conda activate leakage
+cd /mnt/c/Users/nguye/uniyear/causal-isolated-training
 
 # Proves cornac's models really do sample through our loader.
 # Synthetic data — needs no dataset CSVs:
 python -m research.smoke.test_cornac_causal
 ```
+
+To rebuild it from scratch: `conda create -n leakage python=3.12`, then
+`pip install -r requirements.txt`, then `pip install dgl -f https://data.dgl.ai/wheels/torch-2.4/cu121/repo.html`.
 
 ```bash
 export RESEARCH_DATA_DIR=./data                 # Windows: $env:RESEARCH_DATA_DIR = "$PWD\data"
@@ -149,8 +182,9 @@ with `RESEARCH_OUTPUT_DIR`.
 - **cornac's NeuMF defaults to `backend="tensorflow"`**, which has no GPU on
   native Windows. The runners pass `backend="pytorch"`; both take the same
   `uir_iter` path.
-- **DGL on Windows is painful**, and LightGCN needs it. cu121 wheels work under
-  WSL; cu124 conflicts with the torch pin. Never silently fall back to CPU DGL.
+- **Run in WSL, not native Windows.** LightGCN needs dgl; cu121 wheels work under
+  WSL, cu124 conflicts with the torch pin. Never silently fall back to CPU DGL.
+  The other two models run fine on Windows if you only need those.
 - **Reset ρ between cells.** `set_recipe` does it; the counters live on the split,
   which is reused across cells.
 - **Always go through `cornac.Experiment`.** Calling `ranking_eval` directly with

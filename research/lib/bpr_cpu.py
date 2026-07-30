@@ -113,7 +113,7 @@ class BPRMiniBatch(Recommender):
                 u = u_arr[idx]
                 pos = i_arr[idx]
                 ts = ts_arr[idx]
-                neg = self._sampler.sample(ts)
+                neg = self._sampler.sample(ts, u)
 
                 # Compute scores
                 u_emb = self.u_factors[u]            # (B, k)

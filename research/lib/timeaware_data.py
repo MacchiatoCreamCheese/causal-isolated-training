@@ -73,6 +73,58 @@ def uniform_draw(num_items, size, rng):
     return draw(0, num_items, size=size)
 
 
+# How many times to redraw a negative that collided with one of the user's own
+# positives. Bounded on purpose: cornac's samplers use an unbounded `while`,
+# which cannot be used here. The earliest interactions in the log have a causal
+# prefix of exactly one item -- that item being the positive itself -- so for
+# them no non-colliding negative exists and an unbounded loop would spin
+# forever. After the last round we accept whatever remains and count it.
+MAX_REJECT_ROUNDS = 4
+
+
+def build_observed_keys(users, items, num_items):
+    """Sorted `user * num_items + item` keys for every observed interaction.
+
+    Membership testing against a sorted int64 array via `searchsorted` is
+    vectorized, which is what lets collision rejection stay a whole-batch
+    operation instead of cornac's per-element Python loop.
+    """
+    keys = (np.asarray(users, dtype=np.int64) * np.int64(num_items)
+            + np.asarray(items, dtype=np.int64))
+    keys.sort()
+    return keys
+
+
+def find_collisions(users, negs, observed_keys, num_items):
+    """Boolean mask: which drawn negatives are actually the user's positives."""
+    if observed_keys.size == 0:
+        return np.zeros(len(negs), dtype=bool)
+    keys = (np.asarray(users, dtype=np.int64) * np.int64(num_items)
+            + np.asarray(negs, dtype=np.int64))
+    idx = np.searchsorted(observed_keys, keys)
+    np.clip(idx, 0, observed_keys.size - 1, out=idx)
+    return observed_keys[idx] == keys
+
+
+def reject_collisions(users, negs, observed_keys, num_items, redraw,
+                      max_rounds=MAX_REJECT_ROUNDS):
+    """Redraw negatives that collide with the user's own positives.
+
+    `redraw(mask)` returns replacement items for the masked positions. Returns
+    `(negs, n_residual)` where `n_residual` is how many collisions survived all
+    rounds -- non-zero only where no valid negative exists (see the note on
+    MAX_REJECT_ROUNDS).
+    """
+    negs = np.array(negs, dtype=np.int64, copy=True)
+    hit = find_collisions(users, negs, observed_keys, num_items)
+    for _ in range(max_rounds):
+        if not hit.any():
+            return negs, 0
+        negs[hit] = redraw(hit)
+        hit = find_collisions(users, negs, observed_keys, num_items)
+    return negs, int(hit.sum())
+
+
 def causal_draw(sorted_first_seen, sorted_items, pos_timestamps, rng):
     """Vectorized causal negatives, one per element of `pos_timestamps`.
 
@@ -81,12 +133,10 @@ def causal_draw(sorted_first_seen, sorted_items, pos_timestamps, rng):
     `L = searchsorted(sorted_first_seen, t, side="right")`; we draw uniformly
     from that prefix.
 
-    Like vanilla BPR (Rendle 2009) — and unlike cornac's base `uij_iter` /
-    `uir_iter` — this does *not* reject a drawn item that the user has
-    actually observed; the collision probability is ~O(interactions/items)
-    (<0.1% on our datasets) and rejecting it would break bit-parity with the
-    original research sampler. The guarantee this sampler makes is the causal
-    one: a drawn negative never post-dates the positive.
+    The guarantee made here is the causal one: a drawn negative never
+    post-dates the positive. It says nothing about whether the user has
+    actually observed the drawn item -- that is handled separately by
+    `reject_collisions`, applied identically to both sampling arms.
 
     `rng.random` is used rather than an integer draw so the same code path
     works for both `Generator` and `RandomState`.
@@ -125,6 +175,9 @@ class TimeAwareDataset(Dataset):
         self.sorted_item_order = order.astype(np.int64)
         self.sorted_first_seen = self.item_first_seen[order]
         self._ts_array = np.asarray(self.timestamps, dtype=np.int64)
+        self.observed_keys = build_observed_keys(
+            self.uir_tuple[0], self.uir_tuple[1], self.num_items
+        )
         self.reset_counterfactual_counters()
 
     @classmethod
@@ -152,10 +205,11 @@ class TimeAwareDataset(Dataset):
     # idea negatives are being sampled for them.
 
     def reset_counterfactual_counters(self):
-        """Zero the probe. Call before each `fit()` — otherwise counts
+        """Zero the probes. Call before each `fit()` — otherwise counts
         accumulate across the cells of a multi-recipe run."""
         self._counterfactual_negs = 0
         self._total_negs = 0
+        self._residual_collisions = 0
 
     @property
     def counterfactual_rate(self):
@@ -163,17 +217,44 @@ class TimeAwareDataset(Dataset):
             return 0.0
         return self._counterfactual_negs / self._total_negs
 
-    def _draw_negatives(self, batch_ts):
-        """One negative per element of `batch_ts`, under the active arm,
-        updating the counterfactual counters."""
-        if self.neg_sampling == "uniform":
-            negs = uniform_draw(self.num_items, len(batch_ts), self.rng)
+    @property
+    def collision_rate(self):
+        """Fraction of drawn negatives that are still one of the user's own
+        positives after rejection. Non-zero only where the causal prefix offers
+        no alternative — see MAX_REJECT_ROUNDS."""
+        if self._total_negs == 0:
+            return 0.0
+        return self._residual_collisions / self._total_negs
+
+    def _draw_negatives(self, users, batch_ts):
+        """One negative per element of `batch_ts`, under the active arm.
+
+        Collisions with the user's own positives are rejected in both arms
+        identically, so `uniform` and `causal` still differ in exactly one
+        thing: the item pool. Without this the causal arm would collide more
+        often purely because its pool is smaller, which would confound the very
+        comparison the ablation is making.
+        """
+        uniform = self.neg_sampling == "uniform"
+
+        def draw(n, ts):
+            if uniform:
+                return uniform_draw(self.num_items, n, self.rng)
+            return causal_draw(
+                self.sorted_first_seen, self.sorted_item_order, ts, self.rng
+            )
+
+        negs = draw(len(batch_ts), batch_ts)
+        negs, residual = reject_collisions(
+            users, negs, self.observed_keys, self.num_items,
+            redraw=lambda mask: draw(int(mask.sum()), batch_ts[mask]),
+        )
+        self._residual_collisions += residual
+
+        # rho is measured on the negatives actually used, after rejection.
+        if uniform:
             self._counterfactual_negs += int(
                 (self.item_first_seen[negs] > batch_ts).sum()
-            )
-        else:
-            negs = causal_draw(
-                self.sorted_first_seen, self.sorted_item_order, batch_ts, self.rng
             )
         self._total_negs += len(batch_ts)
         return negs
@@ -197,7 +278,9 @@ class TimeAwareDataset(Dataset):
             for batch_ids in self.idx_iter(len(self.uir_tuple[0]), batch_size, shuffle):
                 batch_users = self.uir_tuple[0][batch_ids]
                 batch_pos_items = self.uir_tuple[1][batch_ids]
-                batch_neg_items = self._draw_negatives(self._ts_array[batch_ids])
+                batch_neg_items = self._draw_negatives(
+                    batch_users, self._ts_array[batch_ids]
+                )
                 yield batch_users, batch_pos_items, batch_neg_items
         finally:
             self.neg_sampling = prev
@@ -226,7 +309,9 @@ class TimeAwareDataset(Dataset):
 
             repeated_users = batch_users.repeat(num_zeros)
             repeated_ts = self._ts_array[batch_ids].repeat(num_zeros)
-            neg_items = self._draw_negatives(repeated_ts).astype(batch_items.dtype)
+            neg_items = self._draw_negatives(
+                repeated_users, repeated_ts
+            ).astype(batch_items.dtype)
 
             yield (
                 np.concatenate((batch_users, repeated_users)),
