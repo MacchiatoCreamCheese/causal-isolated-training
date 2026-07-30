@@ -123,6 +123,11 @@ LIGHTGCN = {
         "grid": [1e-6, 1e-5, 1e-4, 1e-3, 1e-2],
         "source": "He 2020 §4.1.2: 'L2 regularization coefficient λ is searched in the range of {1e-6, 1e-5, ..., 1e-2}, and in most cases the optimal value is 1e-4'",
     },
+    "batch_size_musical": {
+        "current": 1024,
+        "status": "PAPER_FIXED",
+        "source": "He 2020 §4.1.2 default 1024. Musical Instruments (0.51M) is smaller than every dataset in the paper; the default applies.",
+    },
     "batch_size_baby": {
         "current": 1024,
         "status": "PAPER_FIXED",
@@ -137,11 +142,6 @@ LIGHTGCN = {
         "current": 2048,
         "status": "EYEBALL",
         "source": "Claude. Healthcare (7.18M) is 2.4× Amazon-Book; paper only mentions 2048 max. Could justify 4096.",
-    },
-    "batch_size_movielens1m": {
-        "current": 1024,
-        "status": "PAPER_FIXED",
-        "source": "He 2020 §4.1.2 default 1024. MovieLens-1M (1.00M) ~ Gowalla (1.03M).",
     },
 
     # --- Training schedule ---
@@ -172,27 +172,11 @@ LIGHTGCN = {
         "source": "He 2020 §4.1.2 + cornac LightGCN.monitor_value: recall@20 on val_set (same as NGCF)",
     },
 
-    # --- Our research mechanisms ---
-    "order": {
-        "current": "shuffle | windowed",
-        "status": "RESEARCH",
-        "source": "Our temporal-batching mechanism (Mechanism 2).",
-    },
+    # --- Our research mechanism ---
     "sampler": {
         "current": "uniform | causal",
         "status": "RESEARCH",
-        "source": "Our causal-negative-sampling mechanism (Mechanism 1).",
-    },
-    "n_windows": {
-        "current": 10,
-        "status": "PAPER_GRID",
-        "grid": [2, 5, 10, 20, 50],
-        "source": "Our paper, Phase 4a K-ablation (sample.tex Table VI / Fig 4). K=10 was the Pareto point on Baby/BPR.",
-    },
-    "epochs_per_window": {
-        "current": 1000,
-        "status": "PAPER_FIXED",
-        "source": "Equal to n_epochs_max for per-row exposure parity with shuffle. Each row lives in exactly one window so this matches shuffle's 1000.",
+        "source": "Our causal-negative-sampling mechanism. Set on the training split, not on the model: cornac's LightGCN takes its negatives from train_set.uij_iter().",
     },
 }
 
@@ -339,18 +323,13 @@ NEUMF = {
     },
     "early_stop_min_delta": {
         "current": None,
-        "status": "NOT_IMPLEMENTED",
-        "source": "Claude: early stopping not wired into our custom NeuMFRecommender training loop yet.",
+        "status": "CORNAC_DEFAULT",
+        "source": "cornac NCFBase accepts early_stopping={'min_delta':..., 'patience':...}; we leave it None (off). Available for free now that we use cornac's NeuMF.",
     },
     "early_stop_patience": {
         "current": None,
-        "status": "NOT_IMPLEMENTED",
-        "source": "Claude: not wired yet.",
-    },
-    "early_stop_check_every": {
-        "current": None,
-        "status": "NOT_IMPLEMENTED",
-        "source": "Claude: not wired yet.",
+        "status": "CORNAC_DEFAULT",
+        "source": "As above — off by default; He 2017 does not pin a patience.",
     },
     "monitor_metric": {
         "current": "HR@10",
@@ -358,32 +337,17 @@ NEUMF = {
         "source": "He 2017 §4.1: 'truncated the ranked list at 10 ... Hit Ratio (HR)'",
     },
 
-    # --- Our research mechanisms ---
-    "order": {
-        "current": "shuffle | windowed",
-        "status": "RESEARCH",
-        "source": "Our temporal-batching mechanism, applied to all three training phases (GMF, MLP, NeuMF).",
-    },
+    # --- Our research mechanism ---
     "sampler": {
         "current": "uniform | causal",
         "status": "RESEARCH",
-        "source": "Our causal-negative-sampling mechanism, applied to all three training phases.",
-    },
-    "n_windows": {
-        "current": 10,
-        "status": "EYEBALL",
-        "source": "Claude. Reused from our BPR K-ablation. Not re-tuned for NeuMF.",
-    },
-    "epochs_per_window": {
-        "current": 20,
-        "status": "EYEBALL",
-        "source": "Claude. Equal to n_epochs_neumf so per-row exposure matches shuffle.",
+        "source": "Our causal-negative-sampling mechanism. Set on the training split, not on the model: cornac's NCF family takes its negatives from train_set.uir_iter(..., num_zeros=num_neg), so all three training phases (GMF, MLP, NeuMF) inherit it.",
     },
 }
 
 
 # ===========================================================================
-# BPR  (research/bpr_gpu.py: BPRMiniBatchGPU + BPRWindowedGPU)
+# BPR  (research/lib/bpr_cpu.py: BPRMiniBatch)
 # ===========================================================================
 
 BPR = {
@@ -478,7 +442,7 @@ BPR = {
     "sampler_kind": {
         "current": "uniform | causal",
         "status": "RESEARCH",
-        "source": "Our causal mechanism. NewBPR §5.3 recommends adaptive sampling for global temporal split; we have NOT implemented adaptive — orthogonal to our axis.",
+        "source": "Our causal mechanism. Unlike NeuMF/LightGCN this is a model argument, because cornac's BPR trains in compiled Cython over train_set.matrix and never asks the data loader for negatives — so our NumPy BPR carries its own sampler. NewBPR §5.3 recommends adaptive sampling for global temporal split; we have NOT implemented adaptive — orthogonal to our axis.",
     },
 
     # --- Training schedule ---
@@ -513,23 +477,6 @@ BPR = {
         "source": "NewBPR §4.1.6: 'We search for the best hyperparameters using NDCG@100 on all datasets except Netflix'.",
     },
 
-    # --- Our research mechanisms ---
-    "order": {
-        "current": "shuffle | windowed",
-        "status": "RESEARCH",
-        "source": "Our temporal-batching mechanism. BPRWindowedGPU subclass.",
-    },
-    "n_windows": {
-        "current": 10,
-        "status": "PAPER_GRID",
-        "grid": [2, 5, 10, 20, 50],
-        "source": "Our paper Phase 4a K-ablation (sample.tex Table VI / Fig 4). K=10 was the Pareto sweet spot on Baby/BPR.",
-    },
-    "epochs_per_window": {
-        "current": 20,
-        "status": "EYEBALL",
-        "source": "Claude. Equal to n_epochs for per-row exposure parity.",
-    },
 }
 
 

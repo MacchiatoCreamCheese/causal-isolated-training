@@ -20,10 +20,20 @@ from ..paths import DATA_DIR
 
 
 # Each dataset records its CSV path (relative to DATA_DIR) plus the val/test
-# cutoff timestamps used by TimestampSplit. Amazon cutoffs are calendar dates
-# (Aug 2021 / Jul 2022) shared across the three Amazon subsets. MovieLens
-# cutoffs are 80/90-percentile quantiles of its own timestamp distribution.
+# cutoff timestamps used by TimestampSplit. All three are Amazon Reviews 2023
+# 5-core subsets sharing the same calendar cutoffs (Aug 2021 / Jul 2022).
+#
+# Those cutoffs are not approximations: splitting the combined 5-core CSV at
+# them reproduces the official `benchmark/5core/timestamp` partition exactly
+# (verified row-for-row on all three datasets).
+# The primary three are musical, baby, cellphone; healthcare is the largest
+# (7.18M) and is run last, so it is not in any runner's default list.
 DATASETS = {
+    "musical": {
+        "path": "musical_dataset/Musical_Instruments.csv",
+        "val_ts": 1628643414042,
+        "test_ts": 1658002729837,
+    },
     "baby": {
         "path": "baby_dataset/Baby_Products.csv",
         "val_ts": 1628643414042,
@@ -39,11 +49,6 @@ DATASETS = {
         "val_ts": 1628643414042,
         "test_ts": 1658002729837,
     },
-    "movielens1m": {
-        "path": "movielens_dataset/MovieLens_1M.csv",
-        "val_ts": 975768738,
-        "test_ts": 978133376,
-    },
 }
 
 
@@ -58,12 +63,14 @@ def load_uirt(path: str):
     return Reader().read(path, fmt="UIRT", sep=",", skip_lines=1)
 
 
-def build_eval_method(key: str, verbose: bool = False) -> CausalTimestampSplit:
+def build_eval_method(key: str, neg_sampling: str = "causal",
+                      verbose: bool = False) -> CausalTimestampSplit:
     """Resolve a dataset key to a ready `CausalTimestampSplit`.
 
     Reads the dataset CSV straight from disk (under DATA_DIR). The training
-    split is a `TimeAwareDataset`, so models can request causal or uniform
-    negatives from the same eval method.
+    split is a `TimeAwareDataset` stamped with `neg_sampling`, which is how a
+    runner selects the ablation arm — cornac's models take their negatives
+    from the split and expose no sampling option of their own.
     """
     if key not in DATASETS:
         raise KeyError(f"unknown dataset key: {key} (known: {list(DATASETS)})")
@@ -84,5 +91,6 @@ def build_eval_method(key: str, verbose: bool = False) -> CausalTimestampSplit:
         test_timestamp=info["test_ts"],
         fmt="UIRT",
         exclude_unknowns=True,
+        neg_sampling=neg_sampling,
         verbose=verbose,
     )

@@ -124,7 +124,3 @@ def future_items_pct_batched(model, eval_method, item_first, k, chunk=512):
         "global_pct": n_future / n_total if n_total else 0.0,
         "evaluated": n_evaluated,
     }
-
-
-if __name__ == "__main__":
-    main()

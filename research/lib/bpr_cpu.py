@@ -165,7 +165,9 @@ class BPRMiniBatch(Recommender):
         self.wait = 0
 
     def monitor_value(self, train_set, val_set):
-        """NDCG@20 on val_set. See bpr_gpu.BPRMiniBatchGPU.monitor_value."""
+        """NDCG@20 on val_set — matches our tuner selection metric and the
+        reported tables. NewBPR §4.1.6 optimizes NDCG@100; we use @20 for
+        consistency with what `aggregate_ablation.py` reports."""
         if val_set is None:
             return None
         from cornac.metrics import NDCG

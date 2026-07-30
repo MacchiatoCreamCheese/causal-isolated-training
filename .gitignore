@@ -12,10 +12,10 @@ venv/
 research/logs/
 research/results/
 research/figures/
+research/reports/
 
-# Datasets (large; keep out of git — see data/README.md)
-data/*
-!data/README.md
+# Datasets (large; keep out of git — see the Datasets section in README.md)
+data/
 
 # OS / editor
 .DS_Store

@@ -15,7 +15,6 @@ Layout:
       baby_dataset/          dataset CSVs (or point RESEARCH_DATA_DIR elsewhere)
       cellphone_dataset/
       healthcare_dataset/
-      movielens_dataset/
 
 Outputs default to *inside* this package (matching the historical on-disk
 layout, so existing `research/results` and `research/logs` keep working).

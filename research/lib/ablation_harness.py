@@ -1,8 +1,12 @@
-"""Shared multi-seed harness for phase5/6/7 2x2 ablations.
+"""Shared multi-seed harness for the causal-sampling ablation.
 
-Each phase script wraps its 4 recipe cells in a per-(dataset, seed) loop,
-captures HR/NDCG/Recall via cornac.Experiment.result, and writes a JSON
-per (model, dataset, seed) to research/results/2x2/.
+Each runner wraps its recipe cells in a per-(dataset, seed) loop, captures
+HR/NDCG/Recall via cornac.Experiment.result, and writes a JSON per
+(model, dataset, seed) to research/results/ablation/.
+
+The ablation is a single-variable comparison: `uniform` (vanilla, negatives
+from the whole catalog) vs `causal` (negatives restricted to items that
+existed at the positive's timestamp). Nothing else differs between cells.
 
 The JSON layout is flat so the aggregator can scan a directory:
 
@@ -11,9 +15,9 @@ The JSON layout is flat so the aggregator can scan a directory:
       "dataset": "baby",
       "seed": 42,
       "recipes": {
-        "shuffle+uniform": {"HR@20": ..., "NDCG@20": ..., "Recall@20": ...,
-                             "counterfactual_rate": ...},
-        ...
+        "uniform": {"HR@20": ..., "NDCG@20": ..., "Recall@20": ...,
+                    "counterfactual_rate": ...},
+        "causal":  {...}
       }
     }
 """
@@ -29,15 +33,41 @@ from typing import Dict, List
 from .data import DATASETS  # noqa: F401
 from ..paths import RESULTS_DIR
 
-OUT_DIR = RESULTS_DIR / "2x2"
+OUT_DIR = RESULTS_DIR / "ablation"
+
+# The two arms of the ablation, in report order.
+RECIPES = ("uniform", "causal")
 
 
-def parse_args(default_seeds=(42,), default_datasets=("baby",)):
+def set_recipe(eval_method, recipe: str):
+    """Point an eval method's training split at a sampling arm.
+
+    Switching in place rather than rebuilding the split matters: re-reading
+    and re-splitting the CSV per cell costs minutes on the larger datasets,
+    and it would also give each cell a differently-seeded `Dataset.rng`.
+
+    Returns the training split so callers can read `counterfactual_rate` off
+    it after the fit. Resetting the probe here is what keeps counts from
+    accumulating across cells.
+    """
+    train_set = eval_method.train_set
+    train_set.neg_sampling = recipe
+    train_set.reset_counterfactual_counters()
+    return train_set
+
+
+# The primary three, in ascending size. `healthcare` (7.18M) is deliberately
+# excluded: it is run last, only if there is time, via an explicit --datasets.
+DEFAULT_DATASETS = ("musical", "baby", "cellphone")
+
+
+def parse_args(default_seeds=(42,), default_datasets=DEFAULT_DATASETS):
     p = argparse.ArgumentParser()
     p.add_argument("--seeds", default=",".join(str(s) for s in default_seeds),
                    help="Comma-separated seeds, e.g. 42,123,2026")
     p.add_argument("--datasets", default=",".join(default_datasets),
-                   help="Comma-separated dataset keys: baby,cellphone,healthcare")
+                   help="Comma-separated dataset keys: musical,baby,cellphone,healthcare "
+                        "(default: musical,baby,cellphone — healthcare is opt-in)")
     args = p.parse_args()
     seeds = [int(s) for s in args.seeds.split(",") if s.strip()]
     datasets = [d.strip() for d in args.datasets.split(",") if d.strip()]
@@ -62,10 +92,14 @@ def load_partial(model: str, dataset: str, seed: int) -> Dict[str, Dict[str, flo
     if not path.exists():
         return {}
     try:
-        with open(path, encoding="utf-8") as f:
+        # utf-8-sig, not utf-8: a BOM (which any Windows editor may add) would
+        # otherwise raise here, and this except-clause would silently discard a
+        # finished cell — turning a resume into a silent re-run.
+        with open(path, encoding="utf-8-sig") as f:
             payload = json.load(f)
         return payload.get("recipes", {})
-    except Exception:
+    except Exception as e:
+        print(f"[warn] could not read checkpoint {path}: {e}", flush=True)
         return {}
 
 

@@ -2,7 +2,7 @@
 
 Scope (per plan):
   - Dataset:  baby
-  - Recipe:   shuffle+uniform (vanilla baseline cell)
+  - Recipe:   uniform (vanilla baseline cell)
   - Seed:     42
   - Metric:   NDCG@20 (TOP_K from research.lib.causal_sampling)
   - Method:   coordinate descent over knobs declared in
@@ -47,7 +47,7 @@ from ..paths import logs_dir, RESULTS_DIR
 TUNE_DIR = RESULTS_DIR / "tuning"
 TUNE_DATASET = "baby"
 TUNE_SEED = 42
-TUNE_RECIPE = "shuffle+uniform"
+TUNE_RECIPE = "uniform"
 SELECT_METRIC = f"NDCG@{TOP_K}"
 
 
@@ -57,61 +57,58 @@ SELECT_METRIC = f"NDCG@{TOP_K}"
 
 def _build_model(model_name: str, config: dict, seed: int):
     if model_name == "lightgcn":
-        from ..lib.lightgcn import LightGCNRecommender
+        from cornac.models import LightGCN
         from .ablation_lightgcn import (
             LIGHTGCN_BATCH, LIGHTGCN_EPOCHS, LIGHTGCN_EARLY_STOP,
         )
-        return LightGCNRecommender(
+        return LightGCN(
             name=f"LightGCN/tune/{TUNE_DATASET}/s{seed}",
             emb_size=64,
             num_layers=int(config["num_layers"]),
             learning_rate=float(config["learning_rate"]),
             lambda_reg=float(config["lambda_reg"]),
             batch_size=LIGHTGCN_BATCH[TUNE_DATASET],
-            n_epochs=LIGHTGCN_EPOCHS,
-            order="shuffle",
-            sampler="uniform",
+            num_epochs=LIGHTGCN_EPOCHS,
             early_stopping=LIGHTGCN_EARLY_STOP,
-            early_stop_every=10,
             seed=seed,
             verbose=False,
         )
 
     if model_name == "neumf":
-        from ..lib.neumf import NeuMFRecommender
+        from cornac.models import NeuMF
+        from .ablation_neumf import NEUMF_KWARGS
         num_factors = int(config["num_factors"])
         hidden = int(config["mlp_hidden_count"])
-        # Tower-halving with layers[-1] == num_factors (paper §3.3 / NeuMF.__init__ assert).
+        # Tower-halving with layers[-1] == num_factors (He 2017 §3.3).
         # hidden=3 ⇒ (num_factors*8, *4, *2, *1) = (64,32,16,8) when num_factors=8.
         layers = tuple(num_factors * (2 ** i) for i in range(hidden, -1, -1))
-        return NeuMFRecommender(
-            name=f"NeuMF/tune/{TUNE_DATASET}/s{seed}",
+        kwargs = dict(NEUMF_KWARGS)
+        kwargs.update(
             num_factors=num_factors,
             layers=layers,
-            act_fn="relu",
-            n_epochs=20,
             batch_size=int(config["batch_size"]),
-            learning_rate=float(config["learning_rate"]),
+            lr=float(config["learning_rate"]),
             num_neg=int(config["num_neg"]),
-            alpha=0.5,
-            order="shuffle",
-            sampler="uniform",
+        )
+        return NeuMF(
+            name=f"NeuMF/tune/{TUNE_DATASET}/s{seed}",
             seed=seed,
             verbose=False,
+            **kwargs,
         )
 
     if model_name == "bpr":
-        from ..lib.bpr_gpu import BPRMiniBatchGPU as BPRMiniBatch
+        from ..lib.bpr_cpu import BPRMiniBatch
         return BPRMiniBatch(
             name=f"BPR/tune/{TUNE_DATASET}/s{seed}",
             k=int(config["k_embed_dim"]),
-            batch_size=16384,
+            batch_size=4096,
             learning_rate=float(config["learning_rate"]),
             lambda_u=float(config["lambda_u"]),
             lambda_i=float(config["lambda_i"]),
             lambda_j=float(config["lambda_j"]),
             n_epochs=int(config["n_epochs"]),
-            sampler="uniform",
+            sampler=TUNE_RECIPE,
             **BPR_EARLY_STOP,
             seed=seed,
             verbose=False,
@@ -182,7 +179,9 @@ def _train_once(model_name: str, config: dict, eval_method) -> tuple:
 
 
 def _build_eval_method():
-    return build_eval_method(TUNE_DATASET)
+    # Tuning happens on the vanilla arm so the chosen hyperparameters are not
+    # picked under the mechanism being evaluated.
+    return build_eval_method(TUNE_DATASET, neg_sampling=TUNE_RECIPE)
 
 
 # ---------------------------------------------------------------------------
