@@ -49,9 +49,16 @@ def set_recipe(eval_method, recipe: str):
     Returns the training split so callers can read `counterfactual_rate` off
     it after the fit. Resetting the probe here is what keeps counts from
     accumulating across cells.
+
+    `reset()` restores the split's RNG to its seed, so each cell starts from the
+    same random stream and the arms form a paired comparison. Without it the
+    second cell would inherit whatever state the first left behind, and results
+    would depend on the order the recipes ran in. It only works if the eval
+    method was built with a seed — see `data.build_eval_method`.
     """
     train_set = eval_method.train_set
     train_set.neg_sampling = recipe
+    train_set.reset()
     train_set.reset_counterfactual_counters()
     return train_set
 

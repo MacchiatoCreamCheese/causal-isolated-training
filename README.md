@@ -185,8 +185,14 @@ with `RESEARCH_OUTPUT_DIR`.
 - **Run in WSL, not native Windows.** LightGCN needs dgl; cu121 wheels work under
   WSL, cu124 conflicts with the torch pin. Never silently fall back to CPU DGL.
   The other two models run fine on Windows if you only need those.
-- **Reset ρ between cells.** `set_recipe` does it; the counters live on the split,
-  which is reused across cells.
+- **Seed the eval method, not just the model.** cornac's models draw negatives
+  from the *split*, so a model-side seed does not cover them. Without
+  `build_eval_method(..., seed=...)`, `Dataset.rng` silently falls back to
+  numpy's global singleton: negative sampling becomes irreproducible and
+  multi-seed runs stop being controlled replicates. The runners pass it.
+- **`set_recipe` resets the split's RNG.** That is what makes the arms a paired
+  comparison — same users, same positives, same batch order, only the negative
+  pool differs — and what stops results depending on the order the cells ran in.
 - **Always go through `cornac.Experiment`.** Calling `ranking_eval` directly with
   `val_set=None` leaves val-positive items in the test candidate pool and
   corrupts the metric.

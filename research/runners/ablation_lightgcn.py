@@ -50,7 +50,7 @@ def run_one(ds_name: str, seed: int) -> None:
     print(f"\n############## LightGCN / {ds_name} / seed={seed} "
           f"({len(pending)}/{len(RECIPES)} cells pending) ##############", flush=True)
     t_start = time.time()
-    eval_method = build_eval_method(ds_name, verbose=True)
+    eval_method = build_eval_method(ds_name, seed=seed, verbose=True)
 
     for recipe in pending:
         print(f"\n--- {recipe} ---", flush=True)

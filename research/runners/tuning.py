@@ -181,7 +181,8 @@ def _train_once(model_name: str, config: dict, eval_method) -> tuple:
 def _build_eval_method():
     # Tuning happens on the vanilla arm so the chosen hyperparameters are not
     # picked under the mechanism being evaluated.
-    return build_eval_method(TUNE_DATASET, neg_sampling=TUNE_RECIPE)
+    return build_eval_method(TUNE_DATASET, neg_sampling=TUNE_RECIPE,
+                             seed=TUNE_SEED)
 
 
 # ---------------------------------------------------------------------------

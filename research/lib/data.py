@@ -64,6 +64,7 @@ def load_uirt(path: str):
 
 
 def build_eval_method(key: str, neg_sampling: str = "causal",
+                      seed: int = None,
                       verbose: bool = False) -> CausalTimestampSplit:
     """Resolve a dataset key to a ready `CausalTimestampSplit`.
 
@@ -71,6 +72,11 @@ def build_eval_method(key: str, neg_sampling: str = "causal",
     split is a `TimeAwareDataset` stamped with `neg_sampling`, which is how a
     runner selects the ablation arm — cornac's models take their negatives
     from the split and expose no sampling option of their own.
+
+    **Pass `seed`.** It is what makes negative sampling reproducible: cornac's
+    models draw their negatives from this split, not from themselves, so a
+    model-side seed does not cover them. Left as None, `Dataset.rng` falls back
+    to numpy's global singleton and every run samples differently.
     """
     if key not in DATASETS:
         raise KeyError(f"unknown dataset key: {key} (known: {list(DATASETS)})")
@@ -92,5 +98,6 @@ def build_eval_method(key: str, neg_sampling: str = "causal",
         fmt="UIRT",
         exclude_unknowns=True,
         neg_sampling=neg_sampling,
+        seed=seed,
         verbose=verbose,
     )
