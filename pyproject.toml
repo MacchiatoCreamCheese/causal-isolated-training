@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "causal-isolated-training"
+version = "0.1.0"
+description = "Causally Isolated Training for Leakage-Free Recommendation — research code built on top of cornac (imported, not vendored)."
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "cornac>=2.4.0",
+    "numpy>=1.23",
+    "scipy>=1.9",
+    "torch>=2.0",
+    "matplotlib>=3.6",
+]
+
+[project.optional-dependencies]
+# LightGCN backend (cornac imports dgl lazily).
+lightgcn = ["dgl>=1.1"]
+
+[tool.setuptools]
+# The importable package is `research` (run modules as `python -m research.<...>`).
+packages = ["research"]
