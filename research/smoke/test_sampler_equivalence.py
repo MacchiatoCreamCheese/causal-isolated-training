@@ -41,7 +41,7 @@ from itertools import repeat
 import numpy as np
 from cornac.data import Dataset
 
-from .fixtures import build_rated_split
+from .fixtures import build_rated_split, negatives_only, uij_batches
 
 # How far the distance-to-cornac may exceed our own sampler's run-to-run
 # self-distance. Both are measured on the same data at the same sample size, so
@@ -66,20 +66,19 @@ def report(label, ok, detail, failures):
 ANY_RATING = np.nextafter(0.0, 1.0)
 
 
-def tally_illegal(train_set, batches):
+def count_illegal(train_set, batches):
     """Count emitted negatives cornac's own predicate would have rejected.
 
     `batches` yields `(users, negatives, positives_or_None)`: a positives array
     means "reject at that item's rating" (cornac's `uij_iter` rule), `None`
-    means "reject at any rating at all" (its `uir_iter` rule). Must be lazy --
-    the counter reset has to land before the iterator runs.
+    means "reject at any rating at all" (its `uir_iter` rule).
 
     Returns `(illegal, own_but_legal, total, residual)`, where `own_but_legal`
     counts the user's own items that cornac nonetheless admits (lower-rated
     than the positive) -- zero under the any-rating threshold by construction.
+    The caller resets the probe, so `residual` covers exactly this pass.
     """
     dok = train_set.dok_matrix
-    train_set.reset_counterfactual_counters()
     illegal = own_but_legal = total = 0
     for users, negs, positives in batches:
         thresholds = (repeat(ANY_RATING) if positives is None
@@ -91,7 +90,7 @@ def tally_illegal(train_set, batches):
             elif observed > 0:
                 own_but_legal += 1
         total += len(users)
-    return illegal, own_but_legal, total, train_set._residual_collisions
+    return illegal, own_but_legal, total, train_set.residual_collisions
 
 
 def report_legality(label, illegal, residual, total, failures):
@@ -115,10 +114,9 @@ def report_legality(label, illegal, residual, total, failures):
 
 def check_uij_legality(train_set, failures):
     """Every `uij_iter` negative must satisfy cornac's `dok[u,j] < pos_rating`."""
-    illegal, own_but_legal, total, residual = tally_illegal(
-        train_set,
-        ((bu, bj, bi)
-         for bu, bi, bj in train_set.uij_iter(batch_size=BATCH, shuffle=True)))
+    train_set.reset_counterfactual_counters()
+    illegal, own_but_legal, total, residual = count_illegal(
+        train_set, uij_batches(train_set, BATCH))
     report_legality("uij_iter legality (cornac's own predicate)", illegal,
                     residual, total, failures)
     # Not pass/fail -- reported because it is the whole reason the two rules
@@ -131,19 +129,19 @@ def check_uij_legality(train_set, failures):
 def check_uir_legality(train_set, failures):
     """Every `uir_iter` negative must satisfy cornac's `dok[u,j] == 0`."""
     num_zeros = 4
-    illegal, _own, total, residual = tally_illegal(
+    train_set.reset_counterfactual_counters()
+    illegal, _own, total, residual = count_illegal(
         train_set,
-        # Layout is positives first, then `num_zeros` negatives each.
-        ((bu[len(bu) // (num_zeros + 1):], bi[len(bu) // (num_zeros + 1):], None)
+        ((*negatives_only(bu, bi, num_zeros), None)
          for bu, bi, _br in train_set.uir_iter(
              batch_size=BATCH, shuffle=True, binary=True, num_zeros=num_zeros)))
     report_legality("uir_iter legality (cornac's own predicate)", illegal,
                     residual, total, failures)
 
 
-def item_histogram(pairs, num_items):
+def item_histogram(neg_batches, num_items):
     counts = np.zeros(num_items, dtype=np.int64)
-    for negs in pairs:
+    for negs in neg_batches:
         np.add.at(counts, np.asarray(negs, dtype=np.int64), 1)
     return counts
 
@@ -205,14 +203,13 @@ def check_causal_conjunction(train_set, failures):
     counted independently: if the loader were bypassed, or silently sampled
     fewer negatives than positives, the two would not agree.
     """
-    illegal, _own, total, residual = tally_illegal(
-        train_set,
-        ((bu, bj, bi)
-         for bu, bi, bj in train_set.uij_iter(batch_size=BATCH, shuffle=True)))
+    train_set.reset_counterfactual_counters()
+    illegal, _own, total, residual = count_illegal(
+        train_set, uij_batches(train_set, BATCH))
     report_legality("causal arm is cornac-legal", illegal, residual, total,
                     failures)
     rho = train_set.counterfactual_rate
-    drawn = train_set._total_negs
+    drawn = train_set.total_negatives
     report("causal arm draws no future items", rho == 0.0 and drawn == total,
            f"counterfactual rate {rho * 100:.2f}%; probe saw {drawn:,} draws "
            f"vs {total:,} negatives emitted (want equal, and non-zero)",

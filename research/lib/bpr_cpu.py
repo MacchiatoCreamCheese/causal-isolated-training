@@ -85,6 +85,17 @@ class BPRMiniBatch(Recommender):
         (item didn't exist at the time of the positive). Available after fit()."""
         return self._sampler.counterfactual_rate if self._sampler is not None else 0.0
 
+    @property
+    def collision_rate(self) -> float:
+        """Fraction of sampled negatives still colliding with the user's own
+        positives after bounded rejection. Available after fit().
+
+        Mirrors `counterfactual_rate` above: the runners read both off the model
+        for BPR (it owns its sampler) and off the training split for the cornac
+        models. Forwarding only one of the pair is what made `ablation_bpr`
+        raise `AttributeError` once it started recording collisions."""
+        return self._sampler.collision_rate if self._sampler is not None else 0.0
+
     def fit(self, train_set, val_set=None):
         Recommender.fit(self, train_set, val_set)
         n_users = train_set.num_users

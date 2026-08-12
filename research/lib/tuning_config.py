@@ -549,3 +549,23 @@ BPR_EARLY_STOP = {
     },
     "early_stop_every": BPR["early_stop_check_every"]["current"],
 }
+
+
+# Convenience config: pass these to NeuMF ctors for the He 2017 defaults, whose
+# provenance is inventoried in NEUMF above. Lives here rather than in the runner
+# because `runners/tuning.py` needs it too, and a runner importing from another
+# runner just to reach a constant is the wrong direction.
+#
+# backend="pytorch" because cornac's default TF backend has no GPU support on
+# native Windows; both backends take the same uir_iter path, so the ablation is
+# unaffected by the choice.
+NEUMF_KWARGS = dict(
+    num_factors=NEUMF["num_factors"]["current"],
+    layers=NEUMF["mlp_layers"]["current"],
+    act_fn=NEUMF["act_fn"]["current"],
+    num_epochs=NEUMF["n_epochs_neumf"]["current"],
+    batch_size=NEUMF["batch_size"]["current"],
+    lr=NEUMF["learning_rate"]["current"],
+    num_neg=NEUMF["num_neg"]["current"],
+    backend="pytorch",
+)

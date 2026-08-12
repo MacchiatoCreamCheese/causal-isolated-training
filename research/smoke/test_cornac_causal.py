@@ -28,7 +28,7 @@ import argparse
 import os
 import sys
 
-from .fixtures import build_rated_split, build_split
+from .fixtures import build_rated_split, build_split, negatives_only
 
 # 2 sampling modes x 4 per-mode checks, plus the 2 rejection-rule checks.
 TOTAL_CHECKS = 10
@@ -61,7 +61,7 @@ class Results:
         bypass is the exact regression this file exists to catch, so the draw
         count is asserted alongside the rate.
         """
-        drawn = train_set._total_negs
+        drawn = train_set.total_negatives
         rho = train_set.counterfactual_rate
         want = "== 0%" if expect_zero else "> 0%"
         ok = drawn > 0 and ((rho == 0.0) if expect_zero else (rho > 0.0))
@@ -100,39 +100,35 @@ def check_rejection_rules(res):
         for u, i in zip(train_set.uir_tuple[0], train_set.uir_tuple[1])
     )
 
-    def tally(batches):
-        """Consume one pass of `(users, negatives)` batches, returning how many
-        emitted negatives are the user's own items and how many collisions the
-        bounded redraw could not resolve.
-
-        `batches` must be lazy -- the counter reset has to land before the
-        iterator runs.
-        """
-        train_set.reset_counterfactual_counters()
-        own = sum(1
-                  for users, negs in batches
-                  for u, j in zip(users, negs)
-                  if int(u) * num_items + int(j) in observed)
-        return own, train_set._residual_collisions
+    def count_own(batches):
+        """How many emitted negatives are items the user actually interacted
+        with. The caller resets the probe first, so `train_set.residual_collisions`
+        afterwards covers exactly this pass."""
+        return sum(1
+                   for users, negs in batches
+                   for u, j in zip(users, negs)
+                   if int(u) * num_items + int(j) in observed)
 
     # The fixture is deliberately dense, so MAX_REJECT_ROUNDS genuinely runs out
     # sometimes and a few of the user's own items survive. Those are counted as
     # residuals, so the assertion is not "no own items" but "none beyond the
     # documented residual" -- otherwise this would test the redraw budget rather
     # than the filter.
-    own, residual = tally(
-        (bu, bj)
-        for bu, _bi, bj in train_set.uij_iter(batch_size=1024, shuffle=True))
+    train_set.reset_counterfactual_counters()
+    own = count_own((bu, bj) for bu, _bi, bj
+                    in train_set.uij_iter(batch_size=1024, shuffle=True))
+    residual = train_set.residual_collisions
     res.record("uij_iter keeps lower-rated own items", own > residual,
                f": {own:,} own items emitted vs {residual:,} unavoidable "
                f"residuals — the surplus is what cornac's rating-aware rule admits")
 
     num_zeros = 4
-    own, residual = tally(
-        # Layout is positives first, then `num_zeros` negatives each.
-        (bu[len(bu) // (num_zeros + 1):], bi[len(bu) // (num_zeros + 1):])
-        for bu, bi, _br in train_set.uir_iter(batch_size=1024, shuffle=True,
-                                              binary=True, num_zeros=num_zeros))
+    train_set.reset_counterfactual_counters()
+    own = count_own(negatives_only(bu, bi, num_zeros)
+                    for bu, bi, _br in train_set.uir_iter(
+                        batch_size=1024, shuffle=True, binary=True,
+                        num_zeros=num_zeros))
+    residual = train_set.residual_collisions
     res.record("uir_iter rejects every own item", own == residual,
                f": {own:,} own items emitted, all {residual:,} of them "
                f"unavoidable residuals (want equal)")

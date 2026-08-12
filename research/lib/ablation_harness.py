@@ -121,12 +121,29 @@ def write_partial(model: str, dataset: str, seed: int,
     os.replace(tmp, path)
 
 
-def extract_metrics(experiment) -> Dict[str, float]:
-    """Pull metric averages from a freshly-run cornac.Experiment."""
+#: Faithfulness probes recorded alongside the accuracy metrics in every cell.
+#: Named once here because the aggregator reads these keys back
+#: (`analysis/aggregate_ablation.py`) and because forwarding them by hand in
+#: each runner is how `collision_rate` came to be recorded for two models and
+#: crash on the third.
+PROBE_METRICS = ("counterfactual_rate", "collision_rate")
+
+
+def extract_metrics(experiment, probe=None) -> Dict[str, float]:
+    """Pull metric averages from a freshly-run cornac.Experiment.
+
+    `probe` is whatever object carries the sampling probes for this model: the
+    training split for cornac's own models (they have no idea negatives are
+    being sampled for them), or the model itself for our BPR, which owns its
+    sampler. Both expose the same `PROBE_METRICS` property names, so the runners
+    differ only in which object they hand over.
+    """
     if experiment.result is None or len(experiment.result) == 0:
         return {}
-    r = experiment.result[0]
-    return dict(r.metric_avg_results)
+    metrics = dict(experiment.result[0].metric_avg_results)
+    if probe is not None:
+        metrics.update((name, float(getattr(probe, name))) for name in PROBE_METRICS)
+    return metrics
 
 
 def write_seed_json(model: str, dataset: str, seed: int,

@@ -70,11 +70,9 @@ def run_one(ds_name: str, seed: int) -> None:
             save_dir=logs_dir(),
         )
         exp.run()
-        metrics = extract_metrics(exp)
         # BPR owns its sampler, so the probe comes off the model here rather
         # than off the training split.
-        metrics["counterfactual_rate"] = float(model.counterfactual_rate)
-        metrics["collision_rate"] = float(model.collision_rate)
+        metrics = extract_metrics(exp, probe=model)
         recipes_out[recipe] = metrics
         write_partial("BPR", ds_name, seed, recipes_out)
         print(f"[{recipe}] {metrics}  ({time.time()-t0:.1f}s)  [checkpointed]", flush=True)

@@ -99,7 +99,7 @@ class NumpyCausalSampler:
         negs = draw(len(ts_rep), ts_rep)
         negs, residual = reject_collisions(
             u_rep, negs, self.observed_keys, self.num_items,
-            redraw=lambda mask: draw(int(mask.sum()), ts_rep[mask]),
+            redraw=lambda sel: draw(len(sel), ts_rep[sel]),
         )
         self._residual_collisions += residual
         # Counted in both arms: gating this on `uniform` would make the causal

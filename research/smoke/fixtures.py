@@ -19,6 +19,18 @@ VAL_TS = 1_615_000_000_000
 TEST_TS = 1_625_000_000_000
 
 
+def negatives_only(batch_users, batch_items, num_zeros):
+    """The negatives half of a `uir_iter` batch.
+
+    cornac's layout is every positive first, then `num_zeros` negatives per
+    positive, so the split point is `len / (num_zeros + 1)`. Kept here because
+    both smoke tests need it: the layout is cornac's to change, and it should
+    not be re-derived in each caller.
+    """
+    split = len(batch_users) // (num_zeros + 1)
+    return batch_users[split:], batch_items[split:]
+
+
 def _generate(rng, rating_fn, n_users, per_block):
     """Four blocks of interactions; block `b` may use the first `(b+1)*40`
     items, so the catalog grows from 40 to 160 as time advances."""
@@ -47,7 +59,7 @@ def _split(rows, neg_sampling):
 def build_split(neg_sampling, seed=0):
     """Implicit-feedback fixture: every rating is 1.0."""
     rng = np.random.default_rng(seed)
-    return _split(_generate(rng, lambda r: 1.0, 300, 4000), neg_sampling)
+    return _split(_generate(rng, lambda _rng: 1.0, 300, 4000), neg_sampling)
 
 
 def build_rated_split(neg_sampling, seed=0):
@@ -60,3 +72,15 @@ def build_rated_split(neg_sampling, seed=0):
     rng = np.random.default_rng(seed)
     rows = _generate(rng, lambda r: float(r.integers(1, 6)), 150, 5000)
     return _split(rows, neg_sampling)
+
+
+def uij_batches(train_set, batch_size):
+    """`uij_iter` batches as `(users, negatives, positives)`.
+
+    Note the reordering: `uij_iter` yields `(users, positives, negatives)`, and
+    the checks want the drawn negative first with the positive as the rejection
+    threshold beside it.
+    """
+    return ((bu, bj, bi)
+            for bu, bi, bj in train_set.uij_iter(batch_size=batch_size,
+                                                 shuffle=True))
