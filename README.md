@@ -30,7 +30,7 @@ rule lives there, **cornac's own models get it with no model-side code**:
 | Model | How it asks for negatives | What we do |
 |---|---|---|
 | **LightGCN** | `train_set.uij_iter(...)` | nothing — stock `cornac.models.LightGCN` |
-| **NeuMF** | `train_set.uir_iter(..., num_zeros=num_neg)` | nothing — stock `cornac.models.NeuMF` |
+| **NeuMF** | `train_set.uir_iter(..., num_zeros=num_neg)` | nothing that affects sampling — stock `cornac.models.NeuMF` with only `save()` stubbed out (see below) |
 | **BPR** | compiled Cython over `train_set.matrix` | our own NumPy BPR |
 
 Neither cornac model exposes a sampling option, so the arm is a property on the
@@ -45,22 +45,39 @@ model = cornac.models.LightGCN(...)      # completely unmodified
 print(em.train_set.counterfactual_rate)  # -> 0.0
 ```
 
-Both arms draw the same way and reject collisions the same way, so they differ
-in exactly one thing: the item pool.
+Within a model both arms draw the same way and reject collisions the same way,
+so they differ in exactly one thing: the item pool.
 
-**Collision rejection.** A negative drawn at random is occasionally an item the
-user actually interacted with — a positive masquerading as a negative. Rendle
-2009 excludes these by definition (`j ∈ I \ I_u⁺`) and cornac's samplers reject
-them too, so we do as well. It matters more here than usual: the causal pool is
-smaller than the full catalog, so without rejection the causal arm would collide
-~1.5× more often than uniform purely as an artefact of pool size, confounding
-the comparison. Measured on musical, rejection takes uniform from 264 collisions
-to **0** and causal from 404 to **1**.
+**Collision rejection, per model.** A negative drawn at random is occasionally
+an item the user actually interacted with — a positive masquerading as a
+negative. Rendle 2009 excludes these by definition (`j ∈ I \ I_u⁺`) and cornac
+rejects them too, but *cornac uses a different rule for each entry point*, and
+we match it rather than imposing one rule everywhere:
 
-That last **1** is not a bug and cannot be fixed. The earliest interaction in the
-log has a causal pool of exactly one item — itself — so no valid negative
-exists. This is why rejection is a *bounded* vectorized retry rather than
-cornac's unbounded `while`, which would spin forever on that row.
+| cornac site | Filter | Why |
+|---|---|---|
+| `uij_iter` → LightGCN | `dok[u,j] >= pos_rating` | pairwise BPR loss asserts only an ordering, so an item the user rated *below* the positive is a valid — indeed observed rather than assumed — negative |
+| `uir_iter` → NeuMF | `dok[u,j] > 0` | pointwise BCE labels the row 0, which is factually wrong for any item the user touched, whatever its rating |
+| BPR Cython (`has_non_zero`) | any observed | same as above; matched by our NumPy BPR |
+
+The rule tracks the *loss*, not the dataset. It matters because `load_uirt`
+reads raw 1–5 stars with no binarization and 70.6% of musical's ratings are 5.0,
+so for most positives cornac admits the user's own 1–4 star items as negatives.
+On implicit data the two rules coincide and the distinction vanishes.
+
+Rejection is a *bounded* vectorized retry (`MAX_REJECT_ROUNDS`), not cornac's
+unbounded `while`: the earliest interaction in the log has a causal pool of
+exactly one item — itself — so no valid negative exists and an unbounded loop
+would spin forever on that row. A handful of collisions therefore survive; they
+are counted by `collision_rate` and written into every seed JSON. On musical
+that is 4 out of 427,957 draws (0.001%).
+
+`smoke/test_sampler_equivalence.py` checks this correspondence rather than
+asserting it: every negative we emit is compared against cornac's own predicate
+evaluated on cornac's own `dok_matrix`, and the count of illegal ones must equal
+the counted residuals exactly. It also compares draw frequencies against
+cornac's real per-element loop, calibrated against our own sampler's
+run-to-run self-distance (on musical: 0.4040 vs a 0.4037 noise floor).
 
 **BPR is the exception.** cornac's BPR extracts `train_set.matrix` — a CSR
 carrying no timestamps — and samples inside a compiled OpenMP loop, so the rule
@@ -71,37 +88,51 @@ means ρ comes off the **model** for BPR (`model.counterfactual_rate`) but off t
 
 ## Quickstart
 
-Everything runs under **WSL**, in one of two conda envs (both Python 3.12,
-torch 2.4.1+cu121 with CUDA, dgl 2.4.0+cu121). LightGCN needs dgl, which is why
-the environment is WSL and not native Windows.
+Everything runs under **WSL**, in the `leakage24` conda env (Python 3.12,
+cornac 2.6.0 from PyPI, torch 2.4.1+cu121 with CUDA, dgl 2.4.0+cu121). LightGCN
+needs dgl, which is why the environment is WSL and not native Windows.
 
-| Env | cornac | Use it for |
-|---|---|---|
-| `leakage` | 2.3.5, editable from `../cornac` | the working env |
-| `leakage24` | 2.6.0 from PyPI | checking the repo stands alone |
-
-`leakage24` exists to prove the code depends only on cornac's public API. The
-smoke test passes 8/8 there, so `TimestampSplit` and both negative-sampling
-entry points are present in released cornac — the `cornac>=2.4.0` pin is real,
-not an artifact of the local fork.
+cornac comes from PyPI, not a source checkout: the repo uses only cornac's
+public API, which is what the `cornac>=2.4.0` pin claims and what a plain
+`pip install` proves. (An earlier `leakage` env held cornac 2.3.5 editable from
+`../cornac`. It has been retired — 2.3.5 is *below* the declared pin, and being
+an editable local fork it could not distinguish "works against cornac" from
+"works against my copy of cornac".)
 
 ```bash
 wsl
-conda activate leakage
+conda activate leakage24
 cd /mnt/c/Users/nguye/uniyear/causal-isolated-training
 
-# Proves cornac's models really do sample through our loader.
-# Synthetic data — needs no dataset CSVs:
-python -m research.smoke.test_cornac_causal
+# Proves cornac's models really do sample through our loader, and that our
+# rejection filter matches cornac's. Synthetic data — needs no dataset CSVs:
+python -m research.smoke.test_cornac_causal          # -> ALL CHECKS PASSED (10/10)
+python -m research.smoke.test_sampler_equivalence
 ```
 
-To rebuild it from scratch: `conda create -n leakage python=3.12`, then
+`test_cornac_causal` reports `10/10` only when all ten checks actually ran. Two
+of them drive a real `cornac.models.LightGCN` and so need dgl; without it the
+test **fails** rather than passing quietly, since those are the checks covering
+the `uij_iter` path. On native Windows, where dgl is unavailable, waive them
+explicitly and get an honest `PASSED 8/10 - 2 skipped`:
+
+```bash
+python -m research.smoke.test_cornac_causal --allow-missing-dgl
+# or: RESEARCH_ALLOW_MISSING_DGL=1
+```
+
+To rebuild the env from scratch: `conda create -n leakage24 python=3.12`, then
 `pip install -r requirements.txt`, then `pip install dgl -f https://data.dgl.ai/wheels/torch-2.4/cu121/repo.html`.
+
+Version coverage is single-point (2.6.0). The useful second point would be the
+pin floor, 2.4.0, pip-installed in CI — not the retired 2.3.5, which is both in
+the past and below the floor.
 
 ```bash
 export RESEARCH_DATA_DIR=./data                 # Windows: $env:RESEARCH_DATA_DIR = "$PWD\data"
 
 python -m research.smoke.smoke_counter          # causal rho = 0%, uniform ~38%
+python -m research.smoke.test_sampler_equivalence --dataset musical
 
 python -m research.runners.ablation_bpr      --seeds 42,123,2026
 python -m research.runners.ablation_neumf    --seeds 42,123,2026
@@ -167,6 +198,9 @@ research/
   runners/     ablation_{bpr,neumf,lightgcn}, tuning
   analysis/    aggregate_ablation, make_figures
   smoke/       self-tests
+    fixtures.py                   synthetic UIRT splits (implicit + rated)
+    test_cornac_causal.py         cornac's models really sample through us
+    test_sampler_equivalence.py   our filter == cornac's, measured
 data/          dataset CSVs
 ```
 
@@ -182,9 +216,40 @@ with `RESEARCH_OUTPUT_DIR`.
 - **cornac's NeuMF defaults to `backend="tensorflow"`**, which has no GPU on
   native Windows. The runners pass `backend="pytorch"`; both take the same
   `uir_iter` path.
+- **`NCFBase.save()` raises after writing the pickle.** In cornac 2.6.0 it calls
+  `Recommender.save()` first — the `.pkl` and `.meta` land fine — and only then
+  hits `raise NotImplementedError()` on the `backend="pytorch"` branch, whose
+  TODO is the *separate weight export* (the `.h5` sidecar the TensorFlow branch
+  writes), not the pickle. Since `Experiment.run()` calls `save()` whenever
+  `save_dir` is set, and does so *after* training and evaluating, a plain NeuMF
+  trains for minutes, writes its pickle, then aborts before `write_partial` can
+  checkpoint the metrics. `runners/ablation_neumf.py` therefore subclasses
+  `save()` to call `Recommender.save()` directly, skipping the raise and nothing
+  else — you still get the same `.pkl` + `.meta` as every other cornac model,
+  and it round-trips (verified: reloaded model reproduces identical scores).
 - **Run in WSL, not native Windows.** LightGCN needs dgl; cu121 wheels work under
   WSL, cu124 conflicts with the torch pin. Never silently fall back to CPU DGL.
-  The other two models run fine on Windows if you only need those.
+  The other two models run fine on Windows if you only need those — but
+  `test_cornac_causal` will fail there rather than skip, since without dgl it
+  cannot verify the `uij_iter` path. Waive it with `--allow-missing-dgl` and read
+  the `8/10 - 2 skipped` summary as what it is: a partial run.
+- **rho is counted in both arms, and the draw count is asserted with it.** Under
+  causal sampling rho is 0 *by construction* — a positive's own item is always in
+  its causal prefix, so the prefix is never empty and no future item is
+  reachable. That makes `rho == 0` a weak assertion, and it was weaker still:
+  the counter used to be gated on `uniform`, and `counterfactual_rate` returns
+  `0.0` when nothing was drawn at all. Both holes are closed, and both were
+  verified by sabotage rather than by argument:
+
+  | Sabotage | rho | Old verdict | Now |
+  |---|---|---|---|
+  | `causal_draw` returns uniform items | 31% | — | 4 causal checks FAIL |
+  | override silently degrades to cornac uniform | 0.00% | **PASS** | FAIL: `over 0 draws <-- NO DRAWS: loader was bypassed` |
+
+  That second row is the regression this whole test file exists to catch, and it
+  used to slip through. Counting costs ~1s per 1000 epochs (measured: 1.5–2.9 ns
+  per draw, a vectorized gather-compare, ~0.5% of the sampling step) — cheap
+  enough that gating it to save time is a false economy.
 - **Seed the eval method, not just the model.** cornac's models draw negatives
   from the *split*, so a model-side seed does not cover them. Without
   `build_eval_method(..., seed=...)`, `Dataset.rng` silently falls back to
@@ -199,7 +264,9 @@ with `RESEARCH_OUTPUT_DIR`.
 
 `test_cornac_causal` is the test that matters: if cornac ever changes which
 iterator a model uses, the ablation would silently become a no-op, and accuracy
-numbers alone would not reveal it.
+numbers alone would not reveal it. `test_sampler_equivalence` guards the other
+half — that the uniform arm we compare everything against is cornac's sampler
+and not a stricter one of our own invention.
 
 ## Open items
 
@@ -207,3 +274,12 @@ numbers alone would not reveal it.
   recompiling Cython — then `bpr_cpu.py` could go and everything would be stock.
 - `faithfulness_metrics.recommendation_recency_distribution` currently has no
   caller; it should be computed per cell alongside ρ and KS-tested across arms.
+- Version coverage is single-point. Add cornac 2.4.0 (the pin floor),
+  pip-installed in CI, as the second point.
+- **Unequal training budgets across models.** NeuMF runs a fixed 20 epochs with
+  no early stopping; BPR and LightGCN run up to 1000 with it. Each is that
+  paper's own protocol, so every model sits at its author-intended operating
+  point — but a cross-model accuracy gap therefore confounds architecture with up
+  to a 50× difference in gradient steps. The ablation claim is unaffected (it is
+  within-model, and both arms share a budget); cross-model rows in the results
+  table are context, not evidence.

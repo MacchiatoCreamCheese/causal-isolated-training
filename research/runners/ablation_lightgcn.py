@@ -74,6 +74,7 @@ def run_one(ds_name: str, seed: int) -> None:
         exp.run()
         metrics = extract_metrics(exp)
         metrics["counterfactual_rate"] = float(train_set.counterfactual_rate)
+        metrics["collision_rate"] = float(train_set.collision_rate)
         recipes_out[recipe] = metrics
         write_partial("LightGCN", ds_name, seed, recipes_out)
         print(f"[{recipe}] {metrics}  ({time.time()-t0:.1f}s)  [checkpointed]", flush=True)

@@ -16,7 +16,7 @@ The JSON layout is flat so the aggregator can scan a directory:
       "seed": 42,
       "recipes": {
         "uniform": {"HR@20": ..., "NDCG@20": ..., "Recall@20": ...,
-                    "counterfactual_rate": ...},
+                    "counterfactual_rate": ..., "collision_rate": ...},
         "causal":  {...}
       }
     }

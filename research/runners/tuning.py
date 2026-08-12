@@ -75,8 +75,8 @@ def _build_model(model_name: str, config: dict, seed: int):
         )
 
     if model_name == "neumf":
-        from cornac.models import NeuMF
-        from .ablation_neumf import NEUMF_KWARGS
+        # Same persistence shim as the ablation runner — see its docstring.
+        from .ablation_neumf import NEUMF_KWARGS, SavableNeuMF
         num_factors = int(config["num_factors"])
         hidden = int(config["mlp_hidden_count"])
         # Tower-halving with layers[-1] == num_factors (He 2017 §3.3).
@@ -90,7 +90,7 @@ def _build_model(model_name: str, config: dict, seed: int):
             lr=float(config["learning_rate"]),
             num_neg=int(config["num_neg"]),
         )
-        return NeuMF(
+        return SavableNeuMF(
             name=f"NeuMF/tune/{TUNE_DATASET}/s{seed}",
             seed=seed,
             verbose=False,

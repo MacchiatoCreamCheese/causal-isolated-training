@@ -8,18 +8,32 @@ negatives: our NumPy BPR (`bpr_cpu.py`), which builds a sampler in `fit()` and
 calls `.sample(pos_ts, num_neg)`.
 
 The sampler also tracks the counterfactual rate (fraction of drawn negatives
-that did not yet exist — a Mechanism-1 faithfulness probe, ~0 for the causal
-sampler by construction). For cornac's models the same probe is read off the
-dataset instead; see `TimeAwareDataset.counterfactual_rate`.
+that did not yet exist — a Mechanism-1 faithfulness probe, 0 for the causal
+sampler by construction, and measured rather than assumed so that it can fail).
+For cornac's models the same probe is read off the dataset instead; see
+`TimeAwareDataset.counterfactual_rate`.
 
 If handed a plain `Dataset` (not a `TimeAwareDataset`), the index is computed
 on the fly, so the model still works under a stock `TimestampSplit`.
+
+Collision rejection here is **any-observed, ratings ignored** — deliberately
+not the rating-aware rule `TimeAwareDataset.uij_iter` uses. That is what
+cornac's own BPR does: it trains in Cython over the CSR and rejects on
+`has_non_zero(indptr, item_ids, user, j)` (`cornac/models/bpr/recom_bpr.pyx`),
+a pure membership test. Matching cornac per model is the point; see the rule
+table in `timeaware_data.py`.
+
+One deliberate deviation from cornac's BPR: on a collision cornac *skips* the
+training sample outright, we redraw. Redrawing keeps the two ablation arms
+symmetric and drops no training rows, where skipping would discard a
+data-dependent number of samples per arm and quietly change the effective
+epoch size between them.
 """
 
 import numpy as np
 
 from .timeaware_data import (
-    build_observed_keys,
+    build_observed_index,
     causal_draw,
     compute_item_first_seen,
     reject_collisions,
@@ -53,10 +67,13 @@ class NumpyCausalSampler:
          self.sorted_first_seen,
          self.sorted_item_order) = ensure_causal_arrays(train_set)
         self.num_items = len(self.item_first_seen)
+        # Ratings are intentionally discarded: our BPR rejects on membership
+        # alone, matching cornac's BPR (see the module docstring).
         self.observed_keys = getattr(train_set, "observed_keys", None)
         if self.observed_keys is None:
-            self.observed_keys = build_observed_keys(
-                train_set.uir_tuple[0], train_set.uir_tuple[1], self.num_items
+            self.observed_keys, _ = build_observed_index(
+                train_set.uir_tuple[0], train_set.uir_tuple[1],
+                train_set.uir_tuple[2], self.num_items,
             )
         self._counterfactual_negs = 0
         self._total_negs = 0
@@ -85,8 +102,10 @@ class NumpyCausalSampler:
             redraw=lambda mask: draw(int(mask.sum()), ts_rep[mask]),
         )
         self._residual_collisions += residual
-        if uniform:
-            self._counterfactual_negs += int((self.item_first_seen[negs] > ts_rep).sum())
+        # Counted in both arms: gating this on `uniform` would make the causal
+        # arm's rho == 0 true by omission rather than by measurement. See the
+        # probe note in `TimeAwareDataset`.
+        self._counterfactual_negs += int((self.item_first_seen[negs] > ts_rep).sum())
         self._total_negs += len(ts_rep)
         return negs if num_neg == 1 else negs.reshape(m, num_neg)
 
