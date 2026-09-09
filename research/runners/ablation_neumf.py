@@ -31,16 +31,22 @@ from ..lib.tuning_config import neumf_kwargs
 from ..lib.ablation_harness import (
     RECIPES, parse_args, extract_metrics, load_partial, write_partial, set_recipe,
 )
+from ..lib.tuning_config import ablation_label
 from ..paths import logs_dir
+
+
+#: Encodes any non-default switches (see tuning_config.ablation_label),
+#: so a variant run cannot overwrite the baseline's seed JSONs.
+MODEL = ablation_label("NeuMF")
 
 
 
 
 def run_one(ds_name: str, seed: int) -> None:
-    recipes_out = load_partial("NeuMF", ds_name, seed)
+    recipes_out = load_partial(MODEL, ds_name, seed)
     pending = [r for r in RECIPES if r not in recipes_out]
     if not pending:
-        print(f"[skip] NeuMF {ds_name} seed={seed} all cells cached", flush=True)
+        print(f"[skip] {MODEL} {ds_name} seed={seed} all cells cached", flush=True)
         return
 
     print(f"\n############## NeuMF / {ds_name} / seed={seed} "
@@ -66,10 +72,10 @@ def run_one(ds_name: str, seed: int) -> None:
         # being sampled for it.
         metrics = extract_metrics(exp, probe=train_set)
         recipes_out[recipe] = metrics
-        write_partial("NeuMF", ds_name, seed, recipes_out)
+        write_partial(MODEL, ds_name, seed, recipes_out)
         print(f"[{recipe}] {metrics}  ({time.time()-t0:.1f}s)  [checkpointed]", flush=True)
 
-    print(f"#### NeuMF/{ds_name}/seed={seed} total: {(time.time()-t_start)/60:.1f} min ####",
+    print(f"#### {MODEL}/{ds_name}/seed={seed} total: {(time.time()-t_start)/60:.1f} min ####",
           flush=True)
 
 

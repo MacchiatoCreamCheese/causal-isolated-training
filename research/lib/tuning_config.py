@@ -220,14 +220,22 @@ NEUMF = {
 
     # --- Pre-training + fusion ---
     "pretrain": {
-        "current": True,
-        "status": "PAPER_FIXED",
-        "source": "He 2017 §4.2.1 + Table 2: NeuMF-with-pretrain wins over NeuMF-from-scratch on both datasets. We do not ablate this; pretrain is always on.",
+        "current": False,
+        "status": "EYEBALL",
+        "source": "He 2017 §4.2.1 + Table 2: NeuMF-with-pretrain wins over NeuMF-from-scratch on both datasets.",
+        "notes": "OUR RESULTS ARE THE PAPER'S WEAKER VARIANT. This entry read 'current: True, status: PAPER_FIXED' until 2026-09-10, but nothing implemented it: cornac's NeuMF.__init__ takes no pretrain argument, a fresh model reports pretrained=False, and pre-training is opt-in only via from_pretrained(gmf, mlp, alpha). It is now implemented in lib/cornac_compat.py:NeuMF.fit and enabled with RESEARCH_NEUMF_PRETRAIN=1, which also moves the fine-tune optimiser to SGD. Left off because it triples the cost of every NeuMF cell and invalidates hyperparameters tuned without it.",
+    },
+    "pretrain_epochs": {
+        "current": 20,
+        "status": "EYEBALL",
+        "source": "Claude. He 2017 does not quote a separate budget for the GMF/MLP pre-training phases.",
+        "notes": "The towers inherit NeuMF's own num_epochs (and batch_size, num_neg, lr, reg) from the instance -- see cornac_compat.NeuMF._tower_kwargs. Recorded here so the inheritance is explicit rather than implied. Only read when pretrain is enabled.",
     },
     "alpha_mixing": {
         "current": 0.5,
         "status": "PAPER_FIXED",
         "source": "He 2017 §4.1: 'α was set to 0.5, allowing the pre-trained GMF and MLP to contribute equally'",
+        "notes": "Read only when pretrain is enabled -- cornac stores it in from_pretrained and the backend uses it to fuse the two towers' output layers. Inert otherwise.",
     },
 
     # --- Loss ---
@@ -262,6 +270,7 @@ NEUMF = {
         "current": "sgd",
         "status": "PAPER_FIXED",
         "source": "He 2017 §3.4.1: 'we optimize it with the vanilla SGD, rather than Adam'",
+        "notes": "Applied only when pretrain is enabled; without pre-training there is no fine-tune phase and the model trains from scratch under optimizer_pretrain_kind (adam). cornac does not infer this -- it always uses whatever `learner` it was given -- so NEUMF_KWARGS sets learner from NEUMF_PRETRAIN.",
     },
     "optimizer_finetune_sgd_momentum": {
         "current": 0.0,
@@ -342,7 +351,7 @@ NEUMF = {
     "sampler": {
         "current": "uniform | causal",
         "status": "RESEARCH",
-        "source": "Our causal-negative-sampling mechanism. Set on the training split, not on the model: cornac's NCF family takes its negatives from train_set.uir_iter(..., num_zeros=num_neg), so all three training phases (GMF, MLP, NeuMF) inherit it.",
+        "source": "Our causal-negative-sampling mechanism. Set on the training split, not on the model: cornac's NCF family takes its negatives from train_set.uir_iter(..., num_zeros=num_neg). GMF and MLP subclass the same base, so when pretrain is enabled all three training phases inherit it; with pretrain off there is only the one phase.",
     },
 }
 
@@ -618,7 +627,20 @@ LIGHTGCN_EARLY_STOP = {
 # backend="pytorch" because cornac's default TF backend has no GPU support on
 # native Windows; both backends take the same uir_iter path, so the ablation is
 # unaffected by the choice.
+# Pre-training is OFF by default. It triples the cost of every NeuMF cell (GMF +
+# MLP + NeuMF) and invalidates any hyperparameters tuned without it, so enabling
+# it is a deliberate act: RESEARCH_NEUMF_PRETRAIN=1. Same pattern as TUNED_ARM.
+#
+# The optimiser has to move with the flag. cornac never switches it -- `_fit_pt`
+# always calls get_optimizer(learner=self.learner) -- so a flag that toggled only
+# `pretrain` would fine-tune pretrained weights with Adam, which is precisely
+# what He 2017 3.4.1 rules out ("we optimize it with the vanilla SGD, rather than
+# Adam"), and the run would look fine while following the wrong protocol.
+NEUMF_PRETRAIN = os.environ.get("RESEARCH_NEUMF_PRETRAIN", "") == "1"
+
 NEUMF_KWARGS = dict(
+    pretrain=NEUMF_PRETRAIN,
+    learner="sgd" if NEUMF_PRETRAIN else "adam",
     num_factors=NEUMF["num_factors"]["current"],
     layers=NEUMF["mlp_layers"]["current"],
     act_fn=NEUMF["act_fn"]["current"],
@@ -658,6 +680,52 @@ TUNED_ARM = os.environ.get("RESEARCH_TUNED_ARM", "uniform")
 TUNING_SEED = 42
 
 
+# ---------------------------------------------------------------------------
+# Result identity
+# ---------------------------------------------------------------------------
+#
+# Two environment switches change what a run *produces* without changing what a
+# run is *called*: RESEARCH_NEUMF_PRETRAIN (a different NeuMF entirely -- three
+# fits, SGD fine-tune) and RESEARCH_TUNED_ARM=per_arm (each arm at its own
+# hyperparameters rather than the uniform arm's). Left unlabelled, a variant run
+# would land on the same tuning directory and the same ablation JSON as the
+# default one -- and both are resume-by-existence, so it would print
+# "[skip] ... cached" and silently adopt results produced under different
+# settings. That is the same failure the dataset/recipe path fix closed, on a
+# newer axis.
+#
+# Both helpers return the bare model name when nothing non-default is set, so
+# existing results keep their paths and are never shadowed.
+
+def _variant_parts(model: str) -> list:
+    parts = []
+    if model.lower().startswith("neumf") and NEUMF_PRETRAIN:
+        parts.append("pretrain")
+    return parts
+
+
+def tuning_model_dir(model: str) -> str:
+    """Directory name under results/tuning/ for a model's tuning cells.
+
+    Only pre-training matters here: TUNED_ARM selects which winners an *ablation*
+    consumes, and a tuning run produces winners rather than reading them.
+    """
+    return "-".join([model] + _variant_parts(model))
+
+
+def ablation_label(model: str) -> str:
+    """Model label for an ablation cell -- names its JSON and is recorded in it.
+
+    Carries both switches, since either changes the numbers in the file.
+    `aggregate_ablation` reads whatever labels it finds, so a variant shows up as
+    its own row rather than overwriting the baseline's.
+    """
+    parts = _variant_parts(model)
+    if TUNED_ARM != "uniform":
+        parts.append("tuned" + TUNED_ARM.replace("_", "-"))
+    return "-".join([model] + parts)
+
+
 def _tuning_source(recipe: str) -> str:
     """Which arm's winners apply to a cell running `recipe`. See TUNED_ARM."""
     return recipe if TUNED_ARM == "per_arm" else TUNED_ARM
@@ -671,8 +739,8 @@ def winner_config(model: str, dataset: str, recipe: str, seed: int = TUNING_SEED
     since coordinate descent starts from the baseline and only overwrites what it
     sweeps. Callers can therefore read any baseline key off it unconditionally.
     """
-    path = (RESULTS_DIR / "tuning" / model / dataset / _tuning_source(recipe)
-            / f"seed{seed}" / "winner.json")
+    path = (RESULTS_DIR / "tuning" / tuning_model_dir(model) / dataset
+            / _tuning_source(recipe) / f"seed{seed}" / "winner.json")
     if not path.exists():
         return None
     with open(path, encoding="utf-8-sig") as f:

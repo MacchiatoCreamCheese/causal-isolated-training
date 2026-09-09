@@ -1,0 +1,34 @@
+
+=== Tuning neumf on musical x causal x seed=42, selecting on NDCG@20 ===
+    -> /mnt/c/Users/nguye/uniyear/causal-isolated-training/research/results/tuning/neumf-pretrain/musical/causal/seed42
+[baseline] running with defaults: {'num_factors': 8, 'mlp_hidden_count': 3, 'learning_rate': 0.001, 'num_neg': 4, 'batch_size': 256}
+
+VALIDATION:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/musical/causal/s42 |      0.0579 |  0.0128 |    0.0276 |  17.3244
+
+TEST:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+----------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/musical/causal/s42 |      0.0445 |  0.0107 |    0.0239 |  223.4030 |  12.2423
+
+[baseline] NDCG@20=0.0107  (253.2s)
+
+--- knob: num_factors  grid=[16, 32, 64]  (default carries metric=0.0107) ---
+
+VALIDATION:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/musical/causal/s42 |      0.0514 |  0.0106 |    0.0244 |  22.9478
+
+TEST:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+----------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/musical/causal/s42 |      0.0433 |  0.0103 |    0.0231 |  278.2862 |  16.2594
+
+[run]  num_factors=16  NDCG@20=0.0103  (317.7s)

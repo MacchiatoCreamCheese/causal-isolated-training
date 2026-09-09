@@ -122,6 +122,13 @@ def write_partial(model: str, dataset: str, seed: int,
 
 
 #: Faithfulness probes recorded alongside the accuracy metrics in every cell.
+#:
+#: The counters are reset once per cell by `set_recipe`, so these cover every
+#: negative drawn during that cell -- which is normally one `fit()`. With NeuMF
+#: pre-training enabled (RESEARCH_NEUMF_PRETRAIN=1) a cell runs three fits (GMF,
+#: MLP, then the fused model) through the same split, so rho and collision_rate
+#: span all three and the denominator is ~3x larger. Both are rates, so they stay
+#: comparable -- but do not read a raw draw count across runs with and without it.
 #: Named once here because the aggregator reads these keys back
 #: (`analysis/aggregate_ablation.py`) and because forwarding them by hand in
 #: each runner is how `collision_rate` came to be recorded for two models and

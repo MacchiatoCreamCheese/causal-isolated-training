@@ -30,14 +30,20 @@ from ..lib.ablation_harness import (
 # rather than restated: `runners/tuning.py` needs the same three constants, and
 # it used to reach them by importing this runner.
 from ..lib.tuning_config import lightgcn_kwargs
+from ..lib.tuning_config import ablation_label
 from ..paths import logs_dir
 
 
+#: Encodes any non-default switches (see tuning_config.ablation_label),
+#: so a variant run cannot overwrite the baseline's seed JSONs.
+MODEL = ablation_label("LightGCN")
+
+
 def run_one(ds_name: str, seed: int) -> None:
-    recipes_out = load_partial("LightGCN", ds_name, seed)
+    recipes_out = load_partial(MODEL, ds_name, seed)
     pending = [r for r in RECIPES if r not in recipes_out]
     if not pending:
-        print(f"[skip] LightGCN {ds_name} seed={seed} all cells cached", flush=True)
+        print(f"[skip] {MODEL} {ds_name} seed={seed} all cells cached", flush=True)
         return
 
     print(f"\n############## LightGCN / {ds_name} / seed={seed} "
@@ -64,10 +70,10 @@ def run_one(ds_name: str, seed: int) -> None:
         exp.run()
         metrics = extract_metrics(exp, probe=train_set)
         recipes_out[recipe] = metrics
-        write_partial("LightGCN", ds_name, seed, recipes_out)
+        write_partial(MODEL, ds_name, seed, recipes_out)
         print(f"[{recipe}] {metrics}  ({time.time()-t0:.1f}s)  [checkpointed]", flush=True)
 
-    print(f"#### LightGCN/{ds_name}/seed={seed} total: {(time.time()-t_start)/60:.1f} min ####",
+    print(f"#### {MODEL}/{ds_name}/seed={seed} total: {(time.time()-t_start)/60:.1f} min ####",
           flush=True)
 
 

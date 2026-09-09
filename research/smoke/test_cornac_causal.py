@@ -30,8 +30,9 @@ import sys
 
 from .fixtures import build_rated_split, build_split, negatives_only
 
-# 2 sampling modes x 4 per-mode checks, plus the 2 rejection-rule checks.
-TOTAL_CHECKS = 10
+# 2 sampling modes x 4 per-mode checks, plus 2 rejection-rule checks and the
+# pre-trained-NeuMF check.
+TOTAL_CHECKS = 11
 
 ALLOW_ENV = "RESEARCH_ALLOW_MISSING_DGL"
 
@@ -193,6 +194,38 @@ def check_sampling_mode(res, mode, dgl_ok, allow_missing_dgl):
                    f"with --allow-missing-dgl / {ALLOW_ENV}=1")
 
 
+def check_pretrained_neumf(res):
+    """Pre-training must sample through the loader too.
+
+    `pretrain` ships off (RESEARCH_NEUMF_PRETRAIN), so nothing in a normal run
+    exercises this path -- which is exactly why it needs a check: a capability
+    that is never run is one that breaks quietly before anyone gets to use it.
+
+    With pre-training on, a cell trains three times (GMF, then MLP, then the
+    fused NeuMF). All three subclass cornac's NCFBase and draw through
+    `train_set.uir_iter(...)`, so all three must respect the causal rule. A
+    non-zero rho here would mean a pre-training phase bypassed the loader --
+    the same class of silent regression the rest of this file exists to catch,
+    just on a newer code path.
+    """
+    print("\n=== pre-trained NeuMF (RESEARCH_NEUMF_PRETRAIN path) ===")
+    from ..lib.cornac_compat import NeuMF
+
+    train_set = build_split("causal").train_set
+    train_set.reset_counterfactual_counters()
+    model = NeuMF(name="pretrain-probe", num_factors=8, layers=(64, 32, 16, 8),
+                  num_epochs=1, batch_size=256, num_neg=4, backend="pytorch",
+                  learner="sgd", pretrain=True, seed=42, verbose=False)
+    model.fit(train_set)
+
+    drawn = train_set.total_negatives
+    rho = train_set.counterfactual_rate
+    ok = model.pretrained and drawn > 0 and rho == 0.0
+    res.record("pre-trained NeuMF samples causally", ok,
+               f": pretrained={model.pretrained} alpha={getattr(model, 'alpha', None)} "
+               f"rho={rho * 100:.2f}% over {drawn:,} draws across 3 fits")
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--allow-missing-dgl", action="store_true",
@@ -208,6 +241,7 @@ def main():
         check_sampling_mode(res, mode, dgl_ok, args.allow_missing_dgl)
 
     check_rejection_rules(res)
+    check_pretrained_neumf(res)
 
     print()
     ran = len(res.passed) + len(res.failed)
@@ -255,6 +289,13 @@ def test_causal_arm_draws_none():
     see a negative that post-dates its positive."""
     res = Results()
     check_sampling_mode(res, "causal", have_dgl(), _waived())
+    assert not res.failed, res.failed
+
+
+def test_pretrained_neumf_samples_causally():
+    """The opt-in pre-training path still draws through TimeAwareDataset."""
+    res = Results()
+    check_pretrained_neumf(res)
     assert not res.failed, res.failed
 
 

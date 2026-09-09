@@ -58,7 +58,9 @@ from cornac.metrics import NDCG, HitRatio, Recall
 from ..lib.causal_sampling import TOP_K
 from ..lib.data import DATASETS, build_eval_method
 from ..lib.timeaware_data import NEG_SAMPLING_MODES
-from ..lib.tuning_config import TUNE_ORDER, BASELINE_CONFIG, BPR_EARLY_STOP
+from ..lib.tuning_config import (
+    BASELINE_CONFIG, BPR_EARLY_STOP, TUNE_ORDER, tuning_model_dir,
+)
 from ..paths import logs_dir, RESULTS_DIR
 
 
@@ -85,7 +87,10 @@ class Scope:
     seed: int
 
     def dir(self, model_name: str) -> Path:
-        return TUNE_DIR / model_name / self.dataset / self.recipe / f"seed{self.seed}"
+        # tuning_model_dir keeps a pre-training sweep off the from-scratch
+        # sweep's files; it is a no-op when nothing non-default is enabled.
+        return (TUNE_DIR / tuning_model_dir(model_name) / self.dataset
+                / self.recipe / f"seed{self.seed}")
 
     def __str__(self) -> str:
         return f"{self.dataset} x {self.recipe} x seed={self.seed}"

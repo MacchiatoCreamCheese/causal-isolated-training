@@ -18,6 +18,10 @@ IN_DIR = RESULTS_DIR / "ablation"
 OUT_MD = REPORTS_DIR / "RESULTS_ablation.md"
 OUT_CSV = RESULTS_DIR / "ablation_summary.csv"
 
+#: Canonical order for the report. Variant runs (e.g. "NeuMF-pretrain",
+#: "BPR-tunedper-arm" -- see tuning_config.ablation_label) carry their own
+#: label and are appended after these, so a variant appears as its own
+#: section instead of being dropped for not being on this list.
 MODELS = ["BPR", "NeuMF", "LightGCN"]
 DATASETS = ["musical", "baby", "cellphone", "healthcare"]
 METRICS = [("HR@20", "HitRatio@20"), ("NDCG@20", "NDCG@20"), ("Recall@20", "Recall@20")]
@@ -47,6 +51,13 @@ def load_all():
     return data, rho
 
 
+def models_present(data):
+    """Canonical models first, then any variant labels found on disk."""
+    seen = {key[0] for key in data}
+    return ([m for m in MODELS if m in seen]
+            + sorted(seen - set(MODELS)))
+
+
 def fmt_cell(values):
     if not values:
         return "TBD"
@@ -68,7 +79,7 @@ def render_markdown(data, rho):
              "from items that existed at the positive's timestamp. Nothing else "
              "differs between the two cells.\n"]
 
-    for model in MODELS:
+    for model in models_present(data):
         lines.append(f"\n## {model}\n")
         # Find best mean per (dataset, metric) for bolding.
         best = {}
