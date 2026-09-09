@@ -140,7 +140,7 @@ LIGHTGCN = {
         "source": "He 2020 §4.1.2 default 1024. Baby (1.24M) ~ Yelp2018 scale (1.56M).",
     },
     "batch_size_cellphone": {
-        "current": 2048,
+        "current": 512,
         "status": "PAPER_FIXED",
         "source": "He 2020 §4.1.2: 'on Amazon-Book, we increase the mini-batch size to 2048 for speed'. Cellphone (2.75M) ~ Amazon-Book (2.98M).",
     },
