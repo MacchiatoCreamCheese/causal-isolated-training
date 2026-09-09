@@ -1,0 +1,25 @@
+{
+  "model": "LightGCN",
+  "dataset": "musical",
+  "seed": 42,
+  "recipes": {
+    "uniform": {
+      "HitRatio@20": 0.058694057226705794,
+      "NDCG@20": 0.015841125801847728,
+      "Recall@20": 0.032735205963116264,
+      "Train (s)": 1121.8889615535736,
+      "Test (s)": 6.822840929031372,
+      "counterfactual_rate": 0.3317396496918099,
+      "collision_rate": 0.0
+    },
+    "causal": {
+      "HitRatio@20": 0.06152394927156483,
+      "NDCG@20": 0.016220098174401062,
+      "Recall@20": 0.034273313107953084,
+      "Train (s)": 1066.8563301563263,
+      "Test (s)": 6.97333550453186,
+      "counterfactual_rate": 0.0,
+      "collision_rate": 5.39234621163413e-06
+    }
+  }
+}

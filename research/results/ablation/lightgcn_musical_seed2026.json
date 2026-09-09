@@ -1,0 +1,25 @@
+{
+  "model": "LightGCN",
+  "dataset": "musical",
+  "seed": 2026,
+  "recipes": {
+    "uniform": {
+      "HitRatio@20": 0.05261502987108269,
+      "NDCG@20": 0.014347512894780496,
+      "Recall@20": 0.029034607081332584,
+      "Train (s)": 1436.7122247219086,
+      "Test (s)": 6.7152931690216064,
+      "counterfactual_rate": 0.3318379533457801,
+      "collision_rate": 0.0
+    },
+    "causal": {
+      "HitRatio@20": 0.059008489676134576,
+      "NDCG@20": 0.015883031414640012,
+      "Recall@20": 0.03352981355792587,
+      "Train (s)": 1266.6285054683685,
+      "Test (s)": 8.441049337387085,
+      "counterfactual_rate": 0.0,
+      "collision_rate": 5.603502810859933e-06
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "model": "LightGCN",
+  "dataset": "baby",
+  "seed": 42,
+  "recipes": {
+    "uniform": {
+      "HitRatio@20": 0.020258414420162706,
+      "NDCG@20": 0.005298590018121736,
+      "Recall@20": 0.01169537066058699,
+      "Train (s)": 2930.6661829948425,
+      "Test (s)": 11.19807767868042,
+      "counterfactual_rate": 0.384294260816956,
+      "collision_rate": 0.0
+    },
+    "causal": {
+      "HitRatio@20": 0.02081671717977349,
+      "NDCG@20": 0.005541174795846716,
+      "Recall@20": 0.012211812467447103,
+      "Train (s)": 2944.8024258613586,
+      "Test (s)": 12.790428638458252,
+      "counterfactual_rate": 0.0,
+      "collision_rate": 1.4872852336700766e-06
+    }
+  }
+}
