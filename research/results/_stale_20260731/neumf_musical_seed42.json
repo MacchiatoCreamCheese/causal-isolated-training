@@ -1,0 +1,25 @@
+{
+  "model": "NeuMF",
+  "dataset": "musical",
+  "seed": 42,
+  "recipes": {
+    "uniform": {
+      "HitRatio@20": 0.019809244314013204,
+      "NDCG@20": 0.004280052921060488,
+      "Recall@20": 0.009898440756705833,
+      "Train (s)": 111.73299837112427,
+      "Test (s)": 12.448014736175537,
+      "counterfactual_rate": 0.3317656037872964,
+      "collision_rate": 0.0
+    },
+    "causal": {
+      "HitRatio@20": 0.01802746043391678,
+      "NDCG@20": 0.0038300455258451563,
+      "Recall@20": 0.009176108743764127,
+      "Train (s)": 108.49981904029846,
+      "Test (s)": 12.35971999168396,
+      "counterfactual_rate": 0.0,
+      "collision_rate": 7.12688424304311e-06
+    }
+  }
+}

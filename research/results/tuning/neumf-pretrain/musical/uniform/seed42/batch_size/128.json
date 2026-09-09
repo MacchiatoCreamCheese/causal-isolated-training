@@ -1,0 +1,19 @@
+{
+  "knob": "batch_size",
+  "value": 128,
+  "config": {
+    "num_factors": 8,
+    "mlp_hidden_count": 3,
+    "learning_rate": 0.0005,
+    "num_neg": 4,
+    "batch_size": 128
+  },
+  "metrics": {
+    "HitRatio@20": 0.04433497536945813,
+    "NDCG@20": 0.012024909541160084,
+    "Recall@20": 0.02240917037613886,
+    "Train (s)": 421.3136637210846,
+    "Test (s)": 14.856528520584106
+  },
+  "wall_seconds": 455.2604789733887
+}

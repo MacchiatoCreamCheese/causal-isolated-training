@@ -1,0 +1,25 @@
+{
+  "model": "NeuMF",
+  "dataset": "cellphone",
+  "seed": 123,
+  "recipes": {
+    "uniform": {
+      "HitRatio@20": 0.004515450456985348,
+      "NDCG@20": 0.0011073204663634342,
+      "Recall@20": 0.0030759227997368137,
+      "Train (s)": 1891.9100694656372,
+      "Test (s)": 203.43945026397705,
+      "counterfactual_rate": 0.4406083229962696,
+      "collision_rate": 0.0
+    },
+    "causal": {
+      "HitRatio@20": 0.004787465544755549,
+      "NDCG@20": 0.001226131203623686,
+      "Recall@20": 0.003339460149357873,
+      "Train (s)": 1939.5586569309235,
+      "Test (s)": 205.160902261734,
+      "counterfactual_rate": 0.0,
+      "collision_rate": 1.8504853138242004e-06
+    }
+  }
+}
