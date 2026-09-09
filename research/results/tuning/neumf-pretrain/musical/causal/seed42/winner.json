@@ -1,0 +1,15 @@
+{
+  "model": "neumf",
+  "dataset": "musical",
+  "seed": 42,
+  "recipe": "causal",
+  "select_metric": "NDCG@20",
+  "config": {
+    "num_factors": 64,
+    "mlp_hidden_count": 3,
+    "learning_rate": 0.001,
+    "num_neg": 4,
+    "batch_size": 1024
+  },
+  "metric": 0.013535776633699483
+}
