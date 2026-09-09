@@ -43,7 +43,11 @@ MODEL = ablation_label("NeuMF")
 
 
 def run_one(ds_name: str, seed: int) -> None:
-    recipes_out = load_partial(MODEL, ds_name, seed)
+    # One source for both the constructor and the provenance stamp. These carry
+    # `pretrain` and `learner`, so a pre-trained cell is distinguishable by its
+    # contents as well as by its filename.
+    configs = {r: neumf_kwargs(ds_name, r) for r in RECIPES}
+    recipes_out = load_partial(MODEL, ds_name, seed, configs)
     pending = [r for r in RECIPES if r not in recipes_out]
     if not pending:
         print(f"[skip] {MODEL} {ds_name} seed={seed} all cells cached", flush=True)
@@ -59,7 +63,7 @@ def run_one(ds_name: str, seed: int) -> None:
         t0 = time.time()
         train_set = set_recipe(eval_method, recipe)
         model = NeuMF(name=f"NeuMF/{ds_name}/{recipe}/s{seed}",
-                      seed=seed, verbose=True, **neumf_kwargs(ds_name, recipe))
+                      seed=seed, verbose=True, **configs[recipe])
         exp = cornac.Experiment(
             eval_method=eval_method,
             models=[model],
@@ -72,7 +76,7 @@ def run_one(ds_name: str, seed: int) -> None:
         # being sampled for it.
         metrics = extract_metrics(exp, probe=train_set)
         recipes_out[recipe] = metrics
-        write_partial(MODEL, ds_name, seed, recipes_out)
+        write_partial(MODEL, ds_name, seed, recipes_out, configs)
         print(f"[{recipe}] {metrics}  ({time.time()-t0:.1f}s)  [checkpointed]", flush=True)
 
     print(f"#### {MODEL}/{ds_name}/seed={seed} total: {(time.time()-t_start)/60:.1f} min ####",

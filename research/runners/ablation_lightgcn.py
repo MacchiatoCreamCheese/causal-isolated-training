@@ -40,7 +40,9 @@ MODEL = ablation_label("LightGCN")
 
 
 def run_one(ds_name: str, seed: int) -> None:
-    recipes_out = load_partial(MODEL, ds_name, seed)
+    # One source for both the constructor and the provenance stamp.
+    configs = {r: lightgcn_kwargs(ds_name, r) for r in RECIPES}
+    recipes_out = load_partial(MODEL, ds_name, seed, configs)
     pending = [r for r in RECIPES if r not in recipes_out]
     if not pending:
         print(f"[skip] {MODEL} {ds_name} seed={seed} all cells cached", flush=True)
@@ -57,7 +59,7 @@ def run_one(ds_name: str, seed: int) -> None:
         train_set = set_recipe(eval_method, recipe)
         model = LightGCN(
             name=f"LightGCN/{ds_name}/{recipe}/s{seed}",
-            **lightgcn_kwargs(ds_name, recipe),
+            **configs[recipe],
             seed=seed, verbose=True,
         )
         exp = cornac.Experiment(
@@ -70,7 +72,7 @@ def run_one(ds_name: str, seed: int) -> None:
         exp.run()
         metrics = extract_metrics(exp, probe=train_set)
         recipes_out[recipe] = metrics
-        write_partial(MODEL, ds_name, seed, recipes_out)
+        write_partial(MODEL, ds_name, seed, recipes_out, configs)
         print(f"[{recipe}] {metrics}  ({time.time()-t0:.1f}s)  [checkpointed]", flush=True)
 
     print(f"#### {MODEL}/{ds_name}/seed={seed} total: {(time.time()-t_start)/60:.1f} min ####",

@@ -2,3 +2,19 @@
 === Tuning neumf on baby x uniform x seed=42, selecting on NDCG@20 ===
     -> /mnt/c/Users/nguye/uniyear/causal-isolated-training/research/results/tuning/neumf-pretrain/baby/uniform/seed42
 [baseline] running with defaults: {'num_factors': 8, 'mlp_hidden_count': 3, 'learning_rate': 0.001, 'num_neg': 4, 'batch_size': 256}
+
+VALIDATION:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/baby/uniform/s42 |      0.0216 |  0.0046 |    0.0103 |  36.0864
+
+TEST:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/baby/uniform/s42 |      0.0147 |  0.0032 |    0.0079 |  827.4495 |  20.6233
+
+[baseline] NDCG@20=0.0032  (884.8s)
+
+--- knob: num_factors  grid=[16, 32, 64]  (default carries metric=0.0032) ---

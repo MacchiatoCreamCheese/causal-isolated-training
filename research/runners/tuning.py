@@ -331,6 +331,9 @@ def run_tuning(model_name: str, scope: Scope, restart_from: str = None) -> None:
     # --- Persist final winner ---
     winner_payload = {
         "model": model_name,
+        # The variant is otherwise only in the path, and these files are synced
+        # between machines -- a stray winner.json must still say what produced it.
+        "variant": tuning_model_dir(model_name),
         "dataset": scope.dataset,
         "seed": scope.seed,
         "recipe": scope.recipe,

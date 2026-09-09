@@ -36,21 +36,31 @@ from ..paths import logs_dir
 MODEL = ablation_label("BPR")
 
 
-def build_model(ds_name: str, seed: int, recipe: str):
-    """Every hyperparameter comes off `lib/tuning_config.py`, which is where
-    each one's provenance is recorded -- including the NewBPR §5.2 protocol
-    (up to 1000 epochs, early stopping on NDCG@20 with patience=13; the actual
-    stop epoch is data-dependent). Nothing is spelled out again here, so the
-    runner cannot drift from the inventory that documents it."""
+def cell_configs(ds_name: str):
+    """`{recipe: kwargs}` for one dataset -- the single source for both the model
+    and its provenance stamp, so the config recorded in a result file cannot
+    drift from the one that produced it.
+
+    Every hyperparameter comes off `lib/tuning_config.py`, which is where each
+    one's provenance is recorded -- including the NewBPR §5.2 protocol (up to
+    1000 epochs, early stopping on NDCG@20 with patience=13; the actual stop
+    epoch is data-dependent). BPR_EARLY_STOP is merged in rather than passed
+    separately at the call site, because patience changes the result and so
+    belongs in what gets compared on resume.
+    """
+    return {r: {**bpr_kwargs(ds_name, r), **BPR_EARLY_STOP} for r in RECIPES}
+
+
+def build_model(ds_name: str, seed: int, recipe: str, kwargs: dict):
     return BPRMiniBatch(
         name=f"{ds_name}/{recipe}/s{seed}",
-        **bpr_kwargs(ds_name, recipe), **BPR_EARLY_STOP,
-        sampler=recipe, seed=seed, verbose=False,
+        **kwargs, sampler=recipe, seed=seed, verbose=False,
     )
 
 
 def run_one(ds_name: str, seed: int) -> None:
-    recipes_out = load_partial(MODEL, ds_name, seed)
+    configs = cell_configs(ds_name)
+    recipes_out = load_partial(MODEL, ds_name, seed, configs)
     pending = [r for r in RECIPES if r not in recipes_out]
     if not pending:
         print(f"[skip] {MODEL} {ds_name} seed={seed} all cells cached", flush=True)
@@ -64,7 +74,7 @@ def run_one(ds_name: str, seed: int) -> None:
     for recipe in pending:
         print(f"\n--- {recipe} ---", flush=True)
         t0 = time.time()
-        model = build_model(ds_name, seed, recipe)
+        model = build_model(ds_name, seed, recipe, configs[recipe])
         exp = cornac.Experiment(
             eval_method=eval_method,
             models=[model],
@@ -77,7 +87,7 @@ def run_one(ds_name: str, seed: int) -> None:
         # than off the training split.
         metrics = extract_metrics(exp, probe=model)
         recipes_out[recipe] = metrics
-        write_partial(MODEL, ds_name, seed, recipes_out)
+        write_partial(MODEL, ds_name, seed, recipes_out, configs)
         print(f"[{recipe}] {metrics}  ({time.time()-t0:.1f}s)  [checkpointed]", flush=True)
 
     print(f"#### {MODEL}/{ds_name}/seed={seed} total: {(time.time()-t_start)/60:.1f} min ####",

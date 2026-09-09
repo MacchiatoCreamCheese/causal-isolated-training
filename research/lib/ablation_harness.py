@@ -31,7 +31,7 @@ from typing import Dict
 # Dataset registry lives in data.py now (the generic loader); re-exported here so
 # existing `from ..lib.ablation_harness import DATASETS` call sites keep working.
 from .data import DATASETS  # noqa: F401
-from ..paths import RESULTS_DIR
+from ..paths import PROJECT_ROOT, RESULTS_DIR
 
 OUT_DIR = RESULTS_DIR / "ablation"
 
@@ -89,12 +89,84 @@ def seed_json_path(model: str, dataset: str, seed: int) -> Path:
     return OUT_DIR / f"{model.lower()}_{dataset}_seed{seed}.json"
 
 
-def already_done(model: str, dataset: str, seed: int) -> bool:
-    return seed_json_path(model, dataset, seed).exists()
+_ENV_CACHE = None
 
 
-def load_partial(model: str, dataset: str, seed: int) -> Dict[str, Dict[str, float]]:
-    """Return the recipes dict from a partial/full JSON, or empty if none."""
+def _environment() -> Dict[str, str]:
+    """Library versions, device, and commit that produced a cell.
+
+    **Recorded, never compared.** A torch patch bump must not invalidate a sweep,
+    so this plays no part in the resume decision -- but it is what answers "was
+    this produced under cornac 2.3.5 or 2.6.0, CPU or GPU?" after the fact, which
+    once cost a session of git archaeology because nothing wrote it down.
+
+    Cached: it shells out to git, and `write_partial` runs once per finished
+    recipe.
+    """
+    global _ENV_CACHE
+    if _ENV_CACHE is not None:
+        return _ENV_CACHE
+
+    from .tuning_config import NEUMF_PRETRAIN, TUNED_ARM
+
+    env = {}
+    for mod in ("cornac", "numpy", "scipy", "torch"):
+        try:
+            env[mod] = getattr(__import__(mod), "__version__", "unknown")
+        except Exception:
+            env[mod] = "absent"
+    try:
+        import torch
+        env["device"] = (torch.cuda.get_device_name(0)
+                         if torch.cuda.is_available() else "cpu")
+    except Exception:
+        env["device"] = "unknown"
+    try:
+        import subprocess
+        env["git_commit"] = subprocess.check_output(
+            ["git", "rev-parse", "--short", "HEAD"],
+            cwd=str(PROJECT_ROOT), text=True,
+            stderr=subprocess.DEVNULL).strip()
+    except Exception:
+        env["git_commit"] = "unknown"
+    # The switches that change results without changing any single kwarg.
+    env["tuned_arm"] = TUNED_ARM
+    env["neumf_pretrain"] = NEUMF_PRETRAIN
+    _ENV_CACHE = env
+    return env
+
+
+def _jsonable(config):
+    """Round-trip through JSON so comparisons see what disk sees.
+
+    Without this a live `layers=(64, 32, 16, 8)` never equals the
+    `[64, 32, 16, 8]` that comes back from a stored cell, and every resume would
+    re-run everything.
+    """
+    return json.loads(json.dumps(config, default=str, sort_keys=True))
+
+
+def _config_diff(stored, current):
+    """`[(key, old, new)]` for every key that changed. Empty means a match."""
+    stored, current = _jsonable(stored), _jsonable(current)
+    return [(k, stored.get(k), current.get(k))
+            for k in sorted(set(stored) | set(current))
+            if stored.get(k) != current.get(k)]
+
+
+def load_partial(model: str, dataset: str, seed: int,
+                 configs: Dict[str, dict] = None) -> Dict[str, Dict[str, float]]:
+    """Recipes already computed for this cell, or empty if none.
+
+    `configs` maps recipe -> the settings this run *would* use. Supplied, each
+    stored recipe is kept only if the config that produced it still matches, so a
+    cell tuned under different hyperparameters is re-run instead of silently
+    resumed. Omitted, this is the old existence-only behaviour.
+
+    Per-recipe rather than per-cell because under `RESEARCH_TUNED_ARM=per_arm`
+    the two arms genuinely differ, and because it lets one arm be re-run without
+    discarding the other.
+    """
     path = seed_json_path(model, dataset, seed)
     if not path.exists():
         return {}
@@ -104,18 +176,55 @@ def load_partial(model: str, dataset: str, seed: int) -> Dict[str, Dict[str, flo
         # finished cell — turning a resume into a silent re-run.
         with open(path, encoding="utf-8-sig") as f:
             payload = json.load(f)
-        return payload.get("recipes", {})
     except Exception as e:
         print(f"[warn] could not read checkpoint {path}: {e}", flush=True)
         return {}
 
+    recipes = payload.get("recipes", {})
+    if configs is None or not recipes:
+        return recipes
+
+    stored_cfgs = payload.get("configs") or {}
+    kept = {}
+    for recipe, metrics in recipes.items():
+        current = configs.get(recipe)
+        if current is None:
+            kept[recipe] = metrics
+            continue
+        stored = stored_cfgs.get(recipe)
+        if stored is None:
+            # Written before provenance stamping. Kept rather than discarded:
+            # silently overwriting real results because they predate a feature is
+            # worse than saying so. Move the file aside to force a re-run.
+            print(f"[warn] {path.name} [{recipe}]: no config recorded, cannot "
+                  f"verify it matches current settings — keeping it", flush=True)
+            kept[recipe] = metrics
+            continue
+        diff = _config_diff(stored, current)
+        if diff:
+            print(f"[stale] {path.name} [{recipe}]: config changed, re-running",
+                  flush=True)
+            for key, old, cur in diff:
+                print(f"         {key}: {old!r} -> {cur!r}", flush=True)
+            continue
+        kept[recipe] = metrics
+    return kept
+
 
 def write_partial(model: str, dataset: str, seed: int,
-                  recipes: Dict[str, Dict[str, float]]) -> None:
+                  recipes: Dict[str, Dict[str, float]],
+                  configs: Dict[str, dict] = None) -> None:
     """Atomic write so a kill mid-write does not corrupt the JSON."""
     path = seed_json_path(model, dataset, seed)
     tmp = path.with_suffix(".json.tmp")
-    payload = {"model": model, "dataset": dataset, "seed": seed, "recipes": recipes}
+    payload = {"model": model, "dataset": dataset, "seed": seed,
+               "recipes": recipes}
+    if configs is not None:
+        # Only for recipes actually present, so a partial cell never claims to
+        # have run something it has not.
+        payload["configs"] = {r: _jsonable(c) for r, c in configs.items()
+                              if r in recipes}
+        payload["env"] = _environment()
     with open(tmp, "w", encoding="utf-8") as f:
         json.dump(payload, f, indent=2)
     os.replace(tmp, path)
