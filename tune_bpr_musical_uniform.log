@@ -1,0 +1,23 @@
+
+=== Tuning bpr on musical x uniform x seed=42, selecting on NDCG@20 ===
+    -> /home/reno/causal-isolated-training/research/results/tuning/bpr/musical/uniform/seed42
+[baseline] running with defaults: {'k_embed_dim': 64, 'learning_rate': 0.05, 'lambda_shared': 0.0001, 'batch_size': 4096, 'n_epochs': 1000}
+Early stopping:
+- best epoch = 36, stopped epoch = 49
+- best monitored value = 0.016409 (delta = -0.000400)
+
+VALIDATION:
+...
+                             | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/musical/uniform/s42 |      0.0646 |  0.0160 |    0.0311 |   5.1046
+
+TEST:
+...
+                             | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/musical/uniform/s42 |      0.0485 |  0.0124 |    0.0249 |  289.4223 |   5.3615
+
+[baseline] NDCG@20=0.0124  (300.0s)
+
+--- knob: k_embed_dim  grid=[32, 128, 256]  (default carries metric=0.0124) ---

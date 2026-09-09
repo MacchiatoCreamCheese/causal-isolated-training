@@ -1,0 +1,25 @@
+{
+  "model": "BPR",
+  "dataset": "cellphone",
+  "seed": 123,
+  "recipes": {
+    "uniform": {
+      "HitRatio@20": 0.013056724212969679,
+      "NDCG@20": 0.004282390186049624,
+      "Recall@20": 0.009202570007033147,
+      "Train (s)": 4695.58472776413,
+      "Test (s)": 103.03899693489075,
+      "counterfactual_rate": 0.4405939340445194,
+      "collision_rate": 0.0
+    },
+    "causal": {
+      "HitRatio@20": 0.02290367039025098,
+      "NDCG@20": 0.006220784422342802,
+      "Recall@20": 0.0165505956897825,
+      "Train (s)": 4616.528805732727,
+      "Test (s)": 116.71008396148682,
+      "counterfactual_rate": 0.0,
+      "collision_rate": 1.8863254982917436e-06
+    }
+  }
+}

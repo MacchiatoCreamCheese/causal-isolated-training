@@ -1,0 +1,25 @@
+{
+  "model": "BPR",
+  "dataset": "musical",
+  "seed": 42,
+  "recipes": {
+    "uniform": {
+      "HitRatio@20": 0.048527408028508544,
+      "NDCG@20": 0.012403053260382671,
+      "Recall@20": 0.02491447477219329,
+      "Train (s)": 293.33167719841003,
+      "Test (s)": 4.203521728515625,
+      "counterfactual_rate": 0.3320284943752455,
+      "collision_rate": 0.0
+    },
+    "causal": {
+      "HitRatio@20": 0.06099989518918352,
+      "NDCG@20": 0.01605295325408786,
+      "Recall@20": 0.032993715700966854,
+      "Train (s)": 310.649222612381,
+      "Test (s)": 4.446772813796997,
+      "counterfactual_rate": 0.0,
+      "collision_rate": 7.144858730415223e-06
+    }
+  }
+}
