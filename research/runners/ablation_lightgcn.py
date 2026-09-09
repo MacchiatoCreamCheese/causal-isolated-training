@@ -29,9 +29,7 @@ from ..lib.ablation_harness import (
 # He 2020 §4.1.2, with each value's provenance recorded alongside it. Imported
 # rather than restated: `runners/tuning.py` needs the same three constants, and
 # it used to reach them by importing this runner.
-from ..lib.tuning_config import (
-    LIGHTGCN_BATCH, LIGHTGCN_EARLY_STOP, LIGHTGCN_EPOCHS,
-)
+from ..lib.tuning_config import lightgcn_kwargs
 from ..paths import logs_dir
 
 
@@ -53,10 +51,7 @@ def run_one(ds_name: str, seed: int) -> None:
         train_set = set_recipe(eval_method, recipe)
         model = LightGCN(
             name=f"LightGCN/{ds_name}/{recipe}/s{seed}",
-            emb_size=64, num_layers=3, learning_rate=1e-3, lambda_reg=1e-4,
-            batch_size=LIGHTGCN_BATCH.get(ds_name, 1024),
-            num_epochs=LIGHTGCN_EPOCHS,
-            early_stopping=LIGHTGCN_EARLY_STOP,
+            **lightgcn_kwargs(ds_name, recipe),
             seed=seed, verbose=True,
         )
         exp = cornac.Experiment(

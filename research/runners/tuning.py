@@ -1,12 +1,20 @@
 """Coordinate-descent hyperparameter tuning for BPR / NeuMF / LightGCN.
 
-Scope (per plan):
-  - Dataset:  baby
-  - Recipe:   uniform (vanilla baseline cell)
-  - Seed:     42
+Scope is chosen per invocation via --dataset / --recipe / --seed, defaulting to
+the historical `baby / uniform / 42` cell:
+  - Dataset:  any key in lib/data.py:DATASETS
+  - Recipe:   uniform (the vanilla arm) or causal
+  - Seed:     42 by default
   - Metric:   NDCG@20 (TOP_K from research.lib.causal_sampling)
   - Method:   coordinate descent over knobs declared in
               research/lib/tuning_config.py:TUNE_ORDER, knob order = most-impactful first.
+
+**Which arm to tune on.** Tuning under `uniform` keeps hyperparameters from being
+chosen under the mechanism being evaluated, which is what makes the ablation a
+single-variable comparison. Sweeping `causal` as well is supported so the two
+arms can also be compared each at its own best -- but that is a separate
+deployment question, not the ablation, and the two must not be mixed in one
+table. See the plan notes in the repo for how the winners are meant to be applied.
 
 For each model:
   1. Run baseline at defaults (research/lib/tuning_config.py:BASELINE_CONFIG).
@@ -16,58 +24,91 @@ For each model:
        - Fix knob at the winner value; carry forward.
   3. Write winner.json.
 
-Per-trial JSON layout:  research/results/tuning/<model>/<knob>/<value>.json
-Baseline:              research/results/tuning/<model>/baseline.json
-Final winner:          research/results/tuning/<model>/winner.json
+Output layout, one tree per (model, dataset, recipe, seed) cell:
 
-Re-running is idempotent: existing trial JSONs are skipped.
+    research/results/tuning/<model>/<dataset>/<recipe>/seed<n>/baseline.json
+    research/results/tuning/<model>/<dataset>/<recipe>/seed<n>/<knob>/<value>.json
+    research/results/tuning/<model>/<dataset>/<recipe>/seed<n>/winner.json
+
+The scope is in the *path*, not just inside the files, and that is load-bearing:
+re-running is idempotent because a cached trial JSON is skipped, so a layout that
+omitted the dataset would let a second dataset silently adopt the first one's
+trials and report them as its own -- printing `[skip] ... [cached]` the whole way
+and looking perfectly healthy. Anything written under the older flat
+`<model>/<knob>/` layout carries no record of which dataset produced it and must
+be deleted rather than migrated.
 
 Usage:
     python -m research.runners.tuning --model lightgcn
-    python -m research.runners.tuning --model neumf
-    python -m research.runners.tuning --model bpr
-    python -m research.runners.tuning --model lightgcn --restart-from lambda_reg
+    python -m research.runners.tuning --model neumf --dataset musical
+    python -m research.runners.tuning --model bpr --dataset cellphone --recipe causal
+    python -m research.runners.tuning --model neumf --restart-from learning_rate
 """
 
 import argparse
 import json
 import os
 import time
+from dataclasses import dataclass
 from pathlib import Path
 
 import cornac
 from cornac.metrics import NDCG, HitRatio, Recall
 
 from ..lib.causal_sampling import TOP_K
-from ..lib.data import build_eval_method
+from ..lib.data import DATASETS, build_eval_method
+from ..lib.timeaware_data import NEG_SAMPLING_MODES
 from ..lib.tuning_config import TUNE_ORDER, BASELINE_CONFIG, BPR_EARLY_STOP
 from ..paths import logs_dir, RESULTS_DIR
 
 
 TUNE_DIR = RESULTS_DIR / "tuning"
-TUNE_DATASET = "baby"
-TUNE_SEED = 42
-TUNE_RECIPE = "uniform"
 SELECT_METRIC = f"NDCG@{TOP_K}"
+
+# CLI defaults -- the cell this tuner used to be hardcoded to.
+DEFAULT_DATASET = "baby"
+DEFAULT_SEED = 42
+DEFAULT_RECIPE = "uniform"
+
+
+@dataclass(frozen=True)
+class Scope:
+    """Which (dataset, arm, seed) cell a tuning run belongs to.
+
+    Passed around rather than read from module globals so one process can tune
+    several cells, and -- more importantly -- so `dir()` below can put all three
+    into the output path. Frozen because it keys the on-disk layout.
+    """
+
+    dataset: str
+    recipe: str
+    seed: int
+
+    def dir(self, model_name: str) -> Path:
+        return TUNE_DIR / model_name / self.dataset / self.recipe / f"seed{self.seed}"
+
+    def __str__(self) -> str:
+        return f"{self.dataset} x {self.recipe} x seed={self.seed}"
 
 
 # ---------------------------------------------------------------------------
 # Model construction — one builder per model, taking the running config dict.
 # ---------------------------------------------------------------------------
 
-def _build_model(model_name: str, config: dict, seed: int):
+def _build_model(model_name: str, config: dict, scope: Scope):
+    seed = scope.seed
     if model_name == "lightgcn":
         from cornac.models import LightGCN
         from ..lib.tuning_config import (
             LIGHTGCN_BATCH, LIGHTGCN_EARLY_STOP, LIGHTGCN_EPOCHS,
         )
         return LightGCN(
-            name=f"LightGCN/tune/{TUNE_DATASET}/s{seed}",
+            name=f"LightGCN/tune/{scope.dataset}/{scope.recipe}/s{seed}",
             emb_size=64,
             num_layers=int(config["num_layers"]),
             learning_rate=float(config["learning_rate"]),
             lambda_reg=float(config["lambda_reg"]),
-            batch_size=LIGHTGCN_BATCH[TUNE_DATASET],
+            batch_size=LIGHTGCN_BATCH[scope.dataset],
             num_epochs=LIGHTGCN_EPOCHS,
             early_stopping=LIGHTGCN_EARLY_STOP,
             seed=seed,
@@ -77,12 +118,9 @@ def _build_model(model_name: str, config: dict, seed: int):
     if model_name == "neumf":
         # Persistence shim: see lib/cornac_compat.py:NeuMF.
         from ..lib.cornac_compat import NeuMF
-        from ..lib.tuning_config import NEUMF_KWARGS
+        from ..lib.tuning_config import NEUMF_KWARGS, neumf_layers
         num_factors = int(config["num_factors"])
-        hidden = int(config["mlp_hidden_count"])
-        # Tower-halving with layers[-1] == num_factors (He 2017 §3.3).
-        # hidden=3 ⇒ (num_factors*8, *4, *2, *1) = (64,32,16,8) when num_factors=8.
-        layers = tuple(num_factors * (2 ** i) for i in range(hidden, -1, -1))
+        layers = neumf_layers(num_factors, int(config["mlp_hidden_count"]))
         kwargs = dict(NEUMF_KWARGS)
         kwargs.update(
             num_factors=num_factors,
@@ -92,7 +130,7 @@ def _build_model(model_name: str, config: dict, seed: int):
             num_neg=int(config["num_neg"]),
         )
         return NeuMF(
-            name=f"NeuMF/tune/{TUNE_DATASET}/s{seed}",
+            name=f"NeuMF/tune/{scope.dataset}/{scope.recipe}/s{seed}",
             seed=seed,
             verbose=False,
             **kwargs,
@@ -100,16 +138,22 @@ def _build_model(model_name: str, config: dict, seed: int):
 
     if model_name == "bpr":
         from ..lib.bpr_cpu import BPRMiniBatch
+        # One tied lambda fanned out to all three. NewBPR §5.2's claim is that
+        # *separated* lambdas matter, which is a claim about their interaction --
+        # and coordinate descent tunes each with the others pinned, so it can
+        # never visit that joint optimum. Sweeping one tied value is the honest
+        # reduction; see BPR["lambda_shared"] in lib/tuning_config.py.
+        lam = float(config["lambda_shared"])
         return BPRMiniBatch(
-            name=f"BPR/tune/{TUNE_DATASET}/s{seed}",
+            name=f"BPR/tune/{scope.dataset}/{scope.recipe}/s{seed}",
             k=int(config["k_embed_dim"]),
             batch_size=int(config["batch_size"]),
             learning_rate=float(config["learning_rate"]),
-            lambda_u=float(config["lambda_u"]),
-            lambda_i=float(config["lambda_i"]),
-            lambda_j=float(config["lambda_j"]),
+            lambda_u=lam,
+            lambda_i=lam,
+            lambda_j=lam,
             n_epochs=int(config["n_epochs"]),
-            sampler=TUNE_RECIPE,
+            sampler=scope.recipe,
             **BPR_EARLY_STOP,
             seed=seed,
             verbose=False,
@@ -128,20 +172,20 @@ def _value_slug(value) -> str:
              .replace("(", "").replace(")", "").replace(",", "_").replace(" ", ""))
 
 
-def _trial_path(model_name: str, knob: str, value) -> Path:
-    d = TUNE_DIR / model_name / knob
+def _trial_path(model_name: str, scope: Scope, knob: str, value) -> Path:
+    d = scope.dir(model_name) / knob
     d.mkdir(parents=True, exist_ok=True)
     return d / f"{_value_slug(value)}.json"
 
 
-def _baseline_path(model_name: str) -> Path:
-    d = TUNE_DIR / model_name
+def _baseline_path(model_name: str, scope: Scope) -> Path:
+    d = scope.dir(model_name)
     d.mkdir(parents=True, exist_ok=True)
     return d / "baseline.json"
 
 
-def _winner_path(model_name: str) -> Path:
-    return TUNE_DIR / model_name / "winner.json"
+def _winner_path(model_name: str, scope: Scope) -> Path:
+    return scope.dir(model_name) / "winner.json"
 
 
 def _write_json(path: Path, payload: dict) -> None:
@@ -160,9 +204,9 @@ def _load_json(path: Path) -> dict:
 # Trial runner.
 # ---------------------------------------------------------------------------
 
-def _train_once(model_name: str, config: dict, eval_method) -> tuple:
+def _train_once(model_name: str, config: dict, eval_method, scope: Scope) -> tuple:
     """Build the model, run cornac.Experiment, return (metrics_dict, wall_seconds)."""
-    model = _build_model(model_name, config, TUNE_SEED)
+    model = _build_model(model_name, config, scope)
     exp = cornac.Experiment(
         eval_method=eval_method,
         models=[model],
@@ -179,33 +223,34 @@ def _train_once(model_name: str, config: dict, eval_method) -> tuple:
     return metrics, wall
 
 
-def _build_eval_method():
-    # Tuning happens on the vanilla arm so the chosen hyperparameters are not
-    # picked under the mechanism being evaluated.
-    return build_eval_method(TUNE_DATASET, neg_sampling=TUNE_RECIPE,
-                             seed=TUNE_SEED)
+def _build_eval_method(scope: Scope):
+    # The default arm is `uniform` so hyperparameters are not chosen under the
+    # mechanism being evaluated -- see the note in the module docstring.
+    return build_eval_method(scope.dataset, neg_sampling=scope.recipe,
+                             seed=scope.seed)
 
 
 # ---------------------------------------------------------------------------
 # Coordinate-descent loop.
 # ---------------------------------------------------------------------------
 
-def run_tuning(model_name: str, restart_from: str = None) -> None:
-    print(f"\n=== Tuning {model_name} on {TUNE_DATASET} × {TUNE_RECIPE} "
-          f"× seed={TUNE_SEED}, selecting on {SELECT_METRIC} ===", flush=True)
+def run_tuning(model_name: str, scope: Scope, restart_from: str = None) -> None:
+    print(f"\n=== Tuning {model_name} on {scope}, "
+          f"selecting on {SELECT_METRIC} ===", flush=True)
+    print(f"    -> {scope.dir(model_name)}", flush=True)
 
-    eval_method = _build_eval_method()
+    eval_method = _build_eval_method(scope)
     config = dict(BASELINE_CONFIG[model_name])
 
     # --- Baseline ---
-    bpath = _baseline_path(model_name)
+    bpath = _baseline_path(model_name, scope)
     if bpath.exists():
         baseline = _load_json(bpath)
         print(f"[baseline] cached: {SELECT_METRIC}="
               f"{baseline['metrics'][SELECT_METRIC]:.4f}", flush=True)
     else:
         print(f"[baseline] running with defaults: {config}", flush=True)
-        metrics, wall = _train_once(model_name, config, eval_method)
+        metrics, wall = _train_once(model_name, config, eval_method, scope)
         baseline = {"config": dict(config), "metrics": metrics, "wall_seconds": wall}
         _write_json(bpath, baseline)
         print(f"[baseline] {SELECT_METRIC}={metrics[SELECT_METRIC]:.4f}  "
@@ -225,7 +270,8 @@ def run_tuning(model_name: str, restart_from: str = None) -> None:
                 break
             # Reuse cached trials to pick the winner without retraining.
             winner_v, winner_m = _resolve_cached_winner(
-                model_name, knob, prev_winner_config[knob], prev_winner_metric)
+                model_name, scope, knob, prev_winner_config[knob],
+                prev_winner_metric)
             config[knob] = winner_v
             prev_winner_config = dict(config)
             prev_winner_metric = winner_m
@@ -242,7 +288,7 @@ def run_tuning(model_name: str, restart_from: str = None) -> None:
 
         results = []  # list of (value, metric)
         for value in grid:
-            tpath = _trial_path(model_name, knob, value)
+            tpath = _trial_path(model_name, scope, knob, value)
             if tpath.exists():
                 trial = _load_json(tpath)
                 m = float(trial["metrics"][SELECT_METRIC])
@@ -251,7 +297,8 @@ def run_tuning(model_name: str, restart_from: str = None) -> None:
             else:
                 trial_config = dict(config)
                 trial_config[knob] = value
-                metrics, wall = _train_once(model_name, trial_config, eval_method)
+                metrics, wall = _train_once(model_name, trial_config,
+                                            eval_method, scope)
                 trial = {
                     "knob": knob,
                     "value": value,
@@ -279,25 +326,25 @@ def run_tuning(model_name: str, restart_from: str = None) -> None:
     # --- Persist final winner ---
     winner_payload = {
         "model": model_name,
-        "dataset": TUNE_DATASET,
-        "seed": TUNE_SEED,
-        "recipe": TUNE_RECIPE,
+        "dataset": scope.dataset,
+        "seed": scope.seed,
+        "recipe": scope.recipe,
         "select_metric": SELECT_METRIC,
         "config": prev_winner_config,
         "metric": prev_winner_metric,
     }
-    _write_json(_winner_path(model_name), winner_payload)
-    print(f"\n=== {model_name} winner: {prev_winner_config}  "
+    _write_json(_winner_path(model_name, scope), winner_payload)
+    print(f"\n=== {model_name} [{scope}] winner: {prev_winner_config}  "
           f"{SELECT_METRIC}={prev_winner_metric:.4f} ===\n", flush=True)
 
 
-def _resolve_cached_winner(model_name: str, knob: str, default_value,
-                           default_metric: float):
+def _resolve_cached_winner(model_name: str, scope: Scope, knob: str,
+                           default_value, default_metric: float):
     """For --restart-from: replay a knob's winner from cached trial JSONs."""
     grid = dict(TUNE_ORDER[model_name])[knob]
     candidates = [(default_value, default_metric)]
     for value in grid:
-        tpath = _trial_path(model_name, knob, value)
+        tpath = _trial_path(model_name, scope, knob, value)
         if not tpath.exists():
             raise SystemExit(
                 f"cannot --restart-from past {knob!r}: "
@@ -316,11 +363,20 @@ def main():
     p.add_argument("--model", required=True,
                    choices=sorted(TUNE_ORDER.keys()),
                    help="Which model to tune.")
+    p.add_argument("--dataset", default=DEFAULT_DATASET, choices=sorted(DATASETS),
+                   help=f"Dataset key (default: {DEFAULT_DATASET}).")
+    p.add_argument("--recipe", default=DEFAULT_RECIPE, choices=list(NEG_SAMPLING_MODES),
+                   help=f"Sampling arm to tune under (default: {DEFAULT_RECIPE}). "
+                        "Tuning on 'uniform' keeps hyperparameters from being "
+                        "chosen under the mechanism being evaluated.")
+    p.add_argument("--seed", type=int, default=DEFAULT_SEED,
+                   help=f"Seed for the split and the model (default: {DEFAULT_SEED}).")
     p.add_argument("--restart-from", default=None,
                    help="Knob name to resume from. Earlier knobs' winners are "
                         "resolved from cached trial JSONs without retraining.")
     args = p.parse_args()
-    run_tuning(args.model, restart_from=args.restart_from)
+    scope = Scope(dataset=args.dataset, recipe=args.recipe, seed=args.seed)
+    run_tuning(args.model, scope, restart_from=args.restart_from)
 
 
 if __name__ == "__main__":

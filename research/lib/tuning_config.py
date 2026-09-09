@@ -31,6 +31,12 @@ References:
                Milogradskii et al., RecSys '24 (NewBPR.pdf)
 """
 
+import json
+import os
+
+from ..paths import RESULTS_DIR
+
+
 # ===========================================================================
 # LightGCN
 # ===========================================================================
@@ -119,9 +125,9 @@ LIGHTGCN = {
     },
     "lambda_reg": {
         "current": 1e-4,
-        "status": "PAPER_GRID",
-        "grid": [1e-6, 1e-5, 1e-4, 1e-3, 1e-2],
+        "status": "PAPER_FIXED",
         "source": "He 2020 §4.1.2: 'L2 regularization coefficient λ is searched in the range of {1e-6, 1e-5, ..., 1e-2}, and in most cases the optimal value is 1e-4'",
+        "notes": "Adopted, not re-searched. The paper ran this grid and published 1e-4 as the answer; repeating it on our most expensive model would only reproduce a known result. Was PAPER_GRID and swept by TUNE_ORDER until 2026-09-09 -- dropping it removed 4 of LightGCN's 10 trials. He 2020 §4.5 does call λ 'the most important hyper-parameter to tune', so revisit if LightGCN underperforms on a dataset unlike theirs.",
     },
     "batch_size_musical": {
         "current": 1024,
@@ -351,6 +357,7 @@ BPR = {
         "current": 64,
         "status": "EYEBALL",
         "source": "Claude. Rendle 2009 doesn't fix k. Cornac default k=10. NewBPR §4.1.7 grid for ML-20M-time-split / Yelp: {32, 64, 128, 256, 512, 1024}; Cornac's best in their study was 512–1024.",
+        "notes": "TUNE_ORDER caps the sweep at 256, so 512 and 1024 -- where NewBPR reports cornac's best -- are NOT searched. A documented ceiling, not a completed search. k is swept first under coordinate descent, so its winner sets the per-trial cost of every later BPR trial; capping bounds those at 4x the k=64 baseline instead of 16x, which is where the saving comes from.",
     },
     "use_bias": {
         "current": False,
@@ -385,11 +392,19 @@ BPR = {
         "status": "PAPER_FIXED",
         "source": "NewBPR §5.2/§5.3 finds three separate (λu, λi, λj) best for global temporal split.",
     },
+    "lambda_shared": {
+        "current": 1e-4,
+        "status": "EYEBALL",
+        "grid": [1e-6, 1e-5, 1e-4, 1e-3, 1e-2],
+        "source": "Claude. One lambda tied across lambda_u/lambda_i/lambda_j, which is what TUNE_ORDER actually sweeps.",
+        "notes": "NewBPR §5.2's claim is that *separated* lambdas matter -- a claim about how the three interact. Coordinate descent cannot test it: it tunes each with the other two pinned, so it never visits the joint optimum the paper is describing. Sweeping all three that way cost 12 of BPR's 18 trials and answered a different question than the one asked. Tuning one tied lambda is the honest reduction; a real test of NewBPR's claim needs a joint search (random/Optuna), which is a separate piece of work. `_build_model` fans this value out to all three constructor arguments.",
+    },
     "lambda_u": {
         "current": 1e-4,
         "status": "PAPER_GRID",
         "grid": [1e-6, 1e-5, 1e-4, 1e-3, 1e-2],
         "source": "NewBPR §5.2: 'distinct regularization lambdas for users, positive and negative items, are crucial for specific datasets'. Range adapted from LightGCN §4.1.2 grid that NewBPR also references.",
+        "notes": "Tied to lambda_i/lambda_j during tuning -- see lambda_shared. The separated form is still what BPR_KWARGS passes and what the model supports.",
     },
     "lambda_i": {
         "current": 1e-4,
@@ -482,27 +497,35 @@ BPR = {
 # For each model, tune knobs in the listed order. The grid for each knob OMITS
 # the current default so the baseline run is reused. See research/tune.py.
 
+# Trimmed 2026-09-09 from 48 to 26 trials per (dataset, arm) cell so the full
+# 3-dataset x 2-arm sweep is ~4 days rather than ~9. Every knob dropped below is
+# one the source paper already answers; each entry's "notes" in the inventory
+# above records which sentence, so the omissions are citable rather than silent.
 TUNE_ORDER = {
     "lightgcn": [
-        # He 2020 §4.5: "the most important hyper-parameter to tune is λ".
-        ("lambda_reg",    [1e-6, 1e-5, 1e-3, 1e-2]),     # default 1e-4
+        # lambda_reg is NOT swept: He 2020 §4.1.2 ran exactly this grid and
+        # published 1e-4, which is already the default -- see LIGHTGCN["lambda_reg"].
+        # learning_rate is NOT swept: PAPER_DEFAULT, He 2020 does not search it.
         ("num_layers",    [1, 2, 4]),                    # default 3
-        ("learning_rate", [1e-4, 5e-4, 5e-3]),           # default 1e-3
     ],
     "neumf": [
+        # num_factors is the one that matters: 8 against BPR/LightGCN's 64 is the
+        # likeliest reason NeuMF scores ~1/3 of LightGCN's HR@20.
         ("num_factors",      [16, 32, 64]),              # default 8
-        ("mlp_hidden_count", [1, 2, 4]),                 # default 3 (skip 0 — degenerate tower)
+        ("mlp_hidden_count", [4]),                       # default 3; He 2017 §4.4: "MLP-4 generally best"
         ("learning_rate",    [1e-4, 5e-4, 5e-3]),        # default 1e-3
-        ("num_neg",          [3, 5, 6]),                 # default 4
+        # num_neg is NOT swept: He 2017 Fig 7 puts the optimum at 3-6 and the
+        # default of 4 is already inside that band, while cost scales with it.
         ("batch_size",       [128, 512, 1024]),          # default 256
     ],
     "bpr": [
-        ("k_embed_dim",   [32, 128, 256, 512, 1024]),    # default 64
+        # Capped at 256; 512/1024 (NewBPR's best for cornac) are not searched.
+        # k is swept first, so its winner sets the cost of every later BPR trial.
+        ("k_embed_dim",   [32, 128, 256]),               # default 64
         ("learning_rate", [1e-3, 1e-2, 1e-1]),           # default 0.05
-        # NewBPR §5.3: λu, λi, λj are tuned independently.
-        ("lambda_u",      [1e-6, 1e-5, 1e-3, 1e-2]),     # default 1e-4
-        ("lambda_i",      [1e-6, 1e-5, 1e-3, 1e-2]),     # default 1e-4
-        ("lambda_j",      [1e-6, 1e-5, 1e-3, 1e-2]),     # default 1e-4
+        # One tied lambda, not three: coordinate descent cannot test NewBPR
+        # §5.2's *interaction* claim. See BPR["lambda_shared"].
+        ("lambda_shared", [1e-6, 1e-5, 1e-3, 1e-2]),     # default 1e-4
         # n_epochs is the budget ceiling (1000); early stopping picks the stop.
     ],
 }
@@ -527,9 +550,8 @@ BASELINE_CONFIG = {
     "bpr": {
         "k_embed_dim":   BPR["k_embed_dim"]["current"],
         "learning_rate": BPR["learning_rate"]["current"],
-        "lambda_u":      BPR["lambda_u"]["current"],
-        "lambda_i":      BPR["lambda_i"]["current"],
-        "lambda_j":      BPR["lambda_j"]["current"],
+        # One tied value; _build_model fans it out to lambda_u/i/j.
+        "lambda_shared": BPR["lambda_shared"]["current"],
         "batch_size":    BPR["batch_size"]["current"],
         # n_epochs is the ceiling; we set it via BPR_EARLY_STOP, not tuned.
         "n_epochs":      BPR["n_epochs"]["current"],
@@ -606,3 +628,120 @@ NEUMF_KWARGS = dict(
     num_neg=NEUMF["num_neg"]["current"],
     backend="pytorch",
 )
+
+
+# ===========================================================================
+# Applying tuned winners
+# ===========================================================================
+#
+# `runners/tuning.py` writes one winner per (model, dataset, arm, seed) to
+#   results/tuning/<model>/<dataset>/<recipe>/seed<n>/winner.json
+# The helpers below read those back so the ablation runners can use them, and
+# fall back to the `"current"` values above whenever a cell has not been tuned --
+# so the runners work identically before and after a sweep.
+#
+# WHICH ARM'S WINNERS TO APPLY is a methodological choice, not a detail:
+#
+#   "uniform" (default) -- both arms run at the *uniform* arm's hyperparameters.
+#       The arms then differ in exactly one thing, the negative-item pool, so any
+#       accuracy difference is attributable to the sampler. This is the ablation
+#       the paper's claim rests on.
+#
+#   "per_arm" -- each arm runs at its own winners. A legitimate question ("which
+#       method is better when each is deployed properly?") but a different one:
+#       two things now differ, so the comparison is a benchmark, not an ablation.
+#       Report it as a separate table; never merge the two.
+#
+# Selected by RESEARCH_TUNED_ARM so the secondary experiment needs no code edit.
+
+TUNED_ARM = os.environ.get("RESEARCH_TUNED_ARM", "uniform")
+TUNING_SEED = 42
+
+
+def _tuning_source(recipe: str) -> str:
+    """Which arm's winners apply to a cell running `recipe`. See TUNED_ARM."""
+    return recipe if TUNED_ARM == "per_arm" else TUNED_ARM
+
+
+def winner_config(model: str, dataset: str, recipe: str, seed: int = TUNING_SEED):
+    """Tuned config for one cell, or None if it was never tuned.
+
+    Returns the `config` dict `runners/tuning.py` wrote, which carries every key
+    in that model's BASELINE_CONFIG -- including knobs the sweep did not touch,
+    since coordinate descent starts from the baseline and only overwrites what it
+    sweeps. Callers can therefore read any baseline key off it unconditionally.
+    """
+    path = (RESULTS_DIR / "tuning" / model / dataset / _tuning_source(recipe)
+            / f"seed{seed}" / "winner.json")
+    if not path.exists():
+        return None
+    with open(path, encoding="utf-8-sig") as f:
+        return json.load(f)["config"]
+
+
+def neumf_layers(num_factors: int, hidden: int) -> tuple:
+    """He 2017 §3.3 tower-halving, with layers[-1] == num_factors.
+
+    hidden=3, num_factors=8 -> (64, 32, 16, 8). Shared by the tuner and the
+    ablation runner so a tuned `mlp_hidden_count` means the same thing in both.
+    """
+    return tuple(num_factors * (2 ** i) for i in range(hidden, -1, -1))
+
+
+def bpr_kwargs(dataset: str, recipe: str) -> dict:
+    """BPRMiniBatch ctor kwargs, tuned if available. Pair with BPR_EARLY_STOP."""
+    w = winner_config("bpr", dataset, recipe)
+    if w is None:
+        return dict(BPR_KWARGS)
+    lam = float(w["lambda_shared"])
+    return dict(
+        k=int(w["k_embed_dim"]),
+        batch_size=int(w["batch_size"]),
+        learning_rate=float(w["learning_rate"]),
+        lambda_u=lam, lambda_i=lam, lambda_j=lam,
+        n_epochs=int(w["n_epochs"]),
+    )
+
+
+def neumf_kwargs(dataset: str, recipe: str) -> dict:
+    """cornac NeuMF ctor kwargs, tuned if available."""
+    w = winner_config("neumf", dataset, recipe)
+    if w is None:
+        return dict(NEUMF_KWARGS)
+    num_factors = int(w["num_factors"])
+    kwargs = dict(NEUMF_KWARGS)
+    kwargs.update(
+        num_factors=num_factors,
+        layers=neumf_layers(num_factors, int(w["mlp_hidden_count"])),
+        batch_size=int(w["batch_size"]),
+        lr=float(w["learning_rate"]),
+        num_neg=int(w["num_neg"]),
+    )
+    return kwargs
+
+
+def lightgcn_kwargs(dataset: str, recipe: str) -> dict:
+    """cornac LightGCN ctor kwargs, tuned if available.
+
+    batch_size is per-dataset from the inventory and is not a tuned knob, so it
+    comes from LIGHTGCN_BATCH either way.
+    """
+    base = dict(
+        emb_size=LIGHTGCN["emb_size"]["current"],
+        num_layers=LIGHTGCN["num_layers"]["current"],
+        learning_rate=LIGHTGCN["learning_rate"]["current"],
+        lambda_reg=LIGHTGCN["lambda_reg"]["current"],
+    )
+    w = winner_config("lightgcn", dataset, recipe)
+    if w is not None:
+        base.update(
+            num_layers=int(w["num_layers"]),
+            learning_rate=float(w["learning_rate"]),
+            lambda_reg=float(w["lambda_reg"]),
+        )
+    base.update(
+        batch_size=LIGHTGCN_BATCH.get(dataset, 1024),
+        num_epochs=LIGHTGCN_EPOCHS,
+        early_stopping=LIGHTGCN_EARLY_STOP,
+    )
+    return base

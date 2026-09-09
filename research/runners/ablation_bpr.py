@@ -26,7 +26,7 @@ from ..lib.data import build_eval_method
 from ..lib.ablation_harness import (
     RECIPES, parse_args, extract_metrics, load_partial, write_partial,
 )
-from ..lib.tuning_config import BPR_EARLY_STOP, BPR_KWARGS
+from ..lib.tuning_config import BPR_EARLY_STOP, bpr_kwargs
 from ..paths import logs_dir
 
 
@@ -38,7 +38,7 @@ def build_model(ds_name: str, seed: int, recipe: str):
     runner cannot drift from the inventory that documents it."""
     return BPRMiniBatch(
         name=f"{ds_name}/{recipe}/s{seed}",
-        **BPR_KWARGS, **BPR_EARLY_STOP,
+        **bpr_kwargs(ds_name, recipe), **BPR_EARLY_STOP,
         sampler=recipe, seed=seed, verbose=False,
     )
 

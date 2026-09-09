@@ -27,7 +27,7 @@ from cornac.metrics import NDCG, HitRatio, Recall
 from ..lib.causal_sampling import TOP_K
 from ..lib.cornac_compat import NeuMF
 from ..lib.data import build_eval_method
-from ..lib.tuning_config import NEUMF_KWARGS
+from ..lib.tuning_config import neumf_kwargs
 from ..lib.ablation_harness import (
     RECIPES, parse_args, extract_metrics, load_partial, write_partial, set_recipe,
 )
@@ -53,7 +53,7 @@ def run_one(ds_name: str, seed: int) -> None:
         t0 = time.time()
         train_set = set_recipe(eval_method, recipe)
         model = NeuMF(name=f"NeuMF/{ds_name}/{recipe}/s{seed}",
-                             seed=seed, verbose=True, **NEUMF_KWARGS)
+                      seed=seed, verbose=True, **neumf_kwargs(ds_name, recipe))
         exp = cornac.Experiment(
             eval_method=eval_method,
             models=[model],
