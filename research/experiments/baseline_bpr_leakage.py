@@ -28,10 +28,18 @@ between the two is the headline number for the data-side fix.
 Phase 2+ will attack the residual TRAINING-time leakage: even inside a
 clean TimestampSplit, batch BPR shares parameters across the training
 timeline, so a row at t1 is implicitly informed by a row at t2 > t1.
+
+This is an experiment, not a self-test: it trains three real cornac BPR
+models on the baby CSV, takes minutes, and prints numbers to be read rather
+than a pass/fail. It also asks a different question from the rest of the
+package -- evaluation-time leakage as a function of the *split*, where the
+ablation studies training-time leakage as a function of the *sampler*. It
+lived in `smoke/` until 2026-09-09 for historical reasons.
+
+Usage:  python -m research.experiments.baseline_bpr_leakage
 """
 
-import csv
-from typing import Dict, List, Tuple
+from typing import Dict
 
 import numpy as np
 
@@ -39,33 +47,16 @@ import cornac
 from cornac.eval_methods import RatioSplit, StratifiedSplit, TimestampSplit
 from cornac.metrics import NDCG, HitRatio, Recall
 
-from ..paths import logs_dir, data_path
+from ..lib.causal_sampling import item_first_seen
+from ..lib.data import dataset_path, load_uirt
+from ..paths import logs_dir
 
 
-DATASET_CSV = data_path("baby_dataset", "Baby_Products.csv")
+DATASET_CSV = dataset_path("baby")
 VAL_TIMESTAMP = 1628643414042
 TEST_TIMESTAMP = 1658002729837
 TOP_K = 20
 BPR_KWARGS = dict(k=64, max_iter=100, learning_rate=0.001, lambda_reg=0.001, seed=42)
-
-
-def load_uirt(path: str) -> List[Tuple[str, str, float, int]]:
-    rows = []
-    with open(path, newline="", encoding="utf-8") as f:
-        reader = csv.reader(f)
-        next(reader)
-        for u, i, r, t in reader:
-            rows.append((u, i, float(r), int(t)))
-    return rows
-
-
-def item_first_seen(rows) -> Dict[str, int]:
-    first: Dict[str, int] = {}
-    for _, item, _, ts in rows:
-        prev = first.get(item)
-        if prev is None or ts < prev:
-            first[item] = ts
-    return first
 
 
 def per_user_test_timestamps(rows, test_set) -> Dict[str, int]:
@@ -92,6 +83,14 @@ def per_user_test_timestamps(rows, test_set) -> Dict[str, int]:
 
 
 def future_items_pct(model, eval_method, item_first, raw_rows, k):
+    """Deliberately not `lib.causal_sampling.future_items_pct`.
+
+    That one assumes a UIRT-built test set with one timestamp per row, which is
+    all the ablation ever uses. This script also evaluates `RatioSplit`, whose
+    test set carries no timestamps at all, so it falls back to re-deriving a
+    per-user timestamp from the raw rows (`per_user_test_timestamps` above).
+    The two agree on the UIRT path; only the fallback is extra.
+    """
     test_set = eval_method.test_set
     uid2raw = {v: k_ for k_, v in test_set.uid_map.items()}
 

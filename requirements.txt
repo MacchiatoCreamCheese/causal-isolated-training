@@ -11,3 +11,7 @@ matplotlib>=3.6
 # LightGCN only: cornac's LightGCN backend imports dgl lazily. Install if you
 # run the LightGCN model/runner; not needed for BPR or NeuMF.
 # dgl>=1.1
+
+# Self-tests only: research/smoke/ runs standalone via `python -m` with nothing
+# extra. pytest is needed solely to run the same checks as `pytest research/smoke`.
+# pytest>=7

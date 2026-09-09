@@ -26,18 +26,13 @@ from ..lib.data import build_eval_method
 from ..lib.ablation_harness import (
     RECIPES, parse_args, extract_metrics, load_partial, write_partial, set_recipe,
 )
+# He 2020 §4.1.2, with each value's provenance recorded alongside it. Imported
+# rather than restated: `runners/tuning.py` needs the same three constants, and
+# it used to reach them by importing this runner.
+from ..lib.tuning_config import (
+    LIGHTGCN_BATCH, LIGHTGCN_EARLY_STOP, LIGHTGCN_EPOCHS,
+)
 from ..paths import logs_dir
-
-
-# He 2020 §4.1.2, as inventoried in lib/tuning_config.py:LIGHTGCN.
-LIGHTGCN_BATCH = {
-    "musical": 1024,
-    "baby": 1024,
-    "cellphone": 2048,
-    "healthcare": 2048,
-}
-LIGHTGCN_EPOCHS = 1000  # "1000 epochs are sufficient ... to converge"
-LIGHTGCN_EARLY_STOP = {"min_delta": 0.0, "patience": 50}
 
 
 def run_one(ds_name: str, seed: int) -> None:

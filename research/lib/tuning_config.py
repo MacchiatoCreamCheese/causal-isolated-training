@@ -156,15 +156,10 @@ LIGHTGCN = {
         "source": "Claude. Paper §4.1.2 says 'same as NGCF' without quoting min_delta.",
     },
     "early_stop_patience": {
-        "current": 5,
+        "current": 50,
         "status": "EYEBALL",
         "source": "Claude. Paper does not quote a patience value.",
-        "notes": "patience=5 with check_every=10 ⇒ stop after 50 epochs without recall@20 improvement.",
-    },
-    "early_stop_check_every": {
-        "current": 10,
-        "status": "EYEBALL",
-        "source": "Claude. Trade-off between eval cost and stopping precision; cornac's own LightGCN checks every epoch.",
+        "notes": "50 epochs without a recall@20 improvement. cornac's LightGCN evaluates every epoch and exposes no check-interval knob, so patience is counted in epochs directly. Recorded as 5 until 2026-09-09, paired with an unimplementable check_every=10 that multiplied out to the same 50; the runner always passed 50.",
     },
     "monitor_metric": {
         "current": "recall@20",
@@ -433,9 +428,10 @@ BPR = {
         "source": "Claude. Cornac default lr=0.001 (paired with 100 iterations). 0.05 chosen for our 20-epoch budget; NewBPR tunes via Optuna without enumerated bounds.",
     },
     "batch_size": {
-        "current": 16384,
+        "current": 4096,
         "status": "EYEBALL",
-        "source": "Claude. GPU throughput choice. NewBPR (PyTorch) and Elliot's Batched BPRMF both batch; neither pins a value.",
+        "source": "Claude. Throughput choice for the pure-NumPy BPR in lib/bpr_cpu.py. NewBPR (PyTorch) and Elliot's Batched BPRMF both batch; neither pins a value.",
+        "notes": "Read by BPR_KWARGS and BASELINE_CONFIG below, so this value is what actually runs. Recorded as 16384 until 2026-09-09 — a leftover from a GPU backend that no longer exists, while every call site passed 4096.",
     },
 
     # --- Negative sampling ---
@@ -534,6 +530,7 @@ BASELINE_CONFIG = {
         "lambda_u":      BPR["lambda_u"]["current"],
         "lambda_i":      BPR["lambda_i"]["current"],
         "lambda_j":      BPR["lambda_j"]["current"],
+        "batch_size":    BPR["batch_size"]["current"],
         # n_epochs is the ceiling; we set it via BPR_EARLY_STOP, not tuned.
         "n_epochs":      BPR["n_epochs"]["current"],
     },
@@ -548,6 +545,46 @@ BPR_EARLY_STOP = {
         "patience":  BPR["early_stop_patience"]["current"],
     },
     "early_stop_every": BPR["early_stop_check_every"]["current"],
+}
+
+
+# Convenience config: the architecture/optimizer knobs `runners/ablation_bpr.py`
+# passes to BPRMiniBatch, read off the inventory above so the runner cannot drift
+# from it -- `batch_size` was recorded here as 16384 for a while whilst every call
+# site passed 4096, which is exactly what this closes. Pair with BPR_EARLY_STOP;
+# `sampler`, `seed`, `name`, and `verbose` stay per-call.
+#
+# n_epochs is the NewBPR §5.2 budget ceiling (1000), not a target: early stopping
+# decides the actual stop epoch, which is data-dependent.
+BPR_KWARGS = dict(
+    k=BPR["k_embed_dim"]["current"],
+    batch_size=BPR["batch_size"]["current"],
+    learning_rate=BPR["learning_rate"]["current"],
+    lambda_u=BPR["lambda_u"]["current"],
+    lambda_i=BPR["lambda_i"]["current"],
+    lambda_j=BPR["lambda_j"]["current"],
+    n_epochs=BPR["n_epochs"]["current"],
+)
+
+
+# Convenience config: the LightGCN knobs both runners need, derived from the
+# LIGHTGCN inventory above. Lives here rather than in `runners/ablation_lightgcn.py`
+# for the same reason NEUMF_KWARGS does -- `runners/tuning.py` needs them too, and
+# a runner importing from another runner just to reach a constant is the wrong
+# direction.
+#
+# cornac's LightGCN evaluates every epoch and takes no check-interval argument, so
+# `patience` here is counted in epochs directly.
+LIGHTGCN_BATCH = {
+    "musical":    LIGHTGCN["batch_size_musical"]["current"],
+    "baby":       LIGHTGCN["batch_size_baby"]["current"],
+    "cellphone":  LIGHTGCN["batch_size_cellphone"]["current"],
+    "healthcare": LIGHTGCN["batch_size_healthcare"]["current"],
+}
+LIGHTGCN_EPOCHS = LIGHTGCN["n_epochs_max"]["current"]
+LIGHTGCN_EARLY_STOP = {
+    "min_delta": LIGHTGCN["early_stop_min_delta"]["current"],
+    "patience":  LIGHTGCN["early_stop_patience"]["current"],
 }
 
 

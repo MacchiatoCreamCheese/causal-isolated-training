@@ -57,8 +57,12 @@ COLOR_CELLS = {
 }
 
 MODELS = ["BPR", "NeuMF", "LightGCN"]
-DATASETS = [("baby", "Baby Products"), ("cellphone", "Cell Phones & Acc."),
-            ("healthcare", "Health & Household")]
+# The datasets the runners actually sweep by default -- kept in step with
+# `ablation_harness.DEFAULT_DATASETS`. Healthcare (7.18M) is opt-in via an
+# explicit `--datasets healthcare` and is left out of the figures for now;
+# add its row back here once it has been run.
+DATASETS = [("musical", "Musical Instruments"), ("baby", "Baby Products"),
+            ("cellphone", "Cell Phones & Acc.")]
 
 SINGLE_COL = (3.4, 2.2)
 DOUBLE_COL = (7.0, 2.6)

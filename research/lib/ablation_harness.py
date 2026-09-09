@@ -26,7 +26,7 @@ import argparse
 import json
 import os
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict
 
 # Dataset registry lives in data.py now (the generic loader); re-exported here so
 # existing `from ..lib.ablation_harness import DATASETS` call sites keep working.
@@ -144,14 +144,3 @@ def extract_metrics(experiment, probe=None) -> Dict[str, float]:
     if probe is not None:
         metrics.update((name, float(getattr(probe, name))) for name in PROBE_METRICS)
     return metrics
-
-
-def write_seed_json(model: str, dataset: str, seed: int,
-                    recipes: Dict[str, Dict[str, float]]) -> None:
-    path = seed_json_path(model, dataset, seed)
-    tmp = path.with_suffix(".json.tmp")
-    payload = {"model": model, "dataset": dataset, "seed": seed, "recipes": recipes}
-    with open(tmp, "w", encoding="utf-8") as f:
-        json.dump(payload, f, indent=2)
-    os.replace(tmp, path)
-    print(f"[multiseed] wrote {path}", flush=True)

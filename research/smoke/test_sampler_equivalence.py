@@ -255,5 +255,38 @@ def main():
           "bounded-rejection residuals.")
 
 
+# ---------------------------------------------------------------------------
+# pytest entry points.
+#
+# The checks above are written to run standalone (`python -m ...`), which is how
+# the README drives them and how they report their per-check detail lines. These
+# two wrappers expose the same checks to `pytest research/smoke`, so CI does not
+# need to shell out and parse stdout. They add no import-time dependency on
+# pytest: a bare `def test_*()` is all pytest needs to collect a test.
+#
+# Each builds its own split rather than sharing one, so a failure in the uniform
+# arm cannot cascade into the causal one.
+# ---------------------------------------------------------------------------
+
+def test_uniform_arm_matches_cornac():
+    """The uniform arm is the baseline every reported effect is measured
+    against, so it must be cornac's sampler and not a stricter one of ours."""
+    failures = []
+    train_set = load(None, "uniform")
+    check_uij_legality(train_set, failures)
+    check_uir_legality(train_set, failures)
+    check_distribution(train_set, failures)
+    assert not failures, failures
+
+
+def test_causal_arm_is_legal_and_time_respecting():
+    """The design claim: every causal negative is one cornac would have
+    accepted *and* one that already existed at the positive's timestamp."""
+    failures = []
+    train_set = load(None, "causal")
+    check_causal_conjunction(train_set, failures)
+    assert not failures, failures
+
+
 if __name__ == "__main__":
     main()

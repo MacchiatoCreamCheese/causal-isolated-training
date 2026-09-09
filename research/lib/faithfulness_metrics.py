@@ -11,8 +11,8 @@ values indicate worse faithfulness.
 
 - future_items_pct(): inference-time. For each test instance, what
   fraction of top-K recommendations weren't released yet at the test
-  timestamp. (Already defined in phase2_causal_negatives.py — we re-
-  import it here for one-stop shopping.)
+  timestamp. (Defined in causal_sampling.py — re-exported here for
+  one-stop shopping.)
 
 - recommendation_recency_distribution(): inference-time. For each
   test instance, look at the recency of every top-K recommendation

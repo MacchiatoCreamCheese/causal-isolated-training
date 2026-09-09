@@ -40,9 +40,17 @@ class StubModel(Recommender):
         return float(s[item_idx])
 
 
-def main():
-    # Synthetic UIRT log: 200 users, 100 items, three time blocks so that
-    # later items have larger tau and can appear "future" to earlier test ts.
+K = 10
+
+
+def build_case():
+    """Synthetic UIRT log plus a stub model, as `(model, eval_method, item_first)`.
+
+    200 users over 100 items in three time blocks, so later items have a larger
+    first-seen and can look "future" to an earlier test timestamp — without that
+    the future-item count is zero and comparing the two implementations proves
+    nothing.
+    """
     rng = np.random.default_rng(0)
     rows = []
     for t_block in range(3):
@@ -68,28 +76,49 @@ def main():
         verbose=False,
     )
 
-    n_items = eval_method.test_set.num_items
-    print(f"test_set num_items={n_items}, num_users={eval_method.test_set.num_users}, "
-          f"num_test_rows={len(eval_method.test_set.uir_tuple[0])}")
-    model = StubModel(num_items=n_items)
+    model = StubModel(num_items=eval_method.test_set.num_items)
     model.fit(eval_method.train_set, eval_method.val_set)
+    return model, eval_method, item_first
 
-    K = 10
-    old = future_items_pct(model, eval_method, item_first, k=K)
-    new = future_items_pct_batched(model, eval_method, item_first, k=K, chunk=64)
 
-    print("OLD:", old)
-    print("NEW:", new)
+def compare(k=K, chunk=64):
+    """Run both implementations over the same case; returns `(old, new)`."""
+    model, eval_method, item_first = build_case()
+    old = future_items_pct(model, eval_method, item_first, k=k)
+    new = future_items_pct_batched(model, eval_method, item_first, k=k, chunk=chunk)
+    return old, new
 
-    ok = (
+
+def agree(old, new):
+    return (
         old["evaluated"] == new["evaluated"]
         and abs(old["global_pct"] - new["global_pct"]) < 1e-9
         and abs(old["mean_pct_per_instance"] - new["mean_pct_per_instance"]) < 1e-9
     )
+
+
+def main():
+    old, new = compare()
+    print("OLD:", old)
+    print("NEW:", new)
+    ok = agree(old, new)
     print("MATCH:", ok)
-    if not ok or old["global_pct"] == 0.0:
-        print("(test inconclusive if global_pct is 0)")
-        sys.exit(0 if ok else 1)
+    if old["global_pct"] == 0.0:
+        print("(test inconclusive: global_pct is 0)")
+    sys.exit(0 if ok else 1)
+
+
+# ---------------------------------------------------------------------------
+# pytest entry point. See the note in test_cornac_causal.py — no import-time
+# pytest dependency, and `python -m` keeps working unchanged.
+# ---------------------------------------------------------------------------
+
+def test_batched_matches_per_user_loop():
+    old, new = compare()
+    assert old["global_pct"] > 0.0, (
+        "degenerate case: no top-K recommendation is a future item, so the "
+        "comparison below would hold trivially for both implementations")
+    assert agree(old, new), f"OLD={old} NEW={new}"
 
 
 if __name__ == "__main__":

@@ -19,7 +19,19 @@ dependencies = [
 [project.optional-dependencies]
 # LightGCN backend (cornac imports dgl lazily).
 lightgcn = ["dgl>=1.1"]
+# The smoke checks run standalone via `python -m research.smoke.<name>` with no
+# extra packages; pytest is only needed to run them as `pytest research/smoke`.
+dev = ["pytest>=7"]
 
-[tool.setuptools]
-# The importable package is `research` (run modules as `python -m research.<...>`).
-packages = ["research"]
+# `research` plus every subpackage under it (lib, runners, analysis, smoke,
+# experiments). Modules are run as `python -m research.<...>`.
+#
+# Discovered rather than enumerated. This was `packages = ["research"]`, which
+# setuptools reads literally: a built wheel carried only `research/*.py` and none
+# of the subpackages, so `pip install .` produced an import-error on the first
+# `from .lib import ...`. Nothing caught it because every documented workflow runs
+# from the repo root, where the source tree shadows the installed package. A
+# hand-written list would go stale the next time a subpackage is added -- as one
+# was, when `experiments/` landed.
+[tool.setuptools.packages.find]
+include = ["research*"]

@@ -110,6 +110,15 @@ python -m research.smoke.test_cornac_causal          # -> ALL CHECKS PASSED (10/
 python -m research.smoke.test_sampler_equivalence
 ```
 
+Both also run under pytest, which is what CI should use — same checks, same
+code path, exit code instead of a summary line. pytest is an extra
+(`pip install -e ".[dev]"`); the `python -m` form above needs nothing beyond the
+base requirements:
+
+```bash
+pytest research/smoke -q          # -> 6 passed
+```
+
 `test_cornac_causal` reports `10/10` only when all ten checks actually ran. Two
 of them drive a real `cornac.models.LightGCN` and so need dgl; without it the
 test **fails** rather than passing quietly, since those are the checks covering
@@ -197,10 +206,12 @@ research/
                                   and a status label — the source of truth
   runners/     ablation_{bpr,neumf,lightgcn}, tuning
   analysis/    aggregate_ablation, make_figures
-  smoke/       self-tests
+  smoke/       self-tests — synthetic data, seconds, pass/fail
     fixtures.py                   synthetic UIRT splits (implicit + rated)
     test_cornac_causal.py         cornac's models really sample through us
     test_sampler_equivalence.py   our filter == cornac's, measured
+  experiments/ real runs whose output is read, not asserted
+    baseline_bpr_leakage.py       evaluation-time leakage across split regimes
 data/          dataset CSVs
 ```
 

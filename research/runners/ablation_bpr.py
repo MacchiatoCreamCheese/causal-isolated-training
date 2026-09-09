@@ -26,23 +26,20 @@ from ..lib.data import build_eval_method
 from ..lib.ablation_harness import (
     RECIPES, parse_args, extract_metrics, load_partial, write_partial,
 )
-from ..lib.tuning_config import BPR_EARLY_STOP
+from ..lib.tuning_config import BPR_EARLY_STOP, BPR_KWARGS
 from ..paths import logs_dir
 
 
-# NewBPR §5.2 training protocol: train up to 1000 epochs with early stopping
-# on NDCG@20 (patience=13). The actual stop epoch is data-dependent.
-BPR_EPOCHS = 1000
-
-
 def build_model(ds_name: str, seed: int, recipe: str):
+    """Every hyperparameter comes off `lib/tuning_config.py`, which is where
+    each one's provenance is recorded -- including the NewBPR §5.2 protocol
+    (up to 1000 epochs, early stopping on NDCG@20 with patience=13; the actual
+    stop epoch is data-dependent). Nothing is spelled out again here, so the
+    runner cannot drift from the inventory that documents it."""
     return BPRMiniBatch(
         name=f"{ds_name}/{recipe}/s{seed}",
-        k=64, batch_size=4096, learning_rate=0.05,
-        lambda_u=1e-4, lambda_i=1e-4, lambda_j=1e-4,
-        n_epochs=BPR_EPOCHS, sampler=recipe,
-        **BPR_EARLY_STOP,
-        seed=seed, verbose=False,
+        **BPR_KWARGS, **BPR_EARLY_STOP,
+        sampler=recipe, seed=seed, verbose=False,
     )
 
 

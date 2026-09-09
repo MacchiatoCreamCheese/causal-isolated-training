@@ -58,8 +58,8 @@ SELECT_METRIC = f"NDCG@{TOP_K}"
 def _build_model(model_name: str, config: dict, seed: int):
     if model_name == "lightgcn":
         from cornac.models import LightGCN
-        from .ablation_lightgcn import (
-            LIGHTGCN_BATCH, LIGHTGCN_EPOCHS, LIGHTGCN_EARLY_STOP,
+        from ..lib.tuning_config import (
+            LIGHTGCN_BATCH, LIGHTGCN_EARLY_STOP, LIGHTGCN_EPOCHS,
         )
         return LightGCN(
             name=f"LightGCN/tune/{TUNE_DATASET}/s{seed}",
@@ -103,7 +103,7 @@ def _build_model(model_name: str, config: dict, seed: int):
         return BPRMiniBatch(
             name=f"BPR/tune/{TUNE_DATASET}/s{seed}",
             k=int(config["k_embed_dim"]),
-            batch_size=4096,
+            batch_size=int(config["batch_size"]),
             learning_rate=float(config["learning_rate"]),
             lambda_u=float(config["lambda_u"]),
             lambda_i=float(config["lambda_i"]),
