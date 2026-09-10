@@ -1,0 +1,17 @@
+{
+  "config": {
+    "k_embed_dim": 64,
+    "learning_rate": 0.05,
+    "lambda_shared": 0.0001,
+    "batch_size": 4096,
+    "n_epochs": 1000
+  },
+  "metrics": {
+    "HitRatio@20": 0.03262083266868719,
+    "NDCG@20": 0.00892353235320491,
+    "Recall@20": 0.019487566725698114,
+    "Train (s)": 426.7635147571564,
+    "Test (s)": 6.045381307601929
+  },
+  "wall_seconds": 443.2047882080078
+}

@@ -1,0 +1,4 @@
+
+=== Tuning bpr on cellphone x uniform x seed=42, selecting on NDCG@20 ===
+    -> /home/reno/causal-isolated-training/research/results/tuning/bpr/cellphone/uniform/seed42
+[baseline] running with defaults: {'k_embed_dim': 64, 'learning_rate': 0.05, 'lambda_shared': 0.0001, 'batch_size': 4096, 'n_epochs': 1000}

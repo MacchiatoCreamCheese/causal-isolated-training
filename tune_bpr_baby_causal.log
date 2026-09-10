@@ -1,0 +1,203 @@
+
+=== Tuning bpr on baby x causal x seed=42, selecting on NDCG@20 ===
+    -> /home/reno/causal-isolated-training/research/results/tuning/bpr/baby/causal/seed42
+[baseline] running with defaults: {'k_embed_dim': 64, 'learning_rate': 0.05, 'lambda_shared': 0.0001, 'batch_size': 4096, 'n_epochs': 1000}
+Early stopping:
+- best epoch = 22, stopped epoch = 35
+- best monitored value = 0.014422 (delta = -0.002317)
+
+VALIDATION:
+...
+                         | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------ + ----------- + ------- + --------- + --------
+BPR/tune/baby/causal/s42 |      0.0491 |  0.0121 |    0.0268 |  10.1799
+
+TEST:
+...
+                         | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------ + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/causal/s42 |      0.0326 |  0.0089 |    0.0195 |  426.7635 |   6.0454
+
+[baseline] NDCG@20=0.0089  (443.2s)
+
+--- knob: k_embed_dim  grid=[32, 128, 256]  (default carries metric=0.0089) ---
+Early stopping:
+- best epoch = 18, stopped epoch = 31
+- best monitored value = 0.012774 (delta = -0.001341)
+
+VALIDATION:
+...
+                         | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------ + ----------- + ------- + --------- + --------
+BPR/tune/baby/causal/s42 |      0.0439 |  0.0114 |    0.0234 |  10.7890
+
+TEST:
+...
+                         | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------ + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/causal/s42 |      0.0343 |  0.0096 |    0.0209 |  350.6281 |   6.0947
+
+[run]  k_embed_dim=32  NDCG@20=0.0096  (367.7s)
+Early stopping:
+- best epoch = 14, stopped epoch = 27
+- best monitored value = 0.013755 (delta = -0.001094)
+
+VALIDATION:
+...
+                         | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------ + ----------- + ------- + --------- + --------
+BPR/tune/baby/causal/s42 |      0.0462 |  0.0127 |    0.0242 |  12.0575
+
+TEST:
+...
+                         | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------ + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/causal/s42 |      0.0328 |  0.0101 |    0.0197 |  406.5847 |   7.2256
+
+[run]  k_embed_dim=128  NDCG@20=0.0101  (428.2s)
+Early stopping:
+- best epoch = 23, stopped epoch = 36
+- best monitored value = 0.013585 (delta = -0.001803)
+
+VALIDATION:
+...
+                         | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------ + ----------- + ------- + --------- + --------
+BPR/tune/baby/causal/s42 |      0.0464 |  0.0118 |    0.0244 |  23.2502
+
+TEST:
+...
+                         | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------ + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/causal/s42 |      0.0358 |  0.0103 |    0.0218 | 1016.7777 |  12.2620
+
+[run]  k_embed_dim=256  NDCG@20=0.0103  (1052.7s)
+[winner@k_embed_dim] k_embed_dim=256  NDCG@20=0.0103
+
+--- knob: learning_rate  grid=[0.001, 0.01, 0.1]  (default carries metric=0.0103) ---
+Early stopping:
+- best epoch = 144, stopped epoch = 157
+- best monitored value = 0.005174 (delta = -0.000029)
+
+VALIDATION:
+...
+                         | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------ + ----------- + ------- + --------- + --------
+BPR/tune/baby/causal/s42 |      0.0268 |  0.0051 |    0.0128 |  20.5440
+
+TEST:
+...
+                         | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------ + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/causal/s42 |      0.0198 |  0.0042 |    0.0102 | 4420.5845 |  14.1377
+
+[run]  learning_rate=0.001  NDCG@20=0.0042  (4455.6s)
+Early stopping:
+- best epoch = 16, stopped epoch = 29
+- best monitored value = 0.005081 (delta = -0.000083)
+
+VALIDATION:
+...
+                         | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------ + ----------- + ------- + --------- + --------
+BPR/tune/baby/causal/s42 |      0.0272 |  0.0050 |    0.0125 |  25.6190
+
+TEST:
+...
+                         | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------ + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/causal/s42 |      0.0193 |  0.0037 |    0.0098 |  807.6660 |  14.8758
+
+[run]  learning_rate=0.01  NDCG@20=0.0037  (848.5s)
+Early stopping:
+- best epoch = 17, stopped epoch = 30
+- best monitored value = 0.013409 (delta = -0.001344)
+
+VALIDATION:
+...
+                         | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------ + ----------- + ------- + --------- + --------
+BPR/tune/baby/causal/s42 |      0.0477 |  0.0121 |    0.0252 |  23.2609
+
+TEST:
+...
+                         | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------ + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/causal/s42 |      0.0318 |  0.0092 |    0.0194 |  842.3999 |  12.0728
+
+[run]  learning_rate=0.1  NDCG@20=0.0092  (878.0s)
+[winner@learning_rate] learning_rate=0.05  NDCG@20=0.0103 (kept default)
+
+--- knob: lambda_shared  grid=[1e-06, 1e-05, 0.001, 0.01]  (default carries metric=0.0103) ---
+Early stopping:
+- best epoch = 23, stopped epoch = 36
+- best monitored value = 0.013587 (delta = -0.001842)
+
+VALIDATION:
+...
+                         | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------ + ----------- + ------- + --------- + --------
+BPR/tune/baby/causal/s42 |      0.0463 |  0.0117 |    0.0242 |  20.1875
+
+TEST:
+...
+                         | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------ + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/causal/s42 |      0.0361 |  0.0102 |    0.0219 | 1005.2731 |  14.5676
+
+[run]  lambda_shared=1e-06  NDCG@20=0.0102  (1040.4s)
+Early stopping:
+- best epoch = 23, stopped epoch = 36
+- best monitored value = 0.013585 (delta = -0.001841)
+
+VALIDATION:
+...
+                         | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------ + ----------- + ------- + --------- + --------
+BPR/tune/baby/causal/s42 |      0.0463 |  0.0117 |    0.0242 |  20.3541
+
+TEST:
+...
+                         | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------ + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/causal/s42 |      0.0362 |  0.0103 |    0.0220 | 1004.5840 |  14.4045
+
+[run]  lambda_shared=1e-05  NDCG@20=0.0103  (1039.7s)
+Early stopping:
+- best epoch = 23, stopped epoch = 36
+- best monitored value = 0.013877 (delta = -0.002189)
+
+VALIDATION:
+...
+                         | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------ + ----------- + ------- + --------- + --------
+BPR/tune/baby/causal/s42 |      0.0462 |  0.0117 |    0.0247 |  25.7942
+
+TEST:
+...
+                         | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------ + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/causal/s42 |      0.0365 |  0.0101 |    0.0220 | 1018.6817 |  14.1905
+
+[run]  lambda_shared=0.001  NDCG@20=0.0101  (1059.0s)
+Early stopping:
+- best epoch = 23, stopped epoch = 36
+- best monitored value = 0.013577 (delta = -0.003594)
+
+VALIDATION:
+...
+                         | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------ + ----------- + ------- + --------- + --------
+BPR/tune/baby/causal/s42 |      0.0425 |  0.0100 |    0.0232 |  25.1284
+
+TEST:
+...
+                         | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------ + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/causal/s42 |      0.0320 |  0.0082 |    0.0195 | 1102.1675 |  13.2902
+
+[run]  lambda_shared=0.01  NDCG@20=0.0082  (1140.9s)
+[winner@lambda_shared] lambda_shared=0.0001  NDCG@20=0.0103 (kept default)
+
+=== bpr [baby x causal x seed=42] winner: {'k_embed_dim': 256, 'learning_rate': 0.05, 'lambda_shared': 0.0001, 'batch_size': 4096, 'n_epochs': 1000}  NDCG@20=0.0103 ===
+
