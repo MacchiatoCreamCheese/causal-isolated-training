@@ -1,0 +1,203 @@
+
+=== Tuning bpr on musical x causal x seed=42, selecting on NDCG@20 ===
+    -> /home/reno/causal-isolated-training/research/results/tuning/bpr/musical/causal/seed42
+[baseline] running with defaults: {'k_embed_dim': 64, 'learning_rate': 0.05, 'lambda_shared': 0.0001, 'batch_size': 4096, 'n_epochs': 1000}
+Early stopping:
+- best epoch = 39, stopped epoch = 52
+- best monitored value = 0.019314 (delta = -0.001436)
+
+VALIDATION:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/musical/causal/s42 |      0.0727 |  0.0179 |    0.0359 |   7.4770
+
+TEST:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/musical/causal/s42 |      0.0610 |  0.0161 |    0.0330 |  405.7547 |   5.3448
+
+[baseline] NDCG@20=0.0161  (418.7s)
+
+--- knob: k_embed_dim  grid=[32, 128, 256]  (default carries metric=0.0161) ---
+Early stopping:
+- best epoch = 31, stopped epoch = 44
+- best monitored value = 0.018236 (delta = -0.001549)
+
+VALIDATION:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/musical/causal/s42 |      0.0686 |  0.0167 |    0.0332 |   7.1436
+
+TEST:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/musical/causal/s42 |      0.0567 |  0.0144 |    0.0310 |  282.8879 |   5.4334
+
+[run]  k_embed_dim=32  NDCG@20=0.0144  (295.6s)
+Early stopping:
+- best epoch = 32, stopped epoch = 45
+- best monitored value = 0.019172 (delta = -0.000433)
+
+VALIDATION:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/musical/causal/s42 |      0.0746 |  0.0187 |    0.0368 |   5.9209
+
+TEST:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/musical/causal/s42 |      0.0618 |  0.0157 |    0.0332 |  336.1744 |   4.1963
+
+[run]  k_embed_dim=128  NDCG@20=0.0157  (346.4s)
+Early stopping:
+- best epoch = 33, stopped epoch = 46
+- best monitored value = 0.020056 (delta = -0.000462)
+
+VALIDATION:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/musical/causal/s42 |      0.0754 |  0.0196 |    0.0380 |   8.8613
+
+TEST:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/musical/causal/s42 |      0.0620 |  0.0168 |    0.0344 |  515.3274 |   6.2772
+
+[run]  k_embed_dim=256  NDCG@20=0.0168  (530.7s)
+[winner@k_embed_dim] k_embed_dim=256  NDCG@20=0.0168
+
+--- knob: learning_rate  grid=[0.001, 0.01, 0.1]  (default carries metric=0.0168) ---
+Early stopping:
+- best epoch = 276, stopped epoch = 289
+- best monitored value = 0.010342 (delta = -0.000105)
+
+VALIDATION:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/musical/causal/s42 |      0.0427 |  0.0102 |    0.0186 |   9.8010
+
+TEST:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/musical/causal/s42 |      0.0386 |  0.0107 |    0.0187 | 3491.2692 |   6.9248
+
+[run]  learning_rate=0.001  NDCG@20=0.0107  (3508.2s)
+Early stopping:
+- best epoch = 168, stopped epoch = 181
+- best monitored value = 0.019701 (delta = -0.000256)
+
+VALIDATION:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/musical/causal/s42 |      0.0760 |  0.0194 |    0.0378 |   9.3922
+
+TEST:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/musical/causal/s42 |      0.0627 |  0.0162 |    0.0347 | 2210.3513 |   8.5777
+
+[run]  learning_rate=0.01  NDCG@20=0.0162  (2228.5s)
+Early stopping:
+- best epoch = 19, stopped epoch = 32
+- best monitored value = 0.020106 (delta = -0.001777)
+
+VALIDATION:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/musical/causal/s42 |      0.0718 |  0.0183 |    0.0358 |   9.5292
+
+TEST:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/musical/causal/s42 |      0.0596 |  0.0154 |    0.0323 |  397.6075 |   6.6946
+
+[run]  learning_rate=0.1  NDCG@20=0.0154  (414.0s)
+[winner@learning_rate] learning_rate=0.05  NDCG@20=0.0168 (kept default)
+
+--- knob: lambda_shared  grid=[1e-06, 1e-05, 0.001, 0.01]  (default carries metric=0.0168) ---
+Early stopping:
+- best epoch = 33, stopped epoch = 46
+- best monitored value = 0.020090 (delta = -0.000367)
+
+VALIDATION:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/musical/causal/s42 |      0.0754 |  0.0197 |    0.0379 |  10.8737
+
+TEST:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/musical/causal/s42 |      0.0623 |  0.0169 |    0.0344 |  571.1267 |   7.7432
+
+[run]  lambda_shared=1e-06  NDCG@20=0.0169  (589.9s)
+Early stopping:
+- best epoch = 33, stopped epoch = 46
+- best monitored value = 0.020059 (delta = -0.000376)
+
+VALIDATION:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/musical/causal/s42 |      0.0754 |  0.0197 |    0.0379 |  10.4610
+
+TEST:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/musical/causal/s42 |      0.0623 |  0.0169 |    0.0344 |  564.8091 |   8.3252
+
+[run]  lambda_shared=1e-05  NDCG@20=0.0169  (583.8s)
+Early stopping:
+- best epoch = 34, stopped epoch = 47
+- best monitored value = 0.020339 (delta = -0.001092)
+
+VALIDATION:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/musical/causal/s42 |      0.0754 |  0.0192 |    0.0376 |  10.6457
+
+TEST:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/musical/causal/s42 |      0.0608 |  0.0165 |    0.0336 |  573.5811 |   7.3692
+
+[run]  lambda_shared=0.001  NDCG@20=0.0165  (591.8s)
+Early stopping:
+- best epoch = 40, stopped epoch = 53
+- best monitored value = 0.019689 (delta = -0.001681)
+
+VALIDATION:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/musical/causal/s42 |      0.0738 |  0.0180 |    0.0363 |   9.1572
+
+TEST:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/musical/causal/s42 |      0.0625 |  0.0153 |    0.0342 |  604.4017 |   6.3534
+
+[run]  lambda_shared=0.01  NDCG@20=0.0153  (620.1s)
+[winner@lambda_shared] lambda_shared=1e-05  NDCG@20=0.0169
+
+=== bpr [musical x causal x seed=42] winner: {'k_embed_dim': 256, 'learning_rate': 0.05, 'lambda_shared': 1e-05, 'batch_size': 4096, 'n_epochs': 1000}  NDCG@20=0.0169 ===
+

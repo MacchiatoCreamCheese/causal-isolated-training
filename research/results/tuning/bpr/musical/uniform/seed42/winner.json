@@ -1,0 +1,15 @@
+{
+  "model": "bpr",
+  "dataset": "musical",
+  "seed": 42,
+  "recipe": "uniform",
+  "select_metric": "NDCG@20",
+  "config": {
+    "k_embed_dim": 256,
+    "learning_rate": 0.05,
+    "lambda_shared": 1e-06,
+    "batch_size": 4096,
+    "n_epochs": 1000
+  },
+  "metric": 0.01395030326184211
+}

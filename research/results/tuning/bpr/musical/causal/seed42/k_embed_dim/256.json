@@ -1,0 +1,19 @@
+{
+  "knob": "k_embed_dim",
+  "value": 256,
+  "config": {
+    "k_embed_dim": 256,
+    "learning_rate": 0.05,
+    "lambda_shared": 0.0001,
+    "batch_size": 4096,
+    "n_epochs": 1000
+  },
+  "metrics": {
+    "HitRatio@20": 0.06204800335394613,
+    "NDCG@20": 0.016840127845608777,
+    "Recall@20": 0.03441813166095818,
+    "Train (s)": 515.3274323940277,
+    "Test (s)": 6.2772297859191895
+  },
+  "wall_seconds": 530.6856260299683
+}

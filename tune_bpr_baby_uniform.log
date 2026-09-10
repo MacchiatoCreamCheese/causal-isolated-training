@@ -1,0 +1,131 @@
+
+=== Tuning bpr on baby x uniform x seed=42, selecting on NDCG@20 ===
+    -> /home/reno/causal-isolated-training/research/results/tuning/bpr/baby/uniform/seed42
+[baseline] running with defaults: {'k_embed_dim': 64, 'learning_rate': 0.05, 'lambda_shared': 0.0001, 'batch_size': 4096, 'n_epochs': 1000}
+Early stopping:
+- best epoch = 27, stopped epoch = 40
+- best monitored value = 0.008933 (delta = -0.001280)
+
+VALIDATION:
+...
+                          | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/baby/uniform/s42 |      0.0332 |  0.0077 |    0.0165 |  11.1966
+
+TEST:
+...
+                          | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/uniform/s42 |      0.0262 |  0.0066 |    0.0145 |  493.1932 |   6.4753
+
+[baseline] NDCG@20=0.0066  (511.1s)
+
+--- knob: k_embed_dim  grid=[32, 128, 256]  (default carries metric=0.0066) ---
+Early stopping:
+- best epoch = 21, stopped epoch = 34
+- best monitored value = 0.008503 (delta = -0.001277)
+
+VALIDATION:
+...
+                          | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/baby/uniform/s42 |      0.0312 |  0.0072 |    0.0149 |  10.6563
+
+TEST:
+...
+                          | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/uniform/s42 |      0.0251 |  0.0061 |    0.0138 |  390.1182 |   6.2713
+
+[run]  k_embed_dim=32  NDCG@20=0.0061  (407.3s)
+Early stopping:
+- best epoch = 24, stopped epoch = 37
+- best monitored value = 0.009410 (delta = -0.001550)
+
+VALIDATION:
+...
+                          | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/baby/uniform/s42 |      0.0343 |  0.0079 |    0.0166 |  12.2143
+
+TEST:
+...
+                          | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/uniform/s42 |      0.0257 |  0.0061 |    0.0140 |  566.8441 |   7.4172
+
+[run]  k_embed_dim=128  NDCG@20=0.0061  (586.8s)
+Early stopping:
+- best epoch = 34, stopped epoch = 47
+- best monitored value = 0.009870 (delta = -0.001416)
+
+VALIDATION:
+...
+                          | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/baby/uniform/s42 |      0.0352 |  0.0085 |    0.0179 |  22.7688
+
+TEST:
+...
+                          | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/uniform/s42 |      0.0255 |  0.0067 |    0.0148 | 1338.0115 |  12.0815
+
+[run]  k_embed_dim=256  NDCG@20=0.0067  (1373.3s)
+[winner@k_embed_dim] k_embed_dim=256  NDCG@20=0.0067
+
+--- knob: learning_rate  grid=[0.001, 0.01, 0.1]  (default carries metric=0.0067) ---
+Early stopping:
+- best epoch = 168, stopped epoch = 181
+- best monitored value = 0.005144 (delta = -0.000180)
+
+VALIDATION:
+...
+                          | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/baby/uniform/s42 |      0.0264 |  0.0050 |    0.0123 |  20.8526
+
+TEST:
+...
+                          | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/uniform/s42 |      0.0186 |  0.0038 |    0.0093 | 4995.0147 |  13.1510
+
+[run]  learning_rate=0.001  NDCG@20=0.0038  (5030.7s)
+Early stopping:
+- best epoch = 17, stopped epoch = 30
+- best monitored value = 0.005216 (delta = -0.000356)
+
+VALIDATION:
+...
+                          | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/baby/uniform/s42 |      0.0264 |  0.0049 |    0.0123 |  24.1929
+
+TEST:
+...
+                          | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/uniform/s42 |      0.0175 |  0.0034 |    0.0089 |  882.2414 |  14.3335
+
+[run]  learning_rate=0.01  NDCG@20=0.0034  (921.1s)
+Early stopping:
+- best epoch = 14, stopped epoch = 27
+- best monitored value = 0.008999 (delta = -0.001091)
+
+VALIDATION:
+...
+                          | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/baby/uniform/s42 |      0.0326 |  0.0079 |    0.0165 |  24.9446
+
+TEST:
+...
+                          | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/uniform/s42 |      0.0246 |  0.0062 |    0.0144 |  820.2432 |  14.3802
+
+[run]  learning_rate=0.1  NDCG@20=0.0062  (859.9s)
+[winner@learning_rate] learning_rate=0.05  NDCG@20=0.0067 (kept default)
+
+--- knob: lambda_shared  grid=[1e-06, 1e-05, 0.001, 0.01]  (default carries metric=0.0067) ---
