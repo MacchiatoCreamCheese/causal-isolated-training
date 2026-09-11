@@ -73,13 +73,18 @@ def parse_log(path):
 def cell_dir(log_path, name):
     """results/tuning/<model dir>/<dataset>/<recipe>/seed<n> for one log.
 
-    The model *directory* (e.g. `neumf-pretrain`) is only in the log's filename,
-    `tune_<model dir>_<dataset>_<recipe>.log`; the seed is only in the table.
+    Dataset, recipe and seed come from the table row (`NeuMF/tune/<dataset>/
+    <recipe>/s<seed>`), so any log name works, including one with a seed suffix
+    or several cells in one file. Only the model *directory* (e.g.
+    `neumf-pretrain`, which the row does not show) comes from the filename:
+    whatever sits between `tune_` and `_<dataset>_`.
     """
-    model_dir, dataset, recipe = Path(log_path).stem[len("tune_"):].rsplit("_", 2)
-    parts = name.split("/")          # NeuMF/tune/<dataset>/<recipe>/s<seed>
-    assert parts[2] == dataset and parts[3] == recipe, (log_path, name)
-    return model_dir, TUNE_DIR / model_dir / dataset / recipe / f"seed{parts[4][1:]}"
+    parts = name.split("/")
+    dataset, recipe, seed = parts[2], parts[3], parts[4][1:]
+    stem = Path(log_path).stem
+    model_dir = stem[len("tune_"):].split(f"_{dataset}_")[0]
+    assert model_dir.split("-")[0] == parts[0].lower(), (log_path, name)
+    return model_dir, TUNE_DIR / model_dir / dataset / recipe / f"seed{seed}"
 
 
 def _matches(stored_test, log_test):
@@ -161,12 +166,21 @@ def main():
                    help="Write and delete. Without it, only report.")
     args = p.parse_args()
 
+    cells = []
     for log in sorted(args.logs):
         events = parse_log(log)
         if not events:
             print(f"{log}: no trials with both tables, skipped")
             continue
-        model_dir, d = cell_dir(log, events[0][5])
+        # One log can hold several seeds (a loop appending to the same file), so
+        # group by the cell named in each table row, never by the first one.
+        by_name = {}
+        for e in events:
+            by_name.setdefault(e[5], []).append(e)
+        cells += [(log, name, evs) for name, evs in by_name.items()]
+
+    for log, name, events in cells:
+        model_dir, d = cell_dir(log, name)
         model = model_dir.split("-")[0]
         loaded = backfill(d, events, f"backfilled from {Path(log).name}, 4 d.p.",
                           args.apply)
