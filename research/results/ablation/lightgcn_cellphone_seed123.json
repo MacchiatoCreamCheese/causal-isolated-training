@@ -1,0 +1,25 @@
+{
+  "model": "LightGCN",
+  "dataset": "cellphone",
+  "seed": 123,
+  "recipes": {
+    "uniform": {
+      "HitRatio@20": 0.013020455534600319,
+      "NDCG@20": 0.004234079938845829,
+      "Recall@20": 0.009380535292740265,
+      "Train (s)": 29090.585464715958,
+      "Test (s)": 158.9610755443573,
+      "counterfactual_rate": 0.4405954278056882,
+      "collision_rate": 0.0
+    },
+    "causal": {
+      "HitRatio@20": 0.015577397359640215,
+      "NDCG@20": 0.004726390615294806,
+      "Recall@20": 0.011230142898592779,
+      "Train (s)": 31884.777084112167,
+      "Test (s)": 158.1681251525879,
+      "counterfactual_rate": 0.0,
+      "collision_rate": 1.8764838000397867e-06
+    }
+  }
+}
