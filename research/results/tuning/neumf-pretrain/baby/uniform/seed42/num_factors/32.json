@@ -1,0 +1,31 @@
+{
+  "knob": "num_factors",
+  "value": 32,
+  "config": {
+    "num_factors": 32,
+    "mlp_hidden_count": 3,
+    "learning_rate": 0.001,
+    "num_neg": 4,
+    "batch_size": 256
+  },
+  "metrics": {
+    "HitRatio@20": 0.0256,
+    "NDCG@20": 0.0059,
+    "Recall@20": 0.0128
+  },
+  "wall_seconds": 1913.815589427948,
+  "test_metrics": {
+    "HitRatio@20": 0.01746690062210879,
+    "NDCG@20": 0.004208524417347157,
+    "Recall@20": 0.010191752785708337,
+    "Train (s)": 1773.9425768852234,
+    "Test (s)": 51.88494944572449
+  },
+  "val_metrics": {
+    "HitRatio@20": 0.0256,
+    "NDCG@20": 0.0059,
+    "Recall@20": 0.0128
+  },
+  "select_split": "validation",
+  "val_metrics_source": "backfilled from tune_neumf-pretrain_baby_uniform.log, 4 d.p."
+}

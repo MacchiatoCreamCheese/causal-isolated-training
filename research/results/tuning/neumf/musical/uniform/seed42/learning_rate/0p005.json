@@ -9,11 +9,23 @@
     "batch_size": 256
   },
   "metrics": {
+    "HitRatio@20": 0.0333,
+    "NDCG@20": 0.007,
+    "Recall@20": 0.0146
+  },
+  "wall_seconds": 338.7056646347046,
+  "test_metrics": {
     "HitRatio@20": 0.029032596163924118,
     "NDCG@20": 0.005935910213652356,
     "Recall@20": 0.014289597124889308,
     "Train (s)": 268.72634291648865,
     "Test (s)": 28.960015535354614
   },
-  "wall_seconds": 338.7056646347046
+  "val_metrics": {
+    "HitRatio@20": 0.0333,
+    "NDCG@20": 0.007,
+    "Recall@20": 0.0146
+  },
+  "select_split": "validation",
+  "val_metrics_source": "backfilled from tune_neumf_musical_uniform.log, 4 d.p."
 }

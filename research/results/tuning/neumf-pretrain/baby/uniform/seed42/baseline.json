@@ -7,11 +7,23 @@
     "batch_size": 256
   },
   "metrics": {
+    "HitRatio@20": 0.0216,
+    "NDCG@20": 0.0046,
+    "Recall@20": 0.0103
+  },
+  "wall_seconds": 884.7724957466125,
+  "test_metrics": {
     "HitRatio@20": 0.014675386824054873,
     "NDCG@20": 0.0032200143473733274,
     "Recall@20": 0.00790191415024276,
     "Train (s)": 827.4495208263397,
     "Test (s)": 20.623297452926636
   },
-  "wall_seconds": 884.7724957466125
+  "val_metrics": {
+    "HitRatio@20": 0.0216,
+    "NDCG@20": 0.0046,
+    "Recall@20": 0.0103
+  },
+  "select_split": "validation",
+  "val_metrics_source": "backfilled from tune_neumf-pretrain_baby_uniform.log, 4 d.p."
 }

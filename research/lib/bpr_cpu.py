@@ -116,44 +116,14 @@ class BPRMiniBatch(Recommender):
         n_samples = len(u_arr)
         self._reset_early_stop()
         for epoch in range(self.n_epochs):
-            perm = self.rng.permutation(n_samples)
             running_correct = 0
             n_seen = 0
-            for start in range(0, n_samples, self.batch_size):
-                idx = perm[start:start + self.batch_size]
+            for idx in self._epoch_batches(train_set, n_samples):
                 u = u_arr[idx]
                 pos = i_arr[idx]
-                ts = ts_arr[idx]
-                neg = self._sampler.sample(ts, u)
-
-                # Compute scores
-                u_emb = self.u_factors[u]            # (B, k)
-                pos_emb = self.i_factors[pos]        # (B, k)
-                neg_emb = self.i_factors[neg]        # (B, k)
-                pos_score = np.einsum("bk,bk->b", u_emb, pos_emb)
-                neg_score = np.einsum("bk,bk->b", u_emb, neg_emb)
-                if self.use_bias:
-                    pos_score = pos_score + self.i_biases[pos]
-                    neg_score = neg_score + self.i_biases[neg]
-                diff = pos_score - neg_score
-                # sigmoid(-diff) is the gradient coefficient
-                z = 1.0 / (1.0 + np.exp(diff))  # shape (B,)
-                running_correct += int((z < 0.5).sum())
+                neg = self._sampler.sample(ts_arr[idx], u)
+                running_correct += self.train_batch(u, pos, neg)
                 n_seen += len(u)
-
-                # Gradients (Rendle 2009) with NewBPR §5.3 separated λs.
-                z_col = z[:, None].astype(np.float32)
-                grad_u = z_col * (pos_emb - neg_emb) - self.reg_u * u_emb
-                grad_pos = z_col * u_emb - self.reg_i * pos_emb
-                grad_neg = -z_col * u_emb - self.reg_j * neg_emb
-
-                # Apply updates via np.add.at to handle repeat indices in a batch.
-                np.add.at(self.u_factors, u, self.lr * grad_u)
-                np.add.at(self.i_factors, pos, self.lr * grad_pos)
-                np.add.at(self.i_factors, neg, self.lr * grad_neg)
-                if self.use_bias:
-                    np.add.at(self.i_biases, pos, self.lr * (z - self.reg_i * self.i_biases[pos]))
-                    np.add.at(self.i_biases, neg, self.lr * (-z - self.reg_j * self.i_biases[neg]))
 
             if self.verbose:
                 pct = 100.0 * running_correct / max(n_seen, 1)
@@ -167,6 +137,68 @@ class BPRMiniBatch(Recommender):
                               flush=True)
                     break
         return self
+
+    def train_batch(self, u, pos, neg):
+        """One SGD step on a batch of `(user, positive, negative)` triples.
+
+        Returns how many pairs the model already ranked correctly, which `fit`
+        accumulates for its progress line.
+
+        Public and extracted rather than inlined in `fit` because Mechanism 3
+        (`research/mecha3/`) drives its own loop: prequential evaluation has to
+        score a batch *before* training on it, which means interleaving something
+        between the batches that `fit` iterates. Calling this keeps the Rendle
+        2009 update below as the single copy in the codebase -- a second loop that
+        reimplemented the gradient is exactly the drift this project keeps
+        closing elsewhere.
+        """
+        u_emb = self.u_factors[u]            # (B, k)
+        pos_emb = self.i_factors[pos]        # (B, k)
+        neg_emb = self.i_factors[neg]        # (B, k)
+        pos_score = np.einsum("bk,bk->b", u_emb, pos_emb)
+        neg_score = np.einsum("bk,bk->b", u_emb, neg_emb)
+        if self.use_bias:
+            pos_score = pos_score + self.i_biases[pos]
+            neg_score = neg_score + self.i_biases[neg]
+        diff = pos_score - neg_score
+        # sigmoid(-diff) is the gradient coefficient
+        z = 1.0 / (1.0 + np.exp(diff))  # shape (B,)
+
+        # Gradients (Rendle 2009) with NewBPR §5.3 separated λs.
+        z_col = z[:, None].astype(np.float32)
+        grad_u = z_col * (pos_emb - neg_emb) - self.reg_u * u_emb
+        grad_pos = z_col * u_emb - self.reg_i * pos_emb
+        grad_neg = -z_col * u_emb - self.reg_j * neg_emb
+
+        # Apply updates via np.add.at to handle repeat indices in a batch.
+        np.add.at(self.u_factors, u, self.lr * grad_u)
+        np.add.at(self.i_factors, pos, self.lr * grad_pos)
+        np.add.at(self.i_factors, neg, self.lr * grad_neg)
+        if self.use_bias:
+            np.add.at(self.i_biases, pos, self.lr * (z - self.reg_i * self.i_biases[pos]))
+            np.add.at(self.i_biases, neg, self.lr * (-z - self.reg_j * self.i_biases[neg]))
+        return int((z < 0.5).sum())
+
+    def _epoch_batches(self, train_set, n_samples):
+        """Row-index batches for one epoch.
+
+        A seam, not a feature. The default is exactly the shuffle this loop has
+        always done -- same RNG, same call order, so behaviour is unchanged.
+
+        It exists because this model batches *itself*: unlike cornac's models it
+        never calls `uij_iter` / `uir_iter`, so it never consults the training
+        split's `idx_iter` and cannot pick up a data-loader-level batching rule.
+        Mechanism 2 overrides this one method (`research/mecha2/bpr.py`) to take
+        the order from the split instead, which keeps the gradient update below
+        as the single copy in the codebase -- the alternative, subclassing `fit`,
+        would duplicate the Rendle 2009 update and invite the two to drift.
+
+        `train_set` is passed rather than closed over so an override can consult
+        it; the default ignores it.
+        """
+        perm = self.rng.permutation(n_samples)
+        for start in range(0, n_samples, self.batch_size):
+            yield perm[start:start + self.batch_size]
 
     def _reset_early_stop(self):
         self.current_epoch = 0

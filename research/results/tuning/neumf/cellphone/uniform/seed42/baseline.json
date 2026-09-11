@@ -1,0 +1,29 @@
+{
+  "config": {
+    "num_factors": 8,
+    "mlp_hidden_count": 3,
+    "learning_rate": 0.001,
+    "num_neg": 4,
+    "batch_size": 256
+  },
+  "metrics": {
+    "HitRatio@20": 0.0053,
+    "NDCG@20": 0.0012,
+    "Recall@20": 0.0031
+  },
+  "wall_seconds": 2463.1147842407227,
+  "test_metrics": {
+    "HitRatio@20": 0.004116494994922385,
+    "NDCG@20": 0.001005424345511574,
+    "Recall@20": 0.0026527947607303476,
+    "Train (s)": 1869.8593282699585,
+    "Test (s)": 214.8844883441925
+  },
+  "val_metrics": {
+    "HitRatio@20": 0.0053,
+    "NDCG@20": 0.0012,
+    "Recall@20": 0.0031
+  },
+  "select_split": "validation",
+  "val_metrics_source": "backfilled from tune_neumf_cellphone_uniform.log, 4 d.p."
+}

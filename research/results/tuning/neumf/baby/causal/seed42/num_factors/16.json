@@ -1,0 +1,31 @@
+{
+  "knob": "num_factors",
+  "value": 16,
+  "config": {
+    "num_factors": 16,
+    "mlp_hidden_count": 3,
+    "learning_rate": 0.001,
+    "num_neg": 4,
+    "batch_size": 256
+  },
+  "metrics": {
+    "HitRatio@20": 0.0151,
+    "NDCG@20": 0.0029,
+    "Recall@20": 0.0067
+  },
+  "wall_seconds": 793.137547492981,
+  "test_metrics": {
+    "HitRatio@20": 0.011804115488913702,
+    "NDCG@20": 0.0027340979083066586,
+    "Recall@20": 0.006940086008042949,
+    "Train (s)": 716.5569682121277,
+    "Test (s)": 27.656791925430298
+  },
+  "val_metrics": {
+    "HitRatio@20": 0.0151,
+    "NDCG@20": 0.0029,
+    "Recall@20": 0.0067
+  },
+  "select_split": "validation",
+  "val_metrics_source": "backfilled from tune_neumf_baby_causal.log, 4 d.p."
+}

@@ -9,11 +9,23 @@
     "n_epochs": 1000
   },
   "metrics": {
+    "HitRatio@20": 0.076,
+    "NDCG@20": 0.0194,
+    "Recall@20": 0.0378
+  },
+  "wall_seconds": 2228.496323823929,
+  "test_metrics": {
     "HitRatio@20": 0.06267686825280369,
     "NDCG@20": 0.01620486336583259,
     "Recall@20": 0.034673262258682246,
     "Train (s)": 2210.3513493537903,
     "Test (s)": 8.577703475952148
   },
-  "wall_seconds": 2228.496323823929
+  "val_metrics": {
+    "HitRatio@20": 0.076,
+    "NDCG@20": 0.0194,
+    "Recall@20": 0.0378
+  },
+  "select_split": "validation",
+  "val_metrics_source": "backfilled from tune_bpr_musical_causal.log, 4 d.p."
 }

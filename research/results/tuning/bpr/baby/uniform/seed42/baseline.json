@@ -7,11 +7,23 @@
     "n_epochs": 1000
   },
   "metrics": {
+    "HitRatio@20": 0.0332,
+    "NDCG@20": 0.0077,
+    "Recall@20": 0.0165
+  },
+  "wall_seconds": 511.1338574886322,
+  "test_metrics": {
     "HitRatio@20": 0.026160472164619558,
     "NDCG@20": 0.006599067769984543,
     "Recall@20": 0.01451010495957974,
     "Train (s)": 493.1932461261749,
     "Test (s)": 6.475261688232422
   },
-  "wall_seconds": 511.1338574886322
+  "val_metrics": {
+    "HitRatio@20": 0.0332,
+    "NDCG@20": 0.0077,
+    "Recall@20": 0.0165
+  },
+  "select_split": "validation",
+  "val_metrics_source": "backfilled from tune_bpr_baby_uniform.log, 4 d.p."
 }

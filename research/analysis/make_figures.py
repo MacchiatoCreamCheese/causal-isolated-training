@@ -171,6 +171,88 @@ def fig_counterfactual_rate():
     save(fig, "counterfactual_rate")
 
 
+def _rolling(a, w):
+    """Centred rolling mean, with the window shrinking at the edges.
+
+    A per-batch metric over a few hundred interactions is jumpy by construction;
+    the smoothed line is what is readable and the raw points are what is honest,
+    so the figure shows both.
+    """
+    a = np.asarray(a, dtype=float)
+    out = np.empty_like(a)
+    for i in range(len(a)):
+        lo, hi = max(0, i - w // 2), min(len(a), i + w // 2 + 1)
+        out[i] = a[lo:hi].mean()
+    return out
+
+
+def fig_prequential(metric="HitRatio@20", window=9):
+    """Performance along the deployment timeline, one line per arm.
+
+    Top panel: each arm's metric per batch, raw points faint behind a rolling
+    mean. Bottom panel: `causal - uniform` against a zero line.
+
+    The bottom panel is the one that carries the claim. Batches differ in
+    difficulty -- different users, different catalogue size, different counts --
+    so an absolute curve confounds "the arms diverged" with "this stretch of the
+    timeline was harder". Both arms are measured on *identical* batches, so their
+    difference cancels that out, and a crossover is simply a sign change.
+    """
+    import json
+
+    paths = sorted((RESULTS_DIR / "prequential").glob("*.json"))
+    if not paths:
+        print("  no results/prequential/*.json, skipping "
+              "(run `python -m research.mecha3.runner` first)")
+        return
+
+    for path in paths:
+        with open(path, encoding="utf-8-sig") as f:
+            payload = json.load(f)
+        arms = payload["arms"]
+        if not {"uniform", "causal"} <= set(arms):
+            continue
+
+        # Batches are identical across arms by construction; take the x-axis from
+        # either and assert rather than assume.
+        u_rec, c_rec = arms["uniform"], arms["causal"]
+        n = min(len(u_rec), len(c_rec))
+        mid = np.array([(r["ts_start"] + r["ts_end"]) / 2 for r in u_rec[:n]])
+        x = (mid - mid.min()) / (1000 * 60 * 60 * 24)   # days since the first point
+        u = np.array([r[metric] for r in u_rec[:n]])
+        c = np.array([r[metric] for r in c_rec[:n]])
+
+        fig, (ax, dax) = plt.subplots(
+            2, 1, figsize=(7.0, 4.2), sharex=True,
+            gridspec_kw={"height_ratios": [2.2, 1]})
+
+        for vals, arm in ((u, "uniform"), (c, "causal")):
+            ax.plot(x, vals, lw=0.5, alpha=0.25, color=COLOR_CELLS[arm])
+            ax.plot(x, _rolling(vals, window), lw=1.6,
+                    color=COLOR_CELLS[arm], label=arm)
+        ax.set_ylabel(metric)
+        ax.legend(loc="upper right", frameon=False, fontsize=6.5)
+        ax.set_title(f"{payload['model']} / {payload['dataset']} / "
+                     f"seed {payload['seed']}", fontsize=8)
+
+        gap = c - u
+        dax.axhline(0.0, color="black", lw=0.6)
+        dax.plot(x, gap, lw=0.5, alpha=0.25, color="black")
+        dax.plot(x, _rolling(gap, window), lw=1.6, color="black")
+        dax.fill_between(x, 0, _rolling(gap, window),
+                         where=_rolling(gap, window) >= 0,
+                         color=COLOR_CELLS["causal"], alpha=0.25, lw=0)
+        dax.set_ylabel("causal - uniform")
+        dax.set_xlabel("days since first evaluated batch")
+
+        fig.tight_layout()
+        # The model label belongs in the filename: two models on the same
+        # dataset and seed are two different figures, and keying only on
+        # dataset+seed silently overwrote the first with the second.
+        save(fig, f"prequential_{payload['model'].lower()}_"
+                  f"{payload['dataset']}_seed{payload['seed']}")
+
+
 # ---------------------------------------------------------------------------
 # Dispatcher
 # ---------------------------------------------------------------------------
@@ -178,6 +260,7 @@ def fig_counterfactual_rate():
 ALL_FIGS = {
     "three_model_ablation":  fig_three_model_ablation,
     "counterfactual_rate":   fig_counterfactual_rate,
+    "prequential":           fig_prequential,
 }
 
 

@@ -1,0 +1,19 @@
+{
+  "model": "neumf",
+  "variant": "neumf",
+  "dataset": "baby",
+  "seed": 42,
+  "recipe": "uniform",
+  "select_metric": "NDCG@20",
+  "config": {
+    "num_factors": 32,
+    "mlp_hidden_count": 3,
+    "learning_rate": 0.0001,
+    "num_neg": 4,
+    "batch_size": 1024
+  },
+  "metric": 0.0055,
+  "select_split": "validation",
+  "test_metric": 0.004094796510799718,
+  "val_metrics_source": "backfilled from tune_neumf_baby_uniform.log, 4 d.p."
+}

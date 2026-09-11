@@ -18,3 +18,48 @@ NeuMF/tune/baby/uniform/s42 |      0.0147 |  0.0032 |    0.0079 |  827.4495 |  2
 [baseline] NDCG@20=0.0032  (884.8s)
 
 --- knob: num_factors  grid=[16, 32, 64]  (default carries metric=0.0032) ---
+
+VALIDATION:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/baby/uniform/s42 |      0.0222 |  0.0046 |    0.0104 |  49.8652
+
+TEST:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/baby/uniform/s42 |      0.0183 |  0.0044 |    0.0104 | 1100.4038 |  28.7190
+
+[run]  num_factors=16  NDCG@20=0.0044  (1179.6s)
+
+VALIDATION:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/baby/uniform/s42 |      0.0256 |  0.0059 |    0.0128 |  86.9253
+
+TEST:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/baby/uniform/s42 |      0.0175 |  0.0042 |    0.0102 | 1773.9426 |  51.8849
+
+[run]  num_factors=32  NDCG@20=0.0042  (1913.8s)
+
+VALIDATION:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/baby/uniform/s42 |      0.0237 |  0.0055 |    0.0122 | 236.7912
+
+TEST:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/baby/uniform/s42 |      0.0162 |  0.0038 |    0.0089 | 3555.0834 | 114.0934
+
+[run]  num_factors=64  NDCG@20=0.0038  (3907.9s)
+[winner@num_factors] num_factors=16  NDCG@20=0.0044
+
+--- knob: mlp_hidden_count  grid=[4]  (default carries metric=0.0044) ---

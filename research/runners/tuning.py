@@ -5,9 +5,24 @@ the historical `baby / uniform / 42` cell:
   - Dataset:  any key in lib/data.py:DATASETS
   - Recipe:   uniform (the vanilla arm) or causal
   - Seed:     42 by default
-  - Metric:   NDCG@20 (TOP_K from research.lib.causal_sampling)
+  - Metric:   **validation** NDCG@20 (TOP_K from research.lib.causal_sampling).
+              Test metrics are recorded next to it for reference and never used
+              to select.
   - Method:   coordinate descent over knobs declared in
               research/lib/tuning_config.py:TUNE_ORDER, knob order = most-impactful first.
+
+**Validation, not test.** cornac keeps the two splits in different lists --
+`exp.val_result` is validation, `exp.result` is *test* -- and reading the wrong
+one selects on the test set with no error at all. Until 2026-09-11 this tuner did
+exactly that. Files written before the fix have no `val_metrics` and are treated
+as stale (re-run, never reused); `runners/tuning_backfill.py` recovers their
+validation scores from the stdout logs so cells where the two splits pick the
+same values need no re-run.
+
+**A cache hit needs the same config.** A trial file is keyed by knob and value
+only, but it was trained around whatever the earlier knobs' winners were. If an
+earlier pick changes, every later trial on disk was trained at a different config
+and must not be reused; `_usable` checks the stored config, not just the path.
 
 **Which arm to tune on.** Tuning under `uniform` keeps hyperparameters from being
 chosen under the mechanism being evaluated, which is what makes the ablation a
@@ -210,7 +225,11 @@ def _load_json(path: Path) -> dict:
 # ---------------------------------------------------------------------------
 
 def _train_once(model_name: str, config: dict, eval_method, scope: Scope) -> tuple:
-    """Build the model, run cornac.Experiment, return (metrics_dict, wall_seconds)."""
+    """Build the model, run cornac.Experiment, return (val, test, wall_seconds).
+
+    Selection reads `val`. `test` is kept only so the file records what the
+    configuration scored on the held-out period.
+    """
     model = _build_model(model_name, config, scope)
     exp = cornac.Experiment(
         eval_method=eval_method,
@@ -222,10 +241,36 @@ def _train_once(model_name: str, config: dict, eval_method, scope: Scope) -> tup
     t0 = time.time()
     exp.run()
     wall = time.time() - t0
+    if exp.val_result is None or len(exp.val_result) == 0:
+        # Falling back to exp.result would silently select on test.
+        raise RuntimeError("cornac.Experiment returned no validation result; "
+                           "the split must have a val_set to tune on")
     if exp.result is None or len(exp.result) == 0:
-        raise RuntimeError("cornac.Experiment returned no result")
-    metrics = dict(exp.result[0].metric_avg_results)
-    return metrics, wall
+        raise RuntimeError("cornac.Experiment returned no test result")
+    val = dict(exp.val_result[0].metric_avg_results)
+    test = dict(exp.result[0].metric_avg_results)
+    return val, test, wall
+
+
+def _canon(config) -> str:
+    """Config as comparable JSON: tuples become lists, key order is fixed."""
+    return json.dumps(config, default=str, sort_keys=True)
+
+
+def _usable(cached: dict, config: dict) -> bool:
+    """Reuse a cached baseline/trial only if it was selected on validation and
+    trained at exactly `config`. See "A cache hit needs the same config"."""
+    return ("val_metrics" in cached
+            and _canon(json.loads(_canon(cached.get("config")))) == _canon(
+                json.loads(_canon(config))))
+
+
+def _record(config: dict, val: dict, test: dict, wall: float, **extra) -> dict:
+    # `metrics` stays as an alias of the selection metrics so any reader that
+    # only wants "the score this config was picked on" keeps working.
+    return {**extra, "config": dict(config), "select_split": "validation",
+            "val_metrics": val, "test_metrics": test, "metrics": val,
+            "wall_seconds": wall}
 
 
 def _build_eval_method(scope: Scope):
@@ -241,7 +286,7 @@ def _build_eval_method(scope: Scope):
 
 def run_tuning(model_name: str, scope: Scope, restart_from: str = None) -> None:
     print(f"\n=== Tuning {model_name} on {scope}, "
-          f"selecting on {SELECT_METRIC} ===", flush=True)
+          f"selecting on validation {SELECT_METRIC} ===", flush=True)
     print(f"    -> {scope.dir(model_name)}", flush=True)
 
     eval_method = _build_eval_method(scope)
@@ -249,22 +294,27 @@ def run_tuning(model_name: str, scope: Scope, restart_from: str = None) -> None:
 
     # --- Baseline ---
     bpath = _baseline_path(model_name, scope)
-    if bpath.exists():
-        baseline = _load_json(bpath)
-        print(f"[baseline] cached: {SELECT_METRIC}="
-              f"{baseline['metrics'][SELECT_METRIC]:.4f}", flush=True)
+    baseline = _load_json(bpath) if bpath.exists() else None
+    if baseline is not None and _usable(baseline, config):
+        print(f"[baseline] cached: val {SELECT_METRIC}="
+              f"{baseline['val_metrics'][SELECT_METRIC]:.4f}", flush=True)
     else:
+        if baseline is not None:
+            print("[stale] baseline: selected on test or trained at another "
+                  "config; re-running", flush=True)
         print(f"[baseline] running with defaults: {config}", flush=True)
-        metrics, wall = _train_once(model_name, config, eval_method, scope)
-        baseline = {"config": dict(config), "metrics": metrics, "wall_seconds": wall}
+        val, test, wall = _train_once(model_name, config, eval_method, scope)
+        baseline = _record(config, val, test, wall)
         _write_json(bpath, baseline)
-        print(f"[baseline] {SELECT_METRIC}={metrics[SELECT_METRIC]:.4f}  "
-              f"({wall:.1f}s)", flush=True)
+        print(f"[baseline] val {SELECT_METRIC}={val[SELECT_METRIC]:.4f}  "
+              f"test={test[SELECT_METRIC]:.4f}  ({wall:.1f}s)", flush=True)
 
-    # Running winner (config dict + its metric). The "default value" for the
-    # current knob lives at config[knob]; its metric is prev_winner_metric.
+    # Running winner: config dict, its validation metric (selects) and its test
+    # metric (recorded). The "default value" for the current knob lives at
+    # config[knob].
     prev_winner_config = dict(baseline["config"])
-    prev_winner_metric = float(baseline["metrics"][SELECT_METRIC])
+    prev_winner_metric = float(baseline["val_metrics"][SELECT_METRIC])
+    prev_winner_test = float(baseline["test_metrics"][SELECT_METRIC])
     config = dict(prev_winner_config)
 
     # If --restart-from was given, fast-forward through earlier knobs by
@@ -274,12 +324,12 @@ def run_tuning(model_name: str, scope: Scope, restart_from: str = None) -> None:
             if knob == restart_from:
                 break
             # Reuse cached trials to pick the winner without retraining.
-            winner_v, winner_m = _resolve_cached_winner(
-                model_name, scope, knob, prev_winner_config[knob],
-                prev_winner_metric)
+            winner_v, winner_m, winner_t = _resolve_cached_winner(
+                model_name, scope, knob, config, prev_winner_metric,
+                prev_winner_test)
             config[knob] = winner_v
             prev_winner_config = dict(config)
-            prev_winner_metric = winner_m
+            prev_winner_metric, prev_winner_test = winner_m, winner_t
 
     # --- Per-knob grid sweep ---
     started = restart_from is None
@@ -291,39 +341,40 @@ def run_tuning(model_name: str, scope: Scope, restart_from: str = None) -> None:
         print(f"\n--- knob: {knob}  grid={grid}  "
               f"(default carries metric={prev_winner_metric:.4f}) ---", flush=True)
 
-        results = []  # list of (value, metric)
+        results = []  # list of (value, val metric, test metric)
         for value in grid:
             tpath = _trial_path(model_name, scope, knob, value)
-            if tpath.exists():
-                trial = _load_json(tpath)
-                m = float(trial["metrics"][SELECT_METRIC])
-                print(f"[skip] {knob}={value}  {SELECT_METRIC}={m:.4f}  [cached]",
-                      flush=True)
+            trial_config = dict(config)
+            trial_config[knob] = value
+            trial = _load_json(tpath) if tpath.exists() else None
+            if trial is not None and _usable(trial, trial_config):
+                m = float(trial["val_metrics"][SELECT_METRIC])
+                t = float(trial["test_metrics"][SELECT_METRIC])
+                print(f"[skip] {knob}={value}  val {SELECT_METRIC}={m:.4f}  "
+                      f"[cached]", flush=True)
             else:
-                trial_config = dict(config)
-                trial_config[knob] = value
-                metrics, wall = _train_once(model_name, trial_config,
-                                            eval_method, scope)
-                trial = {
-                    "knob": knob,
-                    "value": value,
-                    "config": trial_config,
-                    "metrics": metrics,
-                    "wall_seconds": wall,
-                }
+                if trial is not None:
+                    print(f"[stale] {knob}={value}: selected on test or trained "
+                          f"at another config; re-running", flush=True)
+                val, test, wall = _train_once(model_name, trial_config,
+                                              eval_method, scope)
+                trial = _record(trial_config, val, test, wall,
+                                knob=knob, value=value)
                 _write_json(tpath, trial)
-                m = float(metrics[SELECT_METRIC])
-                print(f"[run]  {knob}={value}  {SELECT_METRIC}={m:.4f}  "
-                      f"({wall:.1f}s)", flush=True)
-            results.append((value, m))
+                m, t = float(val[SELECT_METRIC]), float(test[SELECT_METRIC])
+                print(f"[run]  {knob}={value}  val {SELECT_METRIC}={m:.4f}  "
+                      f"test={t:.4f}  ({wall:.1f}s)", flush=True)
+            results.append((value, m, t))
 
-        # Winner = best of (cached default carry-forward) vs grid trials.
+        # Winner = best of (cached default carry-forward) vs grid trials, on
+        # validation. max() keeps the first of equal scores, so a tie keeps the
+        # default.
         default_value = prev_winner_config[knob]
-        candidates = [(default_value, prev_winner_metric)] + results
-        best_value, best_metric = max(candidates, key=lambda x: x[1])
+        candidates = [(default_value, prev_winner_metric, prev_winner_test)] + results
+        best_value, best_metric, best_test = max(candidates, key=lambda x: x[1])
         config[knob] = best_value
         prev_winner_config = dict(config)
-        prev_winner_metric = best_metric
+        prev_winner_metric, prev_winner_test = best_metric, best_test
         marker = " (kept default)" if best_value == default_value else ""
         print(f"[winner@{knob}] {knob}={best_value}  "
               f"{SELECT_METRIC}={best_metric:.4f}{marker}", flush=True)
@@ -338,27 +389,41 @@ def run_tuning(model_name: str, scope: Scope, restart_from: str = None) -> None:
         "seed": scope.seed,
         "recipe": scope.recipe,
         "select_metric": SELECT_METRIC,
+        # winner_config() refuses a winner without this -- one written before
+        # the fix was selected on test.
+        "select_split": "validation",
         "config": prev_winner_config,
         "metric": prev_winner_metric,
+        "test_metric": prev_winner_test,
     }
     _write_json(_winner_path(model_name, scope), winner_payload)
     print(f"\n=== {model_name} [{scope}] winner: {prev_winner_config}  "
-          f"{SELECT_METRIC}={prev_winner_metric:.4f} ===\n", flush=True)
+          f"val {SELECT_METRIC}={prev_winner_metric:.4f}  "
+          f"test={prev_winner_test:.4f} ===\n", flush=True)
 
 
 def _resolve_cached_winner(model_name: str, scope: Scope, knob: str,
-                           default_value, default_metric: float):
-    """For --restart-from: replay a knob's winner from cached trial JSONs."""
+                           config: dict, default_metric: float,
+                           default_test: float):
+    """For --restart-from: replay a knob's winner from cached trial JSONs.
+
+    Returns (value, val metric, test metric). `config` is the running winner
+    config with this knob still at its default.
+    """
     grid = dict(TUNE_ORDER[model_name])[knob]
-    candidates = [(default_value, default_metric)]
+    candidates = [(config[knob], default_metric, default_test)]
     for value in grid:
         tpath = _trial_path(model_name, scope, knob, value)
-        if not tpath.exists():
+        trial_config = dict(config)
+        trial_config[knob] = value
+        trial = _load_json(tpath) if tpath.exists() else None
+        if trial is None or not _usable(trial, trial_config):
             raise SystemExit(
-                f"cannot --restart-from past {knob!r}: "
-                f"missing cached trial {tpath}")
-        trial = _load_json(tpath)
-        candidates.append((value, float(trial["metrics"][SELECT_METRIC])))
+                f"cannot --restart-from past {knob!r}: no valid cached trial "
+                f"{tpath} (missing, selected on test, or trained at another "
+                f"config)")
+        candidates.append((value, float(trial["val_metrics"][SELECT_METRIC]),
+                           float(trial["test_metrics"][SELECT_METRIC])))
     return max(candidates, key=lambda x: x[1])
 
 

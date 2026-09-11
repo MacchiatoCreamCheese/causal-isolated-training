@@ -1,0 +1,103 @@
+{
+  "model": "NeuMF-m2",
+  "dataset": "musical",
+  "seed": 42,
+  "recipes": {
+    "uniform": {
+      "HitRatio@20": 0.04643119169898333,
+      "NDCG@20": 0.012236641011607825,
+      "Recall@20": 0.023146011399862387,
+      "Train (s)": 189.3757131099701,
+      "Test (s)": 42.07190155982971,
+      "counterfactual_rate": 0.3317780758347217,
+      "collision_rate": 0.0
+    },
+    "causal": {
+      "HitRatio@20": 0.049365894560318625,
+      "NDCG@20": 0.01312218272522466,
+      "Recall@20": 0.025967496799307738,
+      "Train (s)": 185.23099660873413,
+      "Test (s)": 41.305307388305664,
+      "counterfactual_rate": 0.0,
+      "collision_rate": 7.448178204819643e-06
+    },
+    "causal+temporal": {
+      "HitRatio@20": 0.059008489676134576,
+      "NDCG@20": 0.015011254290857765,
+      "Recall@20": 0.03009614506450061,
+      "Train (s)": 183.23737168312073,
+      "Test (s)": 40.45585489273071,
+      "counterfactual_rate": 0.0,
+      "collision_rate": 7.331344036900904e-06
+    }
+  },
+  "configs": {
+    "uniform": {
+      "act_fn": "relu",
+      "backend": "pytorch",
+      "batch_order": "shuffle",
+      "batch_size": 1024,
+      "layers": [
+        256,
+        128,
+        64,
+        32
+      ],
+      "learner": "adam",
+      "lr": 0.0001,
+      "neg_sampling": "uniform",
+      "num_epochs": 20,
+      "num_factors": 32,
+      "num_neg": 4,
+      "pretrain": false
+    },
+    "causal": {
+      "act_fn": "relu",
+      "backend": "pytorch",
+      "batch_order": "shuffle",
+      "batch_size": 1024,
+      "layers": [
+        256,
+        128,
+        64,
+        32
+      ],
+      "learner": "adam",
+      "lr": 0.0001,
+      "neg_sampling": "causal",
+      "num_epochs": 20,
+      "num_factors": 32,
+      "num_neg": 4,
+      "pretrain": false
+    },
+    "causal+temporal": {
+      "act_fn": "relu",
+      "backend": "pytorch",
+      "batch_order": "temporal",
+      "batch_size": 1024,
+      "layers": [
+        256,
+        128,
+        64,
+        32
+      ],
+      "learner": "adam",
+      "lr": 0.0001,
+      "neg_sampling": "causal",
+      "num_epochs": 20,
+      "num_factors": 32,
+      "num_neg": 4,
+      "pretrain": false
+    }
+  },
+  "env": {
+    "cornac": "2.6.0",
+    "numpy": "2.4.4",
+    "scipy": "1.17.1",
+    "torch": "2.4.1+cu121",
+    "device": "NVIDIA GeForce RTX 4050 Laptop GPU",
+    "git_commit": "f53d9cb",
+    "tuned_arm": "uniform",
+    "neumf_pretrain": false
+  }
+}

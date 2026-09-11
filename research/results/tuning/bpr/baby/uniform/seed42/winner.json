@@ -12,5 +12,8 @@
     "batch_size": 4096,
     "n_epochs": 1000
   },
-  "metric": 0.0066930966736123065
+  "metric": 0.0085,
+  "select_split": "validation",
+  "test_metric": 0.0066930966736123065,
+  "val_metrics_source": "backfilled from tune_bpr_baby_uniform.log, 4 d.p."
 }

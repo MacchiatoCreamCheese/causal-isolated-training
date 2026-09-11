@@ -9,11 +9,23 @@
     "n_epochs": 1000
   },
   "metrics": {
+    "HitRatio@20": 0.0187,
+    "NDCG@20": 0.0058,
+    "Recall@20": 0.0121
+  },
+  "wall_seconds": 27880.078155994415,
+  "test_metrics": {
     "HitRatio@20": 0.0133106049615552,
     "NDCG@20": 0.004469445484298375,
     "Recall@20": 0.0095641360832842,
     "Train (s)": 27206.735086917877,
     "Test (s)": 251.50952696800232
   },
-  "wall_seconds": 27880.078155994415
+  "val_metrics": {
+    "HitRatio@20": 0.0187,
+    "NDCG@20": 0.0058,
+    "Recall@20": 0.0121
+  },
+  "select_split": "validation",
+  "val_metrics_source": "backfilled from tune_bpr_cellphone_uniform.log, 4 d.p."
 }

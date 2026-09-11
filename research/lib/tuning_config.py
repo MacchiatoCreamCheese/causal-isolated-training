@@ -744,7 +744,16 @@ def winner_config(model: str, dataset: str, recipe: str, seed: int = TUNING_SEED
     if not path.exists():
         return None
     with open(path, encoding="utf-8-sig") as f:
-        return json.load(f)["config"]
+        payload = json.load(f)
+    # A winner written before 2026-09-11 was selected on the *test* set (see
+    # runners/tuning.py). Consuming it would put test-selected hyperparameters
+    # into every ablation, so it is refused -- also when synced from another
+    # machine that has not re-tuned yet.
+    if payload.get("select_split") != "validation":
+        print(f"[warn] ignoring {path}: selected on the test set; using "
+              f"defaults until this cell is re-tuned", flush=True)
+        return None
+    return payload["config"]
 
 
 def neumf_layers(num_factors: int, hidden: int) -> tuple:

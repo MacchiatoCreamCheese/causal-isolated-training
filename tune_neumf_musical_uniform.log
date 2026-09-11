@@ -171,3 +171,52 @@ NeuMF/tune/musical/uniform/s42 |      0.0464 |  0.0122 |    0.0231 |   84.7053 |
 
 === neumf [musical x uniform x seed=42] winner: {'num_factors': 32, 'mlp_hidden_count': 3, 'learning_rate': 0.0001, 'num_neg': 4, 'batch_size': 1024}  NDCG@20=0.0122 ===
 
+
+=== Tuning neumf on musical x uniform x seed=42, selecting on NDCG@20 ===
+    -> /mnt/c/Users/nguye/uniyear/causal-isolated-training/research/results/tuning/neumf/musical/uniform/seed42
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/mnt/c/Users/nguye/uniyear/causal-isolated-training/research/runners/tuning.py", line 391, in <module>
+    main()
+  File "/mnt/c/Users/nguye/uniyear/causal-isolated-training/research/runners/tuning.py", line 387, in main
+    run_tuning(args.model, scope, restart_from=args.restart_from)
+  File "/mnt/c/Users/nguye/uniyear/causal-isolated-training/research/runners/tuning.py", line 247, in run_tuning
+    eval_method = _build_eval_method(scope)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/nguye/uniyear/causal-isolated-training/research/runners/tuning.py", line 234, in _build_eval_method
+    return build_eval_method(scope.dataset, neg_sampling=scope.recipe,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/nguye/uniyear/causal-isolated-training/research/lib/data.py", line 86, in build_eval_method
+    raise FileNotFoundError(
+FileNotFoundError: dataset CSV not found: /mnt/c/Users/nguye/uniyear/causal-isolated-training/musical_dataset/Musical_Instruments.csv
+Put the file there, or set RESEARCH_DATA_DIR to the folder that contains musical_dataset/Musical_Instruments.csv.
+
+=== Tuning neumf on musical x uniform x seed=42, selecting on NDCG@20 ===
+    -> /mnt/c/Users/nguye/uniyear/causal-isolated-training/research/results/tuning/neumf/musical/uniform/seed42
+[baseline] cached: NDCG@20=0.0043
+
+--- knob: num_factors  grid=[16, 32, 64]  (default carries metric=0.0043) ---
+[skip] num_factors=16  NDCG@20=0.0052  [cached]
+[skip] num_factors=32  NDCG@20=0.0081  [cached]
+[skip] num_factors=64  NDCG@20=0.0065  [cached]
+[winner@num_factors] num_factors=32  NDCG@20=0.0081
+
+--- knob: mlp_hidden_count  grid=[4]  (default carries metric=0.0081) ---
+[skip] mlp_hidden_count=4  NDCG@20=0.0069  [cached]
+[winner@mlp_hidden_count] mlp_hidden_count=3  NDCG@20=0.0081 (kept default)
+
+--- knob: learning_rate  grid=[0.0001, 0.0005, 0.005]  (default carries metric=0.0081) ---
+[skip] learning_rate=0.0001  NDCG@20=0.0099  [cached]
+[skip] learning_rate=0.0005  NDCG@20=0.0090  [cached]
+[skip] learning_rate=0.005  NDCG@20=0.0059  [cached]
+[winner@learning_rate] learning_rate=0.0001  NDCG@20=0.0099
+
+--- knob: batch_size  grid=[128, 512, 1024]  (default carries metric=0.0099) ---
+[skip] batch_size=128  NDCG@20=0.0096  [cached]
+[skip] batch_size=512  NDCG@20=0.0106  [cached]
+[skip] batch_size=1024  NDCG@20=0.0122  [cached]
+[winner@batch_size] batch_size=1024  NDCG@20=0.0122
+
+=== neumf [musical x uniform x seed=42] winner: {'num_factors': 32, 'mlp_hidden_count': 3, 'learning_rate': 0.0001, 'num_neg': 4, 'batch_size': 1024}  NDCG@20=0.0122 ===
+

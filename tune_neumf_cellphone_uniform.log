@@ -1,0 +1,65 @@
+
+=== Tuning neumf on cellphone x uniform x seed=42, selecting on NDCG@20 ===
+    -> /mnt/c/Users/nguye/uniyear/causal-isolated-training/research/results/tuning/neumf/cellphone/uniform/seed42
+[baseline] running with defaults: {'num_factors': 8, 'mlp_hidden_count': 3, 'learning_rate': 0.001, 'num_neg': 4, 'batch_size': 256}
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/cellphone/uniform/s42 |      0.0053 |  0.0012 |    0.0031 | 376.7873
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/cellphone/uniform/s42 |      0.0041 |  0.0010 |    0.0027 | 1869.8593 | 214.8845
+
+[baseline] NDCG@20=0.0010  (2463.1s)
+
+--- knob: num_factors  grid=[16, 32, 64]  (default carries metric=0.0010) ---
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/cellphone/uniform/s42 |      0.0058 |  0.0014 |    0.0036 | 548.2914
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/cellphone/uniform/s42 |      0.0049 |  0.0013 |    0.0035 | 3315.4133 | 329.3476
+
+[run]  num_factors=16  NDCG@20=0.0013  (4196.8s)
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 |  Time (s)
+-------------------------------- + ----------- + ------- + --------- + ---------
+NeuMF/tune/cellphone/uniform/s42 |      0.0065 |  0.0016 |    0.0040 | 1011.3131
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/cellphone/uniform/s42 |      0.0051 |  0.0015 |    0.0036 | 5950.5684 | 604.5482
+
+[run]  num_factors=32  NDCG@20=0.0015  (7569.0s)
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 |  Time (s)
+-------------------------------- + ----------- + ------- + --------- + ---------
+NeuMF/tune/cellphone/uniform/s42 |      0.0053 |  0.0015 |    0.0035 | 2443.6989
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) |  Test (s)
+-------------------------------- + ----------- + ------- + --------- + ---------- + ---------
+NeuMF/tune/cellphone/uniform/s42 |      0.0047 |  0.0014 |    0.0036 | 11309.3796 | 1450.7295
+
+[run]  num_factors=64  NDCG@20=0.0014  (15208.5s)
+[winner@num_factors] num_factors=32  NDCG@20=0.0015
+
+--- knob: mlp_hidden_count  grid=[4]  (default carries metric=0.0015) ---
