@@ -1,0 +1,18 @@
+{
+  "model": "neumf",
+  "variant": "neumf-pretrain",
+  "dataset": "baby",
+  "seed": 42,
+  "recipe": "uniform",
+  "select_metric": "NDCG@20",
+  "select_split": "validation",
+  "config": {
+    "num_factors": 32,
+    "mlp_hidden_count": 3,
+    "learning_rate": 0.0005,
+    "num_neg": 4,
+    "batch_size": 1024
+  },
+  "metric": 0.007678715650800043,
+  "test_metric": 0.005182366766952961
+}

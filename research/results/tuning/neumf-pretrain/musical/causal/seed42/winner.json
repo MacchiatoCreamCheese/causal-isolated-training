@@ -1,0 +1,18 @@
+{
+  "model": "neumf",
+  "variant": "neumf-pretrain",
+  "dataset": "musical",
+  "seed": 42,
+  "recipe": "causal",
+  "select_metric": "NDCG@20",
+  "select_split": "validation",
+  "config": {
+    "num_factors": 8,
+    "mlp_hidden_count": 3,
+    "learning_rate": 0.0001,
+    "num_neg": 4,
+    "batch_size": 256
+  },
+  "metric": 0.014341154709888806,
+  "test_metric": 0.01378681085722249
+}

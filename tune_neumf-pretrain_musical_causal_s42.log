@@ -1,0 +1,120 @@
+
+=== Tuning neumf on musical x causal x seed=42, selecting on validation NDCG@20 ===
+    -> /mnt/c/Users/nguye/uniyear/causal-isolated-training/research/results/tuning/neumf-pretrain/musical/causal/seed42
+[baseline] cached: val NDCG@20=0.0128
+
+--- knob: num_factors  grid=[16, 32, 64]  (default carries metric=0.0128) ---
+[skip] num_factors=16  val NDCG@20=0.0106  [cached]
+[skip] num_factors=32  val NDCG@20=0.0122  [cached]
+[skip] num_factors=64  val NDCG@20=0.0125  [cached]
+[winner@num_factors] num_factors=8  NDCG@20=0.0128 (kept default)
+
+--- knob: mlp_hidden_count  grid=[4]  (default carries metric=0.0128) ---
+
+VALIDATION:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/musical/causal/s42 |      0.0422 |  0.0087 |    0.0204 |  16.1187
+
+TEST:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+----------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/musical/causal/s42 |      0.0356 |  0.0082 |    0.0193 |  271.6124 |  11.6775
+
+[run]  mlp_hidden_count=4  val NDCG@20=0.0087  test=0.0082  (299.7s)
+[winner@mlp_hidden_count] mlp_hidden_count=3  NDCG@20=0.0128 (kept default)
+
+--- knob: learning_rate  grid=[0.0001, 0.0005, 0.005]  (default carries metric=0.0128) ---
+
+VALIDATION:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/musical/causal/s42 |      0.0605 |  0.0143 |    0.0278 |  15.4616
+
+TEST:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+----------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/musical/causal/s42 |      0.0508 |  0.0138 |    0.0258 |  207.9609 |  11.1549
+
+[run]  learning_rate=0.0001  val NDCG@20=0.0143  test=0.0138  (234.8s)
+
+VALIDATION:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/musical/causal/s42 |      0.0604 |  0.0137 |    0.0285 |  15.5368
+
+TEST:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+----------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/musical/causal/s42 |      0.0515 |  0.0124 |    0.0260 |  208.3920 |  11.1566
+
+[run]  learning_rate=0.0005  val NDCG@20=0.0137  test=0.0124  (235.2s)
+
+VALIDATION:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/musical/causal/s42 |      0.0469 |  0.0099 |    0.0218 |  15.4617
+
+TEST:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+----------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/musical/causal/s42 |      0.0382 |  0.0088 |    0.0208 |  207.7994 |  11.0795
+
+[run]  learning_rate=0.005  val NDCG@20=0.0099  test=0.0088  (234.5s)
+[winner@learning_rate] learning_rate=0.0001  NDCG@20=0.0143
+
+--- knob: batch_size  grid=[128, 512, 1024]  (default carries metric=0.0143) ---
+
+VALIDATION:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/musical/causal/s42 |      0.0592 |  0.0137 |    0.0279 |  15.6118
+
+TEST:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+----------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/musical/causal/s42 |      0.0498 |  0.0131 |    0.0258 |  400.7515 |  11.2239
+
+[run]  batch_size=128  val NDCG@20=0.0137  test=0.0131  (427.7s)
+
+VALIDATION:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/musical/causal/s42 |      0.0597 |  0.0138 |    0.0274 |  15.4603
+
+TEST:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+----------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/musical/causal/s42 |      0.0529 |  0.0139 |    0.0270 |  113.2942 |  10.7239
+
+[run]  batch_size=512  val NDCG@20=0.0138  test=0.0139  (139.6s)
+
+VALIDATION:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/musical/causal/s42 |      0.0606 |  0.0139 |    0.0278 |  15.5177
+
+TEST:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+----------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/musical/causal/s42 |      0.0540 |  0.0141 |    0.0275 |   88.6515 |  11.9946
+
+[run]  batch_size=1024  val NDCG@20=0.0139  test=0.0141  (116.3s)
+[winner@batch_size] batch_size=256  NDCG@20=0.0143 (kept default)
+
+=== neumf [musical x causal x seed=42] winner: {'num_factors': 8, 'mlp_hidden_count': 3, 'learning_rate': 0.0001, 'num_neg': 4, 'batch_size': 256}  val NDCG@20=0.0143  test=0.0138 ===
+
