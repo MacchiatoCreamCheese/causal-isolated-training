@@ -1,0 +1,26 @@
+
+=== Tuning bpr on baby x uniform x seed=42, selecting on validation NDCG@20 ===
+    -> /home/reno/causal-isolated-training/research/results/tuning/bpr/baby/uniform/seed42
+[baseline] cached: val NDCG@20=0.0077
+
+--- knob: k_embed_dim  grid=[32, 128, 256]  (default carries metric=0.0077) ---
+[skip] k_embed_dim=32  val NDCG@20=0.0072  [cached]
+[skip] k_embed_dim=128  val NDCG@20=0.0079  [cached]
+[skip] k_embed_dim=256  val NDCG@20=0.0085  [cached]
+[winner@k_embed_dim] k_embed_dim=256  NDCG@20=0.0085
+
+--- knob: learning_rate  grid=[0.001, 0.01, 0.1]  (default carries metric=0.0085) ---
+[skip] learning_rate=0.001  val NDCG@20=0.0050  [cached]
+[skip] learning_rate=0.01  val NDCG@20=0.0049  [cached]
+[skip] learning_rate=0.1  val NDCG@20=0.0079  [cached]
+[winner@learning_rate] learning_rate=0.05  NDCG@20=0.0085 (kept default)
+
+--- knob: lambda_shared  grid=[1e-06, 1e-05, 0.001, 0.01]  (default carries metric=0.0085) ---
+[skip] lambda_shared=1e-06  val NDCG@20=0.0084  [cached]
+[skip] lambda_shared=1e-05  val NDCG@20=0.0084  [cached]
+[skip] lambda_shared=0.001  val NDCG@20=0.0084  [cached]
+[skip] lambda_shared=0.01  val NDCG@20=0.0065  [cached]
+[winner@lambda_shared] lambda_shared=0.0001  NDCG@20=0.0085 (kept default)
+
+=== bpr [baby x uniform x seed=42] winner: {'k_embed_dim': 256, 'learning_rate': 0.05, 'lambda_shared': 0.0001, 'batch_size': 4096, 'n_epochs': 1000}  val NDCG@20=0.0085  test=0.0067 ===
+

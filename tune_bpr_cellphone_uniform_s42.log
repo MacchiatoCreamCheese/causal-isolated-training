@@ -1,0 +1,50 @@
+
+=== Tuning bpr on cellphone x uniform x seed=42, selecting on validation NDCG@20 ===
+    -> /home/reno/causal-isolated-training/research/results/tuning/bpr/cellphone/uniform/seed42
+[baseline] cached: val NDCG@20=0.0053
+
+--- knob: k_embed_dim  grid=[32, 128, 256]  (default carries metric=0.0053) ---
+[skip] k_embed_dim=32  val NDCG@20=0.0049  [cached]
+[skip] k_embed_dim=128  val NDCG@20=0.0054  [cached]
+[skip] k_embed_dim=256  val NDCG@20=0.0058  [cached]
+[winner@k_embed_dim] k_embed_dim=256  NDCG@20=0.0058
+
+--- knob: learning_rate  grid=[0.001, 0.01, 0.1]  (default carries metric=0.0058) ---
+[skip] learning_rate=0.001  val NDCG@20=0.0001  [cached]
+Early stopping:
+- best epoch = 25, stopped epoch = 38
+- best monitored value = 0.003692 (delta = -0.000494)
+
+VALIDATION:
+...
+                               | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------------ + ----------- + ------- + --------- + --------
+BPR/tune/cellphone/uniform/s42 |      0.0129 |  0.0032 |    0.0081 | 410.5594
+
+TEST:
+...
+                               | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+------------------------------ + ----------- + ------- + --------- + ---------- + --------
+BPR/tune/cellphone/uniform/s42 |      0.0101 |  0.0026 |    0.0069 | 16438.1060 | 250.3238
+
+[run]  learning_rate=0.01  val NDCG@20=0.0032  test=0.0026  (17101.0s)
+Early stopping:
+- best epoch = 40, stopped epoch = 53
+- best monitored value = 0.006164 (delta = -0.000053)
+
+VALIDATION:
+...
+                               | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------------ + ----------- + ------- + --------- + --------
+BPR/tune/cellphone/uniform/s42 |      0.0198 |  0.0061 |    0.0129 | 418.5943
+
+TEST:
+...
+                               | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+------------------------------ + ----------- + ------- + --------- + ---------- + --------
+BPR/tune/cellphone/uniform/s42 |      0.0139 |  0.0046 |    0.0100 | 22881.5747 | 250.8798
+
+[run]  learning_rate=0.1  val NDCG@20=0.0061  test=0.0046  (23552.3s)
+[winner@learning_rate] learning_rate=0.1  NDCG@20=0.0061
+
+--- knob: lambda_shared  grid=[1e-06, 1e-05, 0.001, 0.01]  (default carries metric=0.0061) ---

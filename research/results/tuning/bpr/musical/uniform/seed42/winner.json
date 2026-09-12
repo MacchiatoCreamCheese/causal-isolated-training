@@ -1,15 +1,18 @@
 {
   "model": "bpr",
+  "variant": "bpr",
   "dataset": "musical",
   "seed": 42,
   "recipe": "uniform",
   "select_metric": "NDCG@20",
+  "select_split": "validation",
   "config": {
     "k_embed_dim": 256,
     "learning_rate": 0.05,
-    "lambda_shared": 1e-06,
+    "lambda_shared": 0.001,
     "batch_size": 4096,
     "n_epochs": 1000
   },
-  "metric": 0.01395030326184211
+  "metric": 0.016307780493331987,
+  "test_metric": 0.013312944093371708
 }

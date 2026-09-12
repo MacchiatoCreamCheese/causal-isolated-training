@@ -1,0 +1,26 @@
+
+=== Tuning bpr on musical x causal x seed=42, selecting on validation NDCG@20 ===
+    -> /home/reno/causal-isolated-training/research/results/tuning/bpr/musical/causal/seed42
+[baseline] cached: val NDCG@20=0.0179
+
+--- knob: k_embed_dim  grid=[32, 128, 256]  (default carries metric=0.0179) ---
+[skip] k_embed_dim=32  val NDCG@20=0.0167  [cached]
+[skip] k_embed_dim=128  val NDCG@20=0.0187  [cached]
+[skip] k_embed_dim=256  val NDCG@20=0.0196  [cached]
+[winner@k_embed_dim] k_embed_dim=256  NDCG@20=0.0196
+
+--- knob: learning_rate  grid=[0.001, 0.01, 0.1]  (default carries metric=0.0196) ---
+[skip] learning_rate=0.001  val NDCG@20=0.0102  [cached]
+[skip] learning_rate=0.01  val NDCG@20=0.0194  [cached]
+[skip] learning_rate=0.1  val NDCG@20=0.0183  [cached]
+[winner@learning_rate] learning_rate=0.05  NDCG@20=0.0196 (kept default)
+
+--- knob: lambda_shared  grid=[1e-06, 1e-05, 0.001, 0.01]  (default carries metric=0.0196) ---
+[skip] lambda_shared=1e-06  val NDCG@20=0.0197  [cached]
+[skip] lambda_shared=1e-05  val NDCG@20=0.0197  [cached]
+[skip] lambda_shared=0.001  val NDCG@20=0.0192  [cached]
+[skip] lambda_shared=0.01  val NDCG@20=0.0180  [cached]
+[winner@lambda_shared] lambda_shared=1e-06  NDCG@20=0.0197
+
+=== bpr [musical x causal x seed=42] winner: {'k_embed_dim': 256, 'learning_rate': 0.05, 'lambda_shared': 1e-06, 'batch_size': 4096, 'n_epochs': 1000}  val NDCG@20=0.0197  test=0.0169 ===
+
