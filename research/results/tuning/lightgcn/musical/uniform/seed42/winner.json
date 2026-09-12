@@ -1,0 +1,16 @@
+{
+  "model": "lightgcn",
+  "variant": "lightgcn",
+  "dataset": "musical",
+  "seed": 42,
+  "recipe": "uniform",
+  "select_metric": "NDCG@20",
+  "select_split": "validation",
+  "config": {
+    "lambda_reg": 0.0001,
+    "num_layers": 4,
+    "learning_rate": 0.001
+  },
+  "metric": 0.01820843524868254,
+  "test_metric": 0.016482024006549016
+}

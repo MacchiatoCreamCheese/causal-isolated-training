@@ -1,0 +1,16 @@
+{
+  "model": "lightgcn",
+  "variant": "lightgcn",
+  "dataset": "baby",
+  "seed": 42,
+  "recipe": "causal",
+  "select_metric": "NDCG@20",
+  "select_split": "validation",
+  "config": {
+    "lambda_reg": 0.0001,
+    "num_layers": 4,
+    "learning_rate": 0.001
+  },
+  "metric": 0.00855221951851804,
+  "test_metric": 0.0064413679983769566
+}

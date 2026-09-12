@@ -1,0 +1,78 @@
+
+=== Tuning lightgcn on baby x causal x seed=42, selecting on validation NDCG@20 ===
+    -> /home/thinh/causal-isolated-training/research/results/tuning/lightgcn/baby/causal/seed42
+[baseline] running with defaults: {'lambda_reg': 0.0001, 'num_layers': 3, 'learning_rate': 0.001}
+Early stopping:
+- best epoch = 30, stopped epoch = 80
+- best monitored value = 0.024467 (delta = -0.008888)
+
+VALIDATION:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------- + ----------- + ------- + --------- + --------
+LightGCN/tune/baby/causal/s42 |      0.0312 |  0.0077 |    0.0156 |  16.5490
+
+TEST:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+----------------------------- + ----------- + ------- + --------- + --------- + --------
+LightGCN/tune/baby/causal/s42 |      0.0208 |  0.0055 |    0.0122 | 2892.7212 |  10.0933
+
+[baseline] val NDCG@20=0.0077  test=0.0055  (2919.7s)
+
+--- knob: num_layers  grid=[1, 2, 4]  (default carries metric=0.0077) ---
+Early stopping:
+- best epoch = 10, stopped epoch = 60
+- best monitored value = 0.026429 (delta = -0.014531)
+
+VALIDATION:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------- + ----------- + ------- + --------- + --------
+LightGCN/tune/baby/causal/s42 |      0.0229 |  0.0055 |    0.0119 |  17.2958
+
+TEST:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+----------------------------- + ----------- + ------- + --------- + --------- + --------
+LightGCN/tune/baby/causal/s42 |      0.0182 |  0.0046 |    0.0106 | 1554.2088 |  10.2691
+
+[run]  num_layers=1  val NDCG@20=0.0055  test=0.0046  (1582.1s)
+Early stopping:
+- best epoch = 9, stopped epoch = 59
+- best monitored value = 0.026989 (delta = -0.010444)
+
+VALIDATION:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------- + ----------- + ------- + --------- + --------
+LightGCN/tune/baby/causal/s42 |      0.0314 |  0.0075 |    0.0165 |  16.9063
+
+TEST:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+----------------------------- + ----------- + ------- + --------- + --------- + --------
+LightGCN/tune/baby/causal/s42 |      0.0213 |  0.0056 |    0.0128 | 1830.7121 |  10.1569
+
+[run]  num_layers=2  val NDCG@20=0.0075  test=0.0056  (1858.1s)
+Early stopping:
+- best epoch = 32, stopped epoch = 82
+- best monitored value = 0.025594 (delta = -0.007196)
+
+VALIDATION:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------- + ----------- + ------- + --------- + --------
+LightGCN/tune/baby/causal/s42 |      0.0355 |  0.0086 |    0.0184 |  16.8258
+
+TEST:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+----------------------------- + ----------- + ------- + --------- + --------- + --------
+LightGCN/tune/baby/causal/s42 |      0.0239 |  0.0064 |    0.0152 | 3426.4669 |  10.7460
+
+[run]  num_layers=4  val NDCG@20=0.0086  test=0.0064  (3454.3s)
+[winner@num_layers] num_layers=4  NDCG@20=0.0086
+
+=== lightgcn [baby x causal x seed=42] winner: {'lambda_reg': 0.0001, 'num_layers': 4, 'learning_rate': 0.001}  val NDCG@20=0.0086  test=0.0064 ===
+
