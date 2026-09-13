@@ -2,3 +2,7 @@
 === Tuning bpr on cellphone x uniform x seed=2026, selecting on validation NDCG@20 ===
     -> /home/trustrs/causal-isolated-training/research/results/tuning/bpr/cellphone/uniform/seed2026
 [baseline] running with defaults: {'k_embed_dim': 64, 'learning_rate': 0.05, 'lambda_shared': 0.0001, 'batch_size': 4096, 'n_epochs': 1000}
+
+=== Tuning bpr on cellphone x uniform x seed=2026, selecting on validation NDCG@20 ===
+    -> /home/trustrs/causal-isolated-training/research/results/tuning/bpr/cellphone/uniform/seed2026
+[baseline] running with defaults: {'k_embed_dim': 64, 'learning_rate': 0.05, 'lambda_shared': 0.0001, 'batch_size': 4096, 'n_epochs': 1000}

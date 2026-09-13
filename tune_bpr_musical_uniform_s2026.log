@@ -201,3 +201,47 @@ BPR/tune/musical/uniform/s2026 |      0.0523 |  0.0131 |    0.0268 |  697.3304 |
 
 === bpr [musical x uniform x seed=2026] winner: {'k_embed_dim': 256, 'learning_rate': 0.05, 'lambda_shared': 1e-05, 'batch_size': 4096, 'n_epochs': 1000}  val NDCG@20=0.0167  test=0.0138 ===
 
+
+=== Tuning bpr on musical x uniform x seed=2026, selecting on validation NDCG@20 ===
+    -> /home/trustrs/causal-isolated-training/research/results/tuning/bpr/musical/uniform/seed2026
+[baseline] cached: val NDCG@20=0.0144
+
+--- knob: k_embed_dim  grid=[32, 128, 256]  (default carries metric=0.0144) ---
+[skip] k_embed_dim=32  val NDCG@20=0.0148  [cached]
+[skip] k_embed_dim=128  val NDCG@20=0.0161  [cached]
+[skip] k_embed_dim=256  val NDCG@20=0.0166  [cached]
+[winner@k_embed_dim] k_embed_dim=256  NDCG@20=0.0166
+
+--- knob: learning_rate  grid=[0.001, 0.01, 0.1]  (default carries metric=0.0166) ---
+[skip] learning_rate=0.001  val NDCG@20=0.0003  [cached]
+[skip] learning_rate=0.01  val NDCG@20=0.0102  [cached]
+[skip] learning_rate=0.1  val NDCG@20=0.0154  [cached]
+[winner@learning_rate] learning_rate=0.05  NDCG@20=0.0166 (kept default)
+
+--- knob: lambda_shared  grid=[1e-06, 1e-05, 0.001, 0.01]  (default carries metric=0.0166) ---
+[skip] lambda_shared=1e-06  val NDCG@20=0.0166  [cached]
+[skip] lambda_shared=1e-05  val NDCG@20=0.0167  [cached]
+[skip] lambda_shared=0.001  val NDCG@20=0.0163  [cached]
+[skip] lambda_shared=0.01  val NDCG@20=0.0157  [cached]
+[winner@lambda_shared] lambda_shared=1e-05  NDCG@20=0.0167
+[users] winner was trained before per-user scores were saved; retraining it once
+Early stopping:
+- best epoch = 34, stopped epoch = 47
+- best monitored value = 0.016686 (delta = -0.000011)
+
+VALIDATION:
+...
+                               | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------------ + ----------- + ------- + --------- + --------
+BPR/tune/musical/uniform/s2026 |      0.0654 |  0.0167 |    0.0316 |  13.7503
+
+TEST:
+...
+                               | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------------ + ----------- + ------- + --------- + --------- + --------
+BPR/tune/musical/uniform/s2026 |      0.0538 |  0.0138 |    0.0286 |  726.3557 |   8.8648
+
+[users] retrained winner: val NDCG@20=0.0167  test=0.0138  (749.1s)
+
+=== bpr [musical x uniform x seed=2026] winner: {'k_embed_dim': 256, 'learning_rate': 0.05, 'lambda_shared': 1e-05, 'batch_size': 4096, 'n_epochs': 1000}  val NDCG@20=0.0167  test=0.0138 ===
+
