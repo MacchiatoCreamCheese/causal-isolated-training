@@ -81,7 +81,7 @@ def run_one(model_name, label, ds_name, seed, batch_size, warmup_frac,
         # Each arm's own tuned winner when RESEARCH_TUNED_ARM=per_arm, so the
         # curves compare each method at its best; under the default both resolve
         # to the uniform arm's winners and the comparison stays single-variable.
-        kwargs = KWARGS_FOR[model_name](ds_name, arm)
+        kwargs = KWARGS_FOR[model_name](ds_name, arm, seed)
         if model_name == "bpr":
             kwargs = {**kwargs, "batch_size": batch_size}
         configs[arm] = {**kwargs, "stream_batch_size": batch_size,

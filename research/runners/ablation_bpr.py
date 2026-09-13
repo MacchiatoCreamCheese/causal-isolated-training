@@ -36,7 +36,7 @@ from ..paths import logs_dir
 MODEL = ablation_label("BPR")
 
 
-def cell_configs(ds_name: str):
+def cell_configs(ds_name: str, seed: int):
     """`{recipe: kwargs}` for one dataset -- the single source for both the model
     and its provenance stamp, so the config recorded in a result file cannot
     drift from the one that produced it.
@@ -48,7 +48,7 @@ def cell_configs(ds_name: str):
     separately at the call site, because patience changes the result and so
     belongs in what gets compared on resume.
     """
-    return {r: {**bpr_kwargs(ds_name, r), **BPR_EARLY_STOP} for r in RECIPES}
+    return {r: {**bpr_kwargs(ds_name, r, seed), **BPR_EARLY_STOP} for r in RECIPES}
 
 
 def build_model(ds_name: str, seed: int, recipe: str, kwargs: dict):
@@ -59,7 +59,7 @@ def build_model(ds_name: str, seed: int, recipe: str, kwargs: dict):
 
 
 def run_one(ds_name: str, seed: int) -> None:
-    configs = cell_configs(ds_name)
+    configs = cell_configs(ds_name, seed)
     recipes_out = load_partial(MODEL, ds_name, seed, configs)
     pending = [r for r in RECIPES if r not in recipes_out]
     if not pending:

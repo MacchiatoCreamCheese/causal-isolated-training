@@ -46,7 +46,7 @@ def run_one(ds_name: str, seed: int) -> None:
     # One source for both the constructor and the provenance stamp. These carry
     # `pretrain` and `learner`, so a pre-trained cell is distinguishable by its
     # contents as well as by its filename.
-    configs = {r: neumf_kwargs(ds_name, r) for r in RECIPES}
+    configs = {r: neumf_kwargs(ds_name, r, seed) for r in RECIPES}
     recipes_out = load_partial(MODEL, ds_name, seed, configs)
     pending = [r for r in RECIPES if r not in recipes_out]
     if not pending:

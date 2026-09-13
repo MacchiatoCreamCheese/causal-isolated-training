@@ -41,6 +41,9 @@ plt.rcParams.update({
     "figure.dpi": 150,
     "savefig.dpi": 300,
     "savefig.bbox": "tight",
+    # ACM rejects Type 3 fonts; 42 embeds TrueType instead.
+    "pdf.fonttype": 42,
+    "ps.fonttype": 42,
     "axes.spines.top": False,
     "axes.spines.right": False,
     "axes.grid": True,

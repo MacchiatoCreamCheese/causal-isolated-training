@@ -677,7 +677,10 @@ NEUMF_KWARGS = dict(
 # Selected by RESEARCH_TUNED_ARM so the secondary experiment needs no code edit.
 
 TUNED_ARM = os.environ.get("RESEARCH_TUNED_ARM", "uniform")
-TUNING_SEED = 42
+
+# Winners are per seed: a seed-N cell uses the winner tuned on seed N. There is
+# deliberately no default seed -- a caller that forgets to pass one would
+# otherwise quietly get another seed's hyperparameters.
 
 
 # ---------------------------------------------------------------------------
@@ -731,17 +734,36 @@ def _tuning_source(recipe: str) -> str:
     return recipe if TUNED_ARM == "per_arm" else TUNED_ARM
 
 
-def winner_config(model: str, dataset: str, recipe: str, seed: int = TUNING_SEED):
-    """Tuned config for one cell, or None if it was never tuned.
+_WARNED = set()
+
+
+def _warn_once(msg: str) -> None:
+    # The kwargs helpers run several times per cell (config stamp, then build).
+    if msg not in _WARNED:
+        _WARNED.add(msg)
+        print(msg, flush=True)
+
+
+def winner_dir(model: str, dataset: str, arm: str, seed: int):
+    """`results/tuning/<model dir>/<dataset>/<arm>/seed<n>` -- one tuning cell.
+
+    `arm` is literal here (no TUNED_ARM mapping), so a caller asking for the
+    uniform tuning cell gets exactly that.
+    """
+    return RESULTS_DIR / "tuning" / tuning_model_dir(model) / dataset / arm / f"seed{seed}"
+
+
+def winner_config(model: str, dataset: str, recipe: str, seed: int):
+    """Tuned config for one cell at one seed, or None if it was never tuned.
 
     Returns the `config` dict `runners/tuning.py` wrote, which carries every key
     in that model's BASELINE_CONFIG -- including knobs the sweep did not touch,
     since coordinate descent starts from the baseline and only overwrites what it
     sweeps. Callers can therefore read any baseline key off it unconditionally.
     """
-    path = (RESULTS_DIR / "tuning" / tuning_model_dir(model) / dataset
-            / _tuning_source(recipe) / f"seed{seed}" / "winner.json")
+    path = winner_dir(model, dataset, _tuning_source(recipe), seed) / "winner.json"
     if not path.exists():
+        _warn_once(f"[warn] no tuned winner at {path}; using defaults")
         return None
     with open(path, encoding="utf-8-sig") as f:
         payload = json.load(f)
@@ -750,8 +772,8 @@ def winner_config(model: str, dataset: str, recipe: str, seed: int = TUNING_SEED
     # into every ablation, so it is refused -- also when synced from another
     # machine that has not re-tuned yet.
     if payload.get("select_split") != "validation":
-        print(f"[warn] ignoring {path}: selected on the test set; using "
-              f"defaults until this cell is re-tuned", flush=True)
+        _warn_once(f"[warn] ignoring {path}: selected on the test set; using "
+                   f"defaults until this cell is re-tuned")
         return None
     return payload["config"]
 
@@ -765,9 +787,9 @@ def neumf_layers(num_factors: int, hidden: int) -> tuple:
     return tuple(num_factors * (2 ** i) for i in range(hidden, -1, -1))
 
 
-def bpr_kwargs(dataset: str, recipe: str) -> dict:
+def bpr_kwargs(dataset: str, recipe: str, seed: int) -> dict:
     """BPRMiniBatch ctor kwargs, tuned if available. Pair with BPR_EARLY_STOP."""
-    w = winner_config("bpr", dataset, recipe)
+    w = winner_config("bpr", dataset, recipe, seed)
     if w is None:
         return dict(BPR_KWARGS)
     lam = float(w["lambda_shared"])
@@ -780,9 +802,9 @@ def bpr_kwargs(dataset: str, recipe: str) -> dict:
     )
 
 
-def neumf_kwargs(dataset: str, recipe: str) -> dict:
+def neumf_kwargs(dataset: str, recipe: str, seed: int) -> dict:
     """cornac NeuMF ctor kwargs, tuned if available."""
-    w = winner_config("neumf", dataset, recipe)
+    w = winner_config("neumf", dataset, recipe, seed)
     if w is None:
         return dict(NEUMF_KWARGS)
     num_factors = int(w["num_factors"])
@@ -797,7 +819,7 @@ def neumf_kwargs(dataset: str, recipe: str) -> dict:
     return kwargs
 
 
-def lightgcn_kwargs(dataset: str, recipe: str) -> dict:
+def lightgcn_kwargs(dataset: str, recipe: str, seed: int) -> dict:
     """cornac LightGCN ctor kwargs, tuned if available.
 
     batch_size is per-dataset from the inventory and is not a tuned knob, so it
@@ -809,7 +831,7 @@ def lightgcn_kwargs(dataset: str, recipe: str) -> dict:
         learning_rate=LIGHTGCN["learning_rate"]["current"],
         lambda_reg=LIGHTGCN["lambda_reg"]["current"],
     )
-    w = winner_config("lightgcn", dataset, recipe)
+    w = winner_config("lightgcn", dataset, recipe, seed)
     if w is not None:
         base.update(
             num_layers=int(w["num_layers"]),

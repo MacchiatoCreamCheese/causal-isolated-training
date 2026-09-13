@@ -44,6 +44,16 @@ Output layout, one tree per (model, dataset, recipe, seed) cell:
     research/results/tuning/<model>/<dataset>/<recipe>/seed<n>/baseline.json
     research/results/tuning/<model>/<dataset>/<recipe>/seed<n>/<knob>/<value>.json
     research/results/tuning/<model>/<dataset>/<recipe>/seed<n>/winner.json
+    research/results/tuning/<model>/<dataset>/<recipe>/seed<n>/winner.users.npz
+
+**The winner's per-user test scores are kept.** A tuning winner is also a rung of
+the ladder ablation (`mecha2/runner.py`): the uniform winner is rung 1, the
+causal winner rung 2. Keeping its per-user scores (`lib/user_scores.py`) lets the
+ladder reuse that run for a paired t-test instead of retraining it. Every new
+trial writes `<value>.users.npz` beside its JSON; when the cell finishes, the
+winner's copy becomes `winner.users.npz` and the rest are deleted. A winner that
+was trained before this existed is retrained once, and `winner.json`'s
+`users_run` says which run the scores (and their test metrics) came from.
 
 The scope is in the *path*, not just inside the files, and that is load-bearing:
 re-running is idempotent because a cached trial JSON is skipped, so a layout that
@@ -63,6 +73,7 @@ Usage:
 import argparse
 import json
 import os
+import shutil
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -70,6 +81,8 @@ from pathlib import Path
 import cornac
 from cornac.metrics import NDCG, HitRatio, Recall
 
+from ..lib import user_scores
+from ..lib.ablation_harness import PROBE_METRICS
 from ..lib.causal_sampling import TOP_K
 from ..lib.data import DATASETS, build_eval_method
 from ..lib.timeaware_data import NEG_SAMPLING_MODES
@@ -225,12 +238,17 @@ def _load_json(path: Path) -> dict:
 # ---------------------------------------------------------------------------
 
 def _train_once(model_name: str, config: dict, eval_method, scope: Scope) -> tuple:
-    """Build the model, run cornac.Experiment, return (val, test, wall_seconds).
+    """Build the model, run cornac.Experiment.
 
-    Selection reads `val`. `test` is kept only so the file records what the
-    configuration scored on the held-out period.
+    Returns `(val, test, users, probes, wall_seconds)`. Selection reads `val`;
+    `test`, the per-user test scores and the sampling probes are recorded so a
+    winning trial can stand in for a ladder rung.
     """
     model = _build_model(model_name, config, scope)
+    # Probe counters are per trial. The sampling RNG is deliberately *not*
+    # reset: trials already on disk were produced with it running on, and
+    # resetting would change what re-running a cell reproduces.
+    eval_method.train_set.reset_counterfactual_counters()
     exp = cornac.Experiment(
         eval_method=eval_method,
         models=[model],
@@ -249,7 +267,59 @@ def _train_once(model_name: str, config: dict, eval_method, scope: Scope) -> tup
         raise RuntimeError("cornac.Experiment returned no test result")
     val = dict(exp.val_result[0].metric_avg_results)
     test = dict(exp.result[0].metric_avg_results)
-    return val, test, wall
+    users = user_scores.from_experiment(exp)
+    # Our BPR owns its sampler; cornac's models draw through the split.
+    probe = model if model_name == "bpr" else eval_method.train_set
+    probes = {name: float(getattr(probe, name)) for name in PROBE_METRICS}
+    return val, test, users, probes, wall
+
+
+def _users_path(json_path: Path) -> Path:
+    """`<name>.users.npz` beside a trial or baseline JSON."""
+    return json_path.with_name(json_path.stem + ".users.npz")
+
+
+def _winner_users(model_name: str, scope: Scope, eval_method, config: dict,
+                  users_path: Path) -> dict:
+    """Put the winning config's per-user test scores at `users_path`.
+
+    Returns `users_run`: which run the scores came from, with that run's own
+    test metrics and probes, so anything built on the scores reports the numbers
+    of the same run. Three cases, cheapest first: already done for this config;
+    copied from the trial (or baseline) that produced the winner; or, for a
+    winner trained before per-user scores were saved, one retrain.
+    """
+    d = scope.dir(model_name)
+    wpath = _winner_path(model_name, scope)
+    if users_path.exists() and wpath.exists():
+        old = _load_json(wpath)
+        if old.get("users_run") and _usable({**old, "val_metrics": True}, config):
+            print("[users] winner per-user scores already saved", flush=True)
+            return old["users_run"]
+
+    for jpath in [d / "baseline.json"] + sorted(d.glob("*/*.json")):
+        npz = _users_path(jpath)
+        if not (jpath.exists() and npz.exists()):
+            continue
+        rec = _load_json(jpath)
+        if _usable(rec, config):
+            shutil.copyfile(npz, users_path)
+            rel = jpath.relative_to(d).as_posix()
+            print(f"[users] winner per-user scores from {rel}", flush=True)
+            return {"source": "trial", "trial": rel,
+                    "val_metrics": rec["val_metrics"],
+                    "test_metrics": rec["test_metrics"],
+                    "probes": rec.get("probes")}
+
+    print("[users] winner was trained before per-user scores were saved; "
+          "retraining it once", flush=True)
+    val, test, users, probes, wall = _train_once(model_name, config,
+                                                 eval_method, scope)
+    user_scores.save(users_path, users)
+    print(f"[users] retrained winner: val {SELECT_METRIC}={val[SELECT_METRIC]:.4f}  "
+          f"test={test[SELECT_METRIC]:.4f}  ({wall:.1f}s)", flush=True)
+    return {"source": "retrain", "val_metrics": val, "test_metrics": test,
+            "probes": probes, "wall_seconds": wall}
 
 
 def _canon(config) -> str:
@@ -303,8 +373,12 @@ def run_tuning(model_name: str, scope: Scope, restart_from: str = None) -> None:
             print("[stale] baseline: selected on test or trained at another "
                   "config; re-running", flush=True)
         print(f"[baseline] running with defaults: {config}", flush=True)
-        val, test, wall = _train_once(model_name, config, eval_method, scope)
-        baseline = _record(config, val, test, wall)
+        val, test, users, probes, wall = _train_once(model_name, config,
+                                                     eval_method, scope)
+        baseline = _record(config, val, test, wall, probes=probes)
+        # Scores before the JSON: the JSON's existence is what makes a trial
+        # count as cached, so it must not appear without its scores.
+        user_scores.save(_users_path(bpath), users)
         _write_json(bpath, baseline)
         print(f"[baseline] val {SELECT_METRIC}={val[SELECT_METRIC]:.4f}  "
               f"test={test[SELECT_METRIC]:.4f}  ({wall:.1f}s)", flush=True)
@@ -356,10 +430,11 @@ def run_tuning(model_name: str, scope: Scope, restart_from: str = None) -> None:
                 if trial is not None:
                     print(f"[stale] {knob}={value}: selected on test or trained "
                           f"at another config; re-running", flush=True)
-                val, test, wall = _train_once(model_name, trial_config,
-                                              eval_method, scope)
+                val, test, users, probes, wall = _train_once(
+                    model_name, trial_config, eval_method, scope)
                 trial = _record(trial_config, val, test, wall,
-                                knob=knob, value=value)
+                                knob=knob, value=value, probes=probes)
+                user_scores.save(_users_path(tpath), users)
                 _write_json(tpath, trial)
                 m, t = float(val[SELECT_METRIC]), float(test[SELECT_METRIC])
                 print(f"[run]  {knob}={value}  val {SELECT_METRIC}={m:.4f}  "
@@ -379,7 +454,10 @@ def run_tuning(model_name: str, scope: Scope, restart_from: str = None) -> None:
         print(f"[winner@{knob}] {knob}={best_value}  "
               f"{SELECT_METRIC}={best_metric:.4f}{marker}", flush=True)
 
-    # --- Persist final winner ---
+    # --- Per-user scores of the winner, then persist it ---
+    users_path = scope.dir(model_name) / "winner.users.npz"
+    users_run = _winner_users(model_name, scope, eval_method,
+                              prev_winner_config, users_path)
     winner_payload = {
         "model": model_name,
         # The variant is otherwise only in the path, and these files are synced
@@ -395,8 +473,13 @@ def run_tuning(model_name: str, scope: Scope, restart_from: str = None) -> None:
         "config": prev_winner_config,
         "metric": prev_winner_metric,
         "test_metric": prev_winner_test,
+        "users_run": users_run,
     }
     _write_json(_winner_path(model_name, scope), winner_payload)
+    # Only the winner's per-user scores are worth keeping.
+    for npz in scope.dir(model_name).rglob("*.users.npz"):
+        if npz != users_path:
+            npz.unlink()
     print(f"\n=== {model_name} [{scope}] winner: {prev_winner_config}  "
           f"val {SELECT_METRIC}={prev_winner_metric:.4f}  "
           f"test={prev_winner_test:.4f} ===\n", flush=True)
