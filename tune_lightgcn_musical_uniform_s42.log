@@ -76,3 +76,34 @@ LightGCN/tune/musical/uniform/s42 |      0.0615 |  0.0165 |    0.0339 | 1237.587
 
 === lightgcn [musical x uniform x seed=42] winner: {'lambda_reg': 0.0001, 'num_layers': 4, 'learning_rate': 0.001}  val NDCG@20=0.0182  test=0.0165 ===
 
+
+=== Tuning lightgcn on musical x uniform x seed=42, selecting on validation NDCG@20 ===
+    -> /home/thinh/causal-isolated-training/research/results/tuning/lightgcn/musical/uniform/seed42
+[baseline] cached: val NDCG@20=0.0179
+
+--- knob: num_layers  grid=[1, 2, 4]  (default carries metric=0.0179) ---
+[skip] num_layers=1  val NDCG@20=0.0141  [cached]
+[skip] num_layers=2  val NDCG@20=0.0169  [cached]
+[skip] num_layers=4  val NDCG@20=0.0182  [cached]
+[winner@num_layers] num_layers=4  NDCG@20=0.0182
+[users] winner was trained before per-user scores were saved; retraining it once
+Early stopping:
+- best epoch = 48, stopped epoch = 98
+- best monitored value = 0.037601 (delta = -0.002022)
+
+VALIDATION:
+...
+                                  | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------------- + ----------- + ------- + --------- + --------
+LightGCN/tune/musical/uniform/s42 |      0.0721 |  0.0182 |    0.0356 |   8.5975
+
+TEST:
+...
+                                  | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------------- + ----------- + ------- + --------- + --------- + --------
+LightGCN/tune/musical/uniform/s42 |      0.0615 |  0.0165 |    0.0339 | 1254.3508 |   7.1391
+
+[users] retrained winner: val NDCG@20=0.0182  test=0.0165  (1270.2s)
+
+=== lightgcn [musical x uniform x seed=42] winner: {'lambda_reg': 0.0001, 'num_layers': 4, 'learning_rate': 0.001}  val NDCG@20=0.0182  test=0.0165 ===
+
