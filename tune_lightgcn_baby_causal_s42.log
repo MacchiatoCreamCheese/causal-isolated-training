@@ -87,3 +87,23 @@ LightGCN/tune/baby/causal/s42 |      0.0239 |  0.0064 |    0.0152 | 3426.4669 | 
 [skip] num_layers=4  val NDCG@20=0.0086  [cached]
 [winner@num_layers] num_layers=4  NDCG@20=0.0086
 [users] winner was trained before per-user scores were saved; retraining it once
+Early stopping:
+- best epoch = 32, stopped epoch = 82
+- best monitored value = 0.025594 (delta = -0.007196)
+
+VALIDATION:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------- + ----------- + ------- + --------- + --------
+LightGCN/tune/baby/causal/s42 |      0.0355 |  0.0086 |    0.0184 |  17.6655
+
+TEST:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+----------------------------- + ----------- + ------- + --------- + --------- + --------
+LightGCN/tune/baby/causal/s42 |      0.0239 |  0.0064 |    0.0152 | 3434.9429 |  11.6138
+
+[users] retrained winner: val NDCG@20=0.0086  test=0.0064  (3464.6s)
+
+=== lightgcn [baby x causal x seed=42] winner: {'lambda_reg': 0.0001, 'num_layers': 4, 'learning_rate': 0.001}  val NDCG@20=0.0086  test=0.0064 ===
+
