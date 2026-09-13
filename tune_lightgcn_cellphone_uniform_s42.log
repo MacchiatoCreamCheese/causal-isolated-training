@@ -2,3 +2,39 @@
 === Tuning lightgcn on cellphone x uniform x seed=42, selecting on validation NDCG@20 ===
     -> /home/thinh/causal-isolated-training/research/results/tuning/lightgcn/cellphone/uniform/seed42
 [baseline] running with defaults: {'lambda_reg': 0.0001, 'num_layers': 3, 'learning_rate': 0.001}
+Early stopping:
+- best epoch = 13, stopped epoch = 63
+- best monitored value = 0.016425 (delta = -0.004703)
+
+VALIDATION:
+...
+                                    | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------------- + ----------- + ------- + --------- + --------
+LightGCN/tune/cellphone/uniform/s42 |      0.0182 |  0.0054 |    0.0117 | 259.0955
+
+TEST:
+...
+                                    | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+----------------------------------- + ----------- + ------- + --------- + ---------- + --------
+LightGCN/tune/cellphone/uniform/s42 |      0.0134 |  0.0043 |    0.0095 | 29028.7417 | 157.0793
+
+[baseline] val NDCG@20=0.0054  test=0.0043  (29446.0s)
+
+--- knob: num_layers  grid=[1, 2, 4]  (default carries metric=0.0054) ---
+Early stopping:
+- best epoch = 5, stopped epoch = 55
+- best monitored value = 0.014517 (delta = -0.005515)
+
+VALIDATION:
+...
+                                    | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------------- + ----------- + ------- + --------- + --------
+LightGCN/tune/cellphone/uniform/s42 |      0.0137 |  0.0042 |    0.0090 | 260.0940
+
+TEST:
+...
+                                    | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+----------------------------------- + ----------- + ------- + --------- + ---------- + --------
+LightGCN/tune/cellphone/uniform/s42 |      0.0103 |  0.0033 |    0.0074 | 19718.1127 | 156.4053
+
+[run]  num_layers=1  val NDCG@20=0.0042  test=0.0033  (20135.5s)
