@@ -4,3 +4,5 @@ nohup: ignoring input
 [run_tuning] musical/uniform/seed42 -> tune_bpr_musical_uniform_s42.log  (08:02)
 [run_tuning] musical/causal/seed42 -> tune_bpr_musical_causal_s42.log  (08:13)
 [run_tuning] baby/uniform/seed42 -> tune_bpr_baby_uniform_s42.log  (08:22)
+[run_tuning] baby/causal/seed42 -> tune_bpr_baby_causal_s42.log  (08:45)
+[run_tuning] cellphone/uniform/seed42 -> tune_bpr_cellphone_uniform_s42.log  (08:52)

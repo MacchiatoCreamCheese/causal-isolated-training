@@ -48,3 +48,23 @@
 [skip] lambda_shared=0.01  val NDCG@20=0.0065  [cached]
 [winner@lambda_shared] lambda_shared=0.0001  NDCG@20=0.0085 (kept default)
 [users] winner was trained before per-user scores were saved; retraining it once
+Early stopping:
+- best epoch = 34, stopped epoch = 47
+- best monitored value = 0.009870 (delta = -0.001416)
+
+VALIDATION:
+...
+                          | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/baby/uniform/s42 |      0.0352 |  0.0085 |    0.0179 |  22.7950
+
+TEST:
+...
+                          | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/uniform/s42 |      0.0255 |  0.0067 |    0.0148 | 1347.2822 |  11.7611
+
+[users] retrained winner: val NDCG@20=0.0085  test=0.0067  (1382.2s)
+
+=== bpr [baby x uniform x seed=42] winner: {'k_embed_dim': 256, 'learning_rate': 0.05, 'lambda_shared': 0.0001, 'batch_size': 4096, 'n_epochs': 1000}  val NDCG@20=0.0085  test=0.0067 ===
+
