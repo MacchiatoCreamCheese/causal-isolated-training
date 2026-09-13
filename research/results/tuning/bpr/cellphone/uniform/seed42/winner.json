@@ -15,5 +15,25 @@
   },
   "metric": 0.006111538989271949,
   "test_metric": 0.004603959423491565,
-  "val_metrics_source": "backfilled from tune_bpr_cellphone_uniform_s42.log, 4 d.p."
+  "users_run": {
+    "source": "retrain",
+    "val_metrics": {
+      "HitRatio@20": 0.019812034136329263,
+      "NDCG@20": 0.006111538989271949,
+      "Recall@20": 0.012853247744720984,
+      "Time (s)": 412.93021178245544
+    },
+    "test_metrics": {
+      "HitRatio@20": 0.013909038154649644,
+      "NDCG@20": 0.004603959423491565,
+      "Recall@20": 0.009959458588446398,
+      "Train (s)": 23018.836002349854,
+      "Test (s)": 247.8052794933319
+    },
+    "probes": {
+      "counterfactual_rate": 0.4405799097023814,
+      "collision_rate": 0.0
+    },
+    "wall_seconds": 23680.708443403244
+  }
 }

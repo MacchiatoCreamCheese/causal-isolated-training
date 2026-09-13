@@ -75,3 +75,49 @@ BPR/tune/cellphone/causal/s42 |      0.0222 |  0.0063 |    0.0161 | 13834.8893 |
 [winner@k_embed_dim] k_embed_dim=32  NDCG@20=0.0092
 
 --- knob: learning_rate  grid=[0.001, 0.01, 0.1]  (default carries metric=0.0092) ---
+
+=== Tuning bpr on cellphone x causal x seed=42, selecting on validation NDCG@20 ===
+    -> /home/reno/causal-isolated-training/research/results/tuning/bpr/cellphone/causal/seed42
+[baseline] cached: val NDCG@20=0.0088
+
+--- knob: k_embed_dim  grid=[32, 128, 256]  (default carries metric=0.0088) ---
+[skip] k_embed_dim=32  val NDCG@20=0.0092  [cached]
+[skip] k_embed_dim=128  val NDCG@20=0.0089  [cached]
+[skip] k_embed_dim=256  val NDCG@20=0.0082  [cached]
+[winner@k_embed_dim] k_embed_dim=32  NDCG@20=0.0092
+
+--- knob: learning_rate  grid=[0.001, 0.01, 0.1]  (default carries metric=0.0092) ---
+Early stopping:
+- best epoch = 213, stopped epoch = 226
+- best monitored value = 0.003893 (delta = -0.000023)
+
+VALIDATION:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/cellphone/causal/s42 |      0.0142 |  0.0039 |    0.0090 | 109.7701
+
+TEST:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+----------------------------- + ----------- + ------- + --------- + ---------- + --------
+BPR/tune/cellphone/causal/s42 |      0.0110 |  0.0031 |    0.0076 | 24175.4589 |  66.5957
+
+[run]  learning_rate=0.001  val NDCG@20=0.0039  test=0.0031  (24352.3s)
+Early stopping:
+- best epoch = 23, stopped epoch = 36
+- best monitored value = 0.003908 (delta = -0.000126)
+
+VALIDATION:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/cellphone/causal/s42 |      0.0147 |  0.0038 |    0.0092 | 109.8255
+
+TEST:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+----------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/cellphone/causal/s42 |      0.0121 |  0.0031 |    0.0080 | 3930.9759 |  66.4507
+
+[run]  learning_rate=0.01  val NDCG@20=0.0038  test=0.0031  (4107.8s)
