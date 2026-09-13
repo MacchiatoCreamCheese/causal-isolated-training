@@ -136,3 +136,47 @@ BPR/tune/baby/causal/s42 |      0.0321 |  0.0081 |    0.0206 |  564.7001 |   8.3
 
 === bpr [baby x causal x seed=42] winner: {'k_embed_dim': 128, 'learning_rate': 0.05, 'lambda_shared': 0.0001, 'batch_size': 4096, 'n_epochs': 1000}  val NDCG@20=0.0127  test=0.0101 ===
 
+
+=== Tuning bpr on baby x causal x seed=42, selecting on validation NDCG@20 ===
+    -> /home/reno/causal-isolated-training/research/results/tuning/bpr/baby/causal/seed42
+[baseline] cached: val NDCG@20=0.0121
+
+--- knob: k_embed_dim  grid=[32, 128, 256]  (default carries metric=0.0121) ---
+[skip] k_embed_dim=32  val NDCG@20=0.0114  [cached]
+[skip] k_embed_dim=128  val NDCG@20=0.0127  [cached]
+[skip] k_embed_dim=256  val NDCG@20=0.0118  [cached]
+[winner@k_embed_dim] k_embed_dim=128  NDCG@20=0.0127
+
+--- knob: learning_rate  grid=[0.001, 0.01, 0.1]  (default carries metric=0.0127) ---
+[skip] learning_rate=0.001  val NDCG@20=0.0051  [cached]
+[skip] learning_rate=0.01  val NDCG@20=0.0048  [cached]
+[skip] learning_rate=0.1  val NDCG@20=0.0108  [cached]
+[winner@learning_rate] learning_rate=0.05  NDCG@20=0.0127 (kept default)
+
+--- knob: lambda_shared  grid=[1e-06, 1e-05, 0.001, 0.01]  (default carries metric=0.0127) ---
+[skip] lambda_shared=1e-06  val NDCG@20=0.0126  [cached]
+[skip] lambda_shared=1e-05  val NDCG@20=0.0126  [cached]
+[skip] lambda_shared=0.001  val NDCG@20=0.0121  [cached]
+[skip] lambda_shared=0.01  val NDCG@20=0.0099  [cached]
+[winner@lambda_shared] lambda_shared=0.0001  NDCG@20=0.0127 (kept default)
+[users] winner was trained before per-user scores were saved; retraining it once
+Early stopping:
+- best epoch = 14, stopped epoch = 27
+- best monitored value = 0.013755 (delta = -0.001094)
+
+VALIDATION:
+...
+                         | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------ + ----------- + ------- + --------- + --------
+BPR/tune/baby/causal/s42 |      0.0462 |  0.0127 |    0.0242 |  12.1385
+
+TEST:
+...
+                         | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------ + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/causal/s42 |      0.0328 |  0.0101 |    0.0197 |  408.1126 |   6.6819
+
+[users] retrained winner: val NDCG@20=0.0127  test=0.0101  (427.2s)
+
+=== bpr [baby x causal x seed=42] winner: {'k_embed_dim': 128, 'learning_rate': 0.05, 'lambda_shared': 0.0001, 'batch_size': 4096, 'n_epochs': 1000}  val NDCG@20=0.0127  test=0.0101 ===
+
