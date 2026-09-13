@@ -121,6 +121,28 @@ def backfill(d, events, source, apply):
     return loaded
 
 
+def _validated_winner(d):
+    """True when `winner.json` was written by the fixed (validation) tuner."""
+    wpath = d / "winner.json"
+    if not wpath.exists():
+        return False
+    w = json.loads(wpath.read_text(encoding="utf-8"))
+    return w.get("select_split") == "validation" and "val_metrics_source" not in w
+
+
+def _carried_value(d, model, knob):
+    """The value of `knob` the tuner carried into later knobs, or None.
+
+    Read off the stored config of any trial from a later knob -- every one of
+    them was trained with `knob` fixed at whatever the tuner picked.
+    """
+    order = [k for k, _ in TUNE_ORDER[model]]
+    for later in order[order.index(knob) + 1:]:
+        for p in sorted((d / later).glob("*.json")) if (d / later).is_dir() else []:
+            return json.loads(p.read_text(encoding="utf-8"))["config"][knob]
+    return None
+
+
 def reselect(model, d, loaded):
     """Replay coordinate descent on validation and on test; find the divergence.
 
@@ -153,7 +175,15 @@ def reselect(model, d, loaded):
         by_val = max(cands, key=lambda c: c[1])
         by_test = max(cands, key=lambda c: c[2])
         if by_val[0] != by_test[0]:
-            return "diverge", knob, config
+            # Disagreement alone proves nothing: what matters is which value
+            # the tuner actually carried forward, since later trials were
+            # trained around it. A cell tuned *after* the fix followed
+            # validation, so its later trials are valid and must be kept.
+            taken = _carried_value(d, model, knob)
+            if taken is None:
+                return "repick", knob, config
+            if _canon(taken) != _canon(by_val[0]):
+                return "diverge", knob, config
         config[knob] = by_val[0]
         carry_v, carry_t = by_val[1], by_val[2]
     return "agree", (carry_v, carry_t), config
@@ -191,13 +221,30 @@ def main():
             wpath = d / "winner.json"
             if wpath.exists():
                 w = json.loads(wpath.read_text(encoding="utf-8"))
-                assert _canon(w["config"]) == _canon(config), (wpath, w["config"], config)
-                w.update(select_split="validation", metric=v, test_metric=t,
-                         val_metrics_source=f"backfilled from {Path(log).name}, 4 d.p.")
-                if args.apply:
-                    _write_json(wpath, w)
+                # A winner the fixed tuner wrote is already validation-selected
+                # and may carry more (users_run); leave it exactly as it is.
+                if w.get("select_split") != "validation":
+                    assert _canon(w["config"]) == _canon(config), (wpath, w["config"], config)
+                    w.update(select_split="validation", metric=v, test_metric=t,
+                             val_metrics_source=f"backfilled from {Path(log).name}, 4 d.p.")
+                    if args.apply:
+                        _write_json(wpath, w)
             print(f"{rel}: KEEP  (validation picks the same values; "
                   f"{len(loaded)} files backfilled)")
+        elif status == "repick" and _validated_winner(d):
+            # The fixed tuner already picked this winner on validation, at full
+            # precision; the log's 4-d.p. scores cannot overrule it. Deleting it
+            # would also drop its users_run and force a retrain of the winner.
+            print(f"{rel}: KEEP  (winner already selected on validation by the "
+                  f"fixed tuner; {len(loaded)} files backfilled)")
+        elif status == "repick":
+            wpath = d / "winner.json"
+            had = wpath.exists()
+            if args.apply and had:
+                wpath.unlink()
+            print(f"{rel}: REPICK at {where}  (validation picks differently; no "
+                  f"later trials to delete; {'winner.json removed, ' if had else ''}"
+                  f"the tuner re-picks from cache without training)")
         elif status == "diverge":
             order = [k for k, _ in TUNE_ORDER[model]]
             later = [d / k for k in order[order.index(where) + 1:] if (d / k).is_dir()]
