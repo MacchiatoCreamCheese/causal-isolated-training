@@ -14,5 +14,6 @@
     "n_epochs": 1000
   },
   "metric": 0.006111538989271949,
-  "test_metric": 0.004603959423491565
+  "test_metric": 0.004603959423491565,
+  "val_metrics_source": "backfilled from tune_bpr_cellphone_uniform_s42.log, 4 d.p."
 }

@@ -1,19 +1,18 @@
 {
   "model": "bpr",
   "variant": "bpr",
-  "dataset": "baby",
-  "seed": 42,
+  "dataset": "musical",
+  "seed": 2026,
   "recipe": "uniform",
   "select_metric": "NDCG@20",
   "select_split": "validation",
   "config": {
     "k_embed_dim": 256,
     "learning_rate": 0.05,
-    "lambda_shared": 0.0001,
+    "lambda_shared": 1e-05,
     "batch_size": 4096,
     "n_epochs": 1000
   },
-  "metric": 0.0085,
-  "test_metric": 0.0066930966736123065,
-  "val_metrics_source": "backfilled from tune_bpr_baby_uniform.log, 4 d.p."
+  "metric": 0.016674671469433893,
+  "test_metric": 0.013758820311520804
 }
