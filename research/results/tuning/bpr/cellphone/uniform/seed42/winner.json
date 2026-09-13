@@ -1,0 +1,18 @@
+{
+  "model": "bpr",
+  "variant": "bpr",
+  "dataset": "cellphone",
+  "seed": 42,
+  "recipe": "uniform",
+  "select_metric": "NDCG@20",
+  "select_split": "validation",
+  "config": {
+    "k_embed_dim": 256,
+    "learning_rate": 0.1,
+    "lambda_shared": 0.0001,
+    "batch_size": 4096,
+    "n_epochs": 1000
+  },
+  "metric": 0.006111538989271949,
+  "test_metric": 0.004603959423491565
+}

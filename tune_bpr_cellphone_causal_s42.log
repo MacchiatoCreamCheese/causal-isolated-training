@@ -1,0 +1,77 @@
+
+=== Tuning bpr on cellphone x causal x seed=42, selecting on validation NDCG@20 ===
+    -> /home/reno/causal-isolated-training/research/results/tuning/bpr/cellphone/causal/seed42
+[baseline] running with defaults: {'k_embed_dim': 64, 'learning_rate': 0.05, 'lambda_shared': 0.0001, 'batch_size': 4096, 'n_epochs': 1000}
+Early stopping:
+- best epoch = 19, stopped epoch = 32
+- best monitored value = 0.011226 (delta = -0.002428)
+
+VALIDATION:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/cellphone/causal/s42 |      0.0321 |  0.0088 |    0.0206 | 155.8633
+
+TEST:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+----------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/cellphone/causal/s42 |      0.0233 |  0.0067 |    0.0167 | 4862.4360 |  94.0317
+
+[baseline] val NDCG@20=0.0088  test=0.0067  (5112.9s)
+
+--- knob: k_embed_dim  grid=[32, 128, 256]  (default carries metric=0.0088) ---
+Early stopping:
+- best epoch = 19, stopped epoch = 32
+- best monitored value = 0.010403 (delta = -0.001178)
+
+VALIDATION:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/cellphone/causal/s42 |      0.0328 |  0.0092 |    0.0211 | 110.7829
+
+TEST:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+----------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/cellphone/causal/s42 |      0.0236 |  0.0071 |    0.0171 | 3540.4150 |  68.9052
+
+[run]  k_embed_dim=32  val NDCG@20=0.0092  test=0.0071  (3720.7s)
+Early stopping:
+- best epoch = 17, stopped epoch = 30
+- best monitored value = 0.010163 (delta = -0.001288)
+
+VALIDATION:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/cellphone/causal/s42 |      0.0324 |  0.0089 |    0.0209 | 241.2640
+
+TEST:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+----------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/cellphone/causal/s42 |      0.0242 |  0.0068 |    0.0175 | 7401.1542 | 146.7144
+
+[run]  k_embed_dim=128  val NDCG@20=0.0089  test=0.0068  (7789.9s)
+Early stopping:
+- best epoch = 19, stopped epoch = 32
+- best monitored value = 0.011245 (delta = -0.003067)
+
+VALIDATION:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/cellphone/causal/s42 |      0.0301 |  0.0082 |    0.0195 | 423.1817
+
+TEST:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+----------------------------- + ----------- + ------- + --------- + ---------- + --------
+BPR/tune/cellphone/causal/s42 |      0.0222 |  0.0063 |    0.0161 | 13834.8893 | 251.1561
+
+[run]  k_embed_dim=256  val NDCG@20=0.0082  test=0.0063  (14510.3s)
+[winner@k_embed_dim] k_embed_dim=32  NDCG@20=0.0092
+
+--- knob: learning_rate  grid=[0.001, 0.01, 0.1]  (default carries metric=0.0092) ---
