@@ -1,0 +1,203 @@
+
+=== Tuning bpr on baby x causal x seed=2026, selecting on validation NDCG@20 ===
+    -> /home/trustrs/causal-isolated-training/research/results/tuning/bpr/baby/causal/seed2026
+[baseline] running with defaults: {'k_embed_dim': 64, 'learning_rate': 0.05, 'lambda_shared': 0.0001, 'batch_size': 4096, 'n_epochs': 1000}
+Early stopping:
+- best epoch = 13, stopped epoch = 26
+- best monitored value = 0.013193 (delta = -0.000766)
+
+VALIDATION:
+...
+                           | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/baby/causal/s2026 |      0.0479 |  0.0124 |    0.0254 |  17.8837
+
+TEST:
+...
+                           | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/causal/s2026 |      0.0394 |  0.0110 |    0.0231 |  485.7762 |   9.6916
+
+[baseline] val NDCG@20=0.0124  test=0.0110  (513.6s)
+
+--- knob: k_embed_dim  grid=[32, 128, 256]  (default carries metric=0.0124) ---
+Early stopping:
+- best epoch = 18, stopped epoch = 31
+- best monitored value = 0.013170 (delta = -0.002183)
+
+VALIDATION:
+...
+                           | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/baby/causal/s2026 |      0.0437 |  0.0110 |    0.0234 |  16.6744
+
+TEST:
+...
+                           | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/causal/s2026 |      0.0329 |  0.0089 |    0.0194 |  533.9843 |   9.5962
+
+[run]  k_embed_dim=32  val NDCG@20=0.0110  test=0.0089  (560.5s)
+Early stopping:
+- best epoch = 16, stopped epoch = 29
+- best monitored value = 0.013892 (delta = -0.002025)
+
+VALIDATION:
+...
+                           | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/baby/causal/s2026 |      0.0453 |  0.0119 |    0.0238 |  19.2629
+
+TEST:
+...
+                           | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/causal/s2026 |      0.0321 |  0.0093 |    0.0189 |  660.7045 |  12.5420
+
+[run]  k_embed_dim=128  val NDCG@20=0.0119  test=0.0093  (692.8s)
+Early stopping:
+- best epoch = 25, stopped epoch = 38
+- best monitored value = 0.013353 (delta = -0.001342)
+
+VALIDATION:
+...
+                           | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/baby/causal/s2026 |      0.0495 |  0.0120 |    0.0264 |  30.6531
+
+TEST:
+...
+                           | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/causal/s2026 |      0.0372 |  0.0100 |    0.0233 | 1395.3055 |  17.9740
+
+[run]  k_embed_dim=256  val NDCG@20=0.0120  test=0.0100  (1444.3s)
+[winner@k_embed_dim] k_embed_dim=64  NDCG@20=0.0124 (kept default)
+
+--- knob: learning_rate  grid=[0.001, 0.01, 0.1]  (default carries metric=0.0124) ---
+Early stopping:
+- best epoch = 128, stopped epoch = 141
+- best monitored value = 0.005019 (delta = -0.000023)
+
+VALIDATION:
+...
+                           | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/baby/causal/s2026 |      0.0246 |  0.0050 |    0.0116 |  17.3858
+
+TEST:
+...
+                           | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/causal/s2026 |      0.0193 |  0.0043 |    0.0104 | 2572.0823 |   9.5214
+
+[run]  learning_rate=0.001  val NDCG@20=0.0050  test=0.0043  (2599.2s)
+Early stopping:
+- best epoch = 14, stopped epoch = 27
+- best monitored value = 0.004961 (delta = -0.000392)
+
+VALIDATION:
+...
+                           | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/baby/causal/s2026 |      0.0248 |  0.0046 |    0.0112 |  16.3143
+
+TEST:
+...
+                           | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/causal/s2026 |      0.0183 |  0.0034 |    0.0089 |  484.1150 |   9.5110
+
+[run]  learning_rate=0.01  val NDCG@20=0.0046  test=0.0034  (510.2s)
+Early stopping:
+- best epoch = 10, stopped epoch = 23
+- best monitored value = 0.013235 (delta = -0.002125)
+
+VALIDATION:
+...
+                           | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/baby/causal/s2026 |      0.0445 |  0.0111 |    0.0239 |  16.7288
+
+TEST:
+...
+                           | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/causal/s2026 |      0.0297 |  0.0083 |    0.0174 |  423.2878 |   9.7237
+
+[run]  learning_rate=0.1  val NDCG@20=0.0111  test=0.0083  (450.0s)
+[winner@learning_rate] learning_rate=0.05  NDCG@20=0.0124 (kept default)
+
+--- knob: lambda_shared  grid=[1e-06, 1e-05, 0.001, 0.01]  (default carries metric=0.0124) ---
+Early stopping:
+- best epoch = 13, stopped epoch = 26
+- best monitored value = 0.013189 (delta = -0.000720)
+
+VALIDATION:
+...
+                           | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/baby/causal/s2026 |      0.0478 |  0.0125 |    0.0253 |  18.5362
+
+TEST:
+...
+                           | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/causal/s2026 |      0.0392 |  0.0111 |    0.0232 |  477.6494 |   9.7953
+
+[run]  lambda_shared=1e-06  val NDCG@20=0.0125  test=0.0111  (506.2s)
+Early stopping:
+- best epoch = 13, stopped epoch = 26
+- best monitored value = 0.013192 (delta = -0.000705)
+
+VALIDATION:
+...
+                           | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/baby/causal/s2026 |      0.0478 |  0.0125 |    0.0253 |  18.6853
+
+TEST:
+...
+                           | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/causal/s2026 |      0.0394 |  0.0111 |    0.0232 |  487.2701 |   9.7965
+
+[run]  lambda_shared=1e-05  val NDCG@20=0.0125  test=0.0111  (516.0s)
+Early stopping:
+- best epoch = 13, stopped epoch = 26
+- best monitored value = 0.013130 (delta = -0.000742)
+
+VALIDATION:
+...
+                           | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/baby/causal/s2026 |      0.0479 |  0.0124 |    0.0259 |  17.6760
+
+TEST:
+...
+                           | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/causal/s2026 |      0.0387 |  0.0108 |    0.0230 |  505.1789 |  11.3329
+
+[run]  lambda_shared=0.001  val NDCG@20=0.0124  test=0.0108  (534.4s)
+Early stopping:
+- best epoch = 27, stopped epoch = 40
+- best monitored value = 0.013658 (delta = -0.002970)
+
+VALIDATION:
+...
+                           | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/baby/causal/s2026 |      0.0454 |  0.0107 |    0.0247 |  17.0086
+
+TEST:
+...
+                           | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/causal/s2026 |      0.0291 |  0.0076 |    0.0177 |  743.8482 |   9.9511
+
+[run]  lambda_shared=0.01  val NDCG@20=0.0107  test=0.0076  (771.0s)
+[winner@lambda_shared] lambda_shared=1e-05  NDCG@20=0.0125
+
+=== bpr [baby x causal x seed=2026] winner: {'k_embed_dim': 64, 'learning_rate': 0.05, 'lambda_shared': 1e-05, 'batch_size': 4096, 'n_epochs': 1000}  val NDCG@20=0.0125  test=0.0111 ===
+
