@@ -1,0 +1,39 @@
+{
+  "model": "bpr",
+  "variant": "bpr",
+  "dataset": "musical",
+  "seed": 42,
+  "recipe": "causal",
+  "select_metric": "NDCG@20",
+  "select_split": "validation",
+  "config": {
+    "k_embed_dim": 256,
+    "learning_rate": 0.05,
+    "lambda_shared": 1e-06,
+    "batch_size": 4096,
+    "n_epochs": 1000
+  },
+  "metric": 0.0197,
+  "test_metric": 0.016852406557396133,
+  "users_run": {
+    "source": "retrain",
+    "val_metrics": {
+      "HitRatio@20": 0.07535252643948297,
+      "NDCG@20": 0.019723117893971333,
+      "Recall@20": 0.03787202327695621,
+      "Time (s)": 7.9378674030303955
+    },
+    "test_metrics": {
+      "HitRatio@20": 0.06225762498689865,
+      "NDCG@20": 0.016852406557396133,
+      "Recall@20": 0.03444433436507724,
+      "Train (s)": 518.8608078956604,
+      "Test (s)": 6.45901346206665
+    },
+    "probes": {
+      "counterfactual_rate": 0.0,
+      "collision_rate": 6.806860217874388e-06
+    },
+    "wall_seconds": 533.3981103897095
+  }
+}

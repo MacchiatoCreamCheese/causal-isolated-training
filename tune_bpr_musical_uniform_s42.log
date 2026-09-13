@@ -150,3 +150,23 @@ BPR/tune/musical/uniform/s42 |      0.0540 |  0.0133 |    0.0281 |  673.1230 |  
 [skip] lambda_shared=0.01  val NDCG@20=0.0157  [cached]
 [winner@lambda_shared] lambda_shared=0.001  NDCG@20=0.0163
 [users] winner was trained before per-user scores were saved; retraining it once
+Early stopping:
+- best epoch = 44, stopped epoch = 57
+- best monitored value = 0.016903 (delta = -0.000595)
+
+VALIDATION:
+...
+                             | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/musical/uniform/s42 |      0.0651 |  0.0163 |    0.0315 |  10.7616
+
+TEST:
+...
+                             | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/musical/uniform/s42 |      0.0533 |  0.0133 |    0.0292 |  645.4694 |   6.0899
+
+[users] retrained winner: val NDCG@20=0.0163  test=0.0133  (662.5s)
+
+=== bpr [musical x uniform x seed=42] winner: {'k_embed_dim': 256, 'learning_rate': 0.05, 'lambda_shared': 0.001, 'batch_size': 4096, 'n_epochs': 1000}  val NDCG@20=0.0163  test=0.0133 ===
+
