@@ -1,0 +1,37 @@
+{
+  "model": "lightgcn",
+  "variant": "lightgcn",
+  "dataset": "baby",
+  "seed": 123,
+  "recipe": "uniform",
+  "select_metric": "NDCG@20",
+  "select_split": "validation",
+  "config": {
+    "lambda_reg": 0.0001,
+    "num_layers": 2,
+    "learning_rate": 0.001
+  },
+  "metric": 0.0076166440420924715,
+  "test_metric": 0.005732070848462528,
+  "users_run": {
+    "source": "trial",
+    "trial": "num_layers/2.json",
+    "val_metrics": {
+      "HitRatio@20": 0.029405101717185446,
+      "NDCG@20": 0.0076166440420924715,
+      "Recall@20": 0.014815321096830912,
+      "Time (s)": 22.36907124519348
+    },
+    "test_metrics": {
+      "HitRatio@20": 0.02121550486520976,
+      "NDCG@20": 0.005732070848462528,
+      "Recall@20": 0.01239745744964586,
+      "Train (s)": 1577.4846019744873,
+      "Test (s)": 7.406622648239136
+    },
+    "probes": {
+      "counterfactual_rate": 0.38432888619639377,
+      "collision_rate": 0.0
+    }
+  }
+}
