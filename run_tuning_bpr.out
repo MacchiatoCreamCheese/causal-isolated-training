@@ -1,4 +1,8 @@
 nohup: ignoring input
-[run_tuning] bpr | env=leakage24 | data=/home/reno/causal-isolated-training/data | Sun Sep 13 08:02:17 UTC 2026
-[run_tuning] cornac 2.6.0 | torch 2.4.0+cu121
-[run_tuning] musical/uniform/seed42 -> tune_bpr_musical_uniform_s42.log  (08:02)
+[run_tuning] bpr | env=leakage24 | data=/home/trustrs/causal-isolated-training/data | Sun Sep 13 15:22:01 +07 2026
+[run_tuning] cornac 3.0.0 | torch 2.4.0+cu121
+[run_tuning] musical/uniform/seed2026 -> tune_bpr_musical_uniform_s2026.log  (15:22)
+[run_tuning] musical/causal/seed2026 -> tune_bpr_musical_causal_s2026.log  (15:34)
+[run_tuning] baby/uniform/seed2026 -> tune_bpr_baby_uniform_s2026.log  (15:48)
+[run_tuning] baby/causal/seed2026 -> tune_bpr_baby_causal_s2026.log  (16:13)
+[run_tuning] cellphone/uniform/seed2026 -> tune_bpr_cellphone_uniform_s2026.log  (16:22)

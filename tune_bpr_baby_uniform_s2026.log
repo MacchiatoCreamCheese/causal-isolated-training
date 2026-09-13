@@ -201,3 +201,47 @@ BPR/tune/baby/uniform/s2026 |      0.0234 |  0.0048 |    0.0128 |  807.7905 |  1
 
 === bpr [baby x uniform x seed=2026] winner: {'k_embed_dim': 256, 'learning_rate': 0.05, 'lambda_shared': 1e-06, 'batch_size': 4096, 'n_epochs': 1000}  val NDCG@20=0.0086  test=0.0058 ===
 
+
+=== Tuning bpr on baby x uniform x seed=2026, selecting on validation NDCG@20 ===
+    -> /home/trustrs/causal-isolated-training/research/results/tuning/bpr/baby/uniform/seed2026
+[baseline] cached: val NDCG@20=0.0078
+
+--- knob: k_embed_dim  grid=[32, 128, 256]  (default carries metric=0.0078) ---
+[skip] k_embed_dim=32  val NDCG@20=0.0070  [cached]
+[skip] k_embed_dim=128  val NDCG@20=0.0077  [cached]
+[skip] k_embed_dim=256  val NDCG@20=0.0085  [cached]
+[winner@k_embed_dim] k_embed_dim=256  NDCG@20=0.0085
+
+--- knob: learning_rate  grid=[0.001, 0.01, 0.1]  (default carries metric=0.0085) ---
+[skip] learning_rate=0.001  val NDCG@20=0.0056  [cached]
+[skip] learning_rate=0.01  val NDCG@20=0.0045  [cached]
+[skip] learning_rate=0.1  val NDCG@20=0.0082  [cached]
+[winner@learning_rate] learning_rate=0.05  NDCG@20=0.0085 (kept default)
+
+--- knob: lambda_shared  grid=[1e-06, 1e-05, 0.001, 0.01]  (default carries metric=0.0085) ---
+[skip] lambda_shared=1e-06  val NDCG@20=0.0086  [cached]
+[skip] lambda_shared=1e-05  val NDCG@20=0.0086  [cached]
+[skip] lambda_shared=0.001  val NDCG@20=0.0081  [cached]
+[skip] lambda_shared=0.01  val NDCG@20=0.0066  [cached]
+[winner@lambda_shared] lambda_shared=1e-06  NDCG@20=0.0086
+[users] winner was trained before per-user scores were saved; retraining it once
+Early stopping:
+- best epoch = 27, stopped epoch = 40
+- best monitored value = 0.009940 (delta = -0.001351)
+
+VALIDATION:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/baby/uniform/s2026 |      0.0357 |  0.0086 |    0.0178 |  30.0916
+
+TEST:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/uniform/s2026 |      0.0258 |  0.0058 |    0.0138 | 1488.5400 |  17.1533
+
+[users] retrained winner: val NDCG@20=0.0086  test=0.0058  (1536.2s)
+
+=== bpr [baby x uniform x seed=2026] winner: {'k_embed_dim': 256, 'learning_rate': 0.05, 'lambda_shared': 1e-06, 'batch_size': 4096, 'n_epochs': 1000}  val NDCG@20=0.0086  test=0.0058 ===
+
