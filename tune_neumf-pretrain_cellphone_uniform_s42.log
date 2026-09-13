@@ -63,3 +63,109 @@ NeuMF/tune/cellphone/uniform/s42 |      0.0094 |  0.0029 |    0.0067 | 14356.974
 [winner@num_factors] num_factors=32  NDCG@20=0.0034
 
 --- knob: mlp_hidden_count  grid=[4]  (default carries metric=0.0034) ---
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 |  Time (s)
+-------------------------------- + ----------- + ------- + --------- + ---------
+NeuMF/tune/cellphone/uniform/s42 |      0.0114 |  0.0033 |    0.0075 | 1237.2602
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + ---------- + --------
+NeuMF/tune/cellphone/uniform/s42 |      0.0094 |  0.0028 |    0.0065 | 13105.5798 | 742.9574
+
+[run]  mlp_hidden_count=4  val NDCG@20=0.0033  test=0.0028  (15092.2s)
+[winner@mlp_hidden_count] mlp_hidden_count=3  NDCG@20=0.0034 (kept default)
+
+--- knob: learning_rate  grid=[0.0001, 0.0005, 0.005]  (default carries metric=0.0034) ---
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/mnt/c/Users/nguye/uniyear/causal-isolated-training/research/runners/tuning.py", line 456, in <module>
+    print(f"[winner@{knob}] {knob}={best_value}  "
+^^^^^^
+  File "/mnt/c/Users/nguye/uniyear/causal-isolated-training/research/runners/tuning.py", line 452, in main
+    config[knob] = best_value
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/nguye/uniyear/causal-isolated-training/research/runners/tuning.py", line 359, in run_tuning
+    def run_tuning(model_name: str, scope: Scope, restart_from: str = None) -> None:
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/nguye/uniyear/causal-isolated-training/research/runners/tuning.py", line 242, in _train_once
+    def _train_once(model_name: str, config: dict, eval_method, scope: Scope) -> tuple:
+        ^^^^^^^^^
+  File "/home/nguye/miniconda3/envs/leakage24/lib/python3.12/site-packages/cornac/experiment/experiment.py", line 142, in run
+    test_result, val_result = self.eval_method.evaluate(
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nguye/miniconda3/envs/leakage24/lib/python3.12/site-packages/cornac/eval_methods/base_method.py", line 734, in evaluate
+    model.fit(self.train_set, self.val_set)
+  File "/mnt/c/Users/nguye/uniyear/causal-isolated-training/research/lib/cornac_compat.py", line 146, in fit
+    mlp.fit(train_set, val_set)
+  File "/home/nguye/miniconda3/envs/leakage24/lib/python3.12/site-packages/cornac/models/ncf/recom_ncf_base.py", line 135, in fit
+    self._fit_pt(train_set, val_set)
+  File "/home/nguye/miniconda3/envs/leakage24/lib/python3.12/site-packages/cornac/models/ncf/recom_ncf_base.py", line 284, in _fit_pt
+    sum_loss += len(batch_users) * loss.data.item()
+                                   ^^^^^^^^^^^^^^^^
+KeyboardInterrupt
+
+=== Tuning neumf on cellphone x uniform x seed=42, selecting on validation NDCG@20 ===
+    -> /mnt/c/Users/nguye/uniyear/causal-isolated-training/research/results/tuning/neumf-pretrain/cellphone/uniform/seed42
+[baseline] cached: val NDCG@20=0.0028
+
+--- knob: num_factors  grid=[16, 32, 64]  (default carries metric=0.0028) ---
+[skip] num_factors=16  val NDCG@20=0.0032  [cached]
+[skip] num_factors=32  val NDCG@20=0.0034  [cached]
+[skip] num_factors=64  val NDCG@20=0.0032  [cached]
+[winner@num_factors] num_factors=32  NDCG@20=0.0034
+
+--- knob: mlp_hidden_count  grid=[4]  (default carries metric=0.0034) ---
+[skip] mlp_hidden_count=4  val NDCG@20=0.0033  [cached]
+[winner@mlp_hidden_count] mlp_hidden_count=3  NDCG@20=0.0034 (kept default)
+
+--- knob: learning_rate  grid=[0.0001, 0.0005, 0.005]  (default carries metric=0.0034) ---
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/cellphone/uniform/s42 |      0.0127 |  0.0037 |    0.0084 | 646.2825
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/cellphone/uniform/s42 |      0.0096 |  0.0030 |    0.0070 | 7634.5451 | 386.0397
+
+[run]  learning_rate=0.0001  val NDCG@20=0.0037  test=0.0030  (8670.9s)
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/cellphone/uniform/s42 |      0.0130 |  0.0038 |    0.0086 | 647.2455
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/cellphone/uniform/s42 |      0.0107 |  0.0033 |    0.0078 | 7711.3669 | 385.5095
+
+[run]  learning_rate=0.0005  val NDCG@20=0.0038  test=0.0033  (8747.1s)
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/cellphone/uniform/s42 |      0.0110 |  0.0031 |    0.0070 | 648.6624
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/cellphone/uniform/s42 |      0.0089 |  0.0026 |    0.0063 | 7717.3749 | 394.8278
+
+[run]  learning_rate=0.005  val NDCG@20=0.0031  test=0.0026  (8763.6s)
+[winner@learning_rate] learning_rate=0.0005  NDCG@20=0.0038
+
+--- knob: batch_size  grid=[128, 512, 1024]  (default carries metric=0.0038) ---

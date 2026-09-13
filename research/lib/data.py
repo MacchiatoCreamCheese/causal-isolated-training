@@ -44,6 +44,31 @@ DATASETS = {
         "val_ts": 1628643414042,
         "test_ts": 1658002729837,
     },
+    # Yelp, Philadelphia businesses (from the OSCAR project). Same protocol as
+    # the Amazon sets -- already 5-core, split once for the whole corpus at the
+    # 80th and 90th percentiles of interaction time -- but on its own dates: its
+    # log ends in Jan 2022, before the Amazon test cutoff. Timestamps were
+    # seconds in the source and are stored in ms here, like the Amazon files.
+    # The test period starts Nov 2019 and so spans the COVID years. Opt-in, like
+    # healthcare: pass --datasets philadelphia.
+    "philadelphia": {
+        "path": "philadelphia_dataset/Philadelphia.csv",
+        "val_ts": 1537357870200,    # 2018-09-19
+        "test_ts": 1572859360400,   # 2019-11-04
+    },
+    # MovieLens-32M (GroupLens), same protocol as the Amazon sets. The last 10
+    # years of the log (2013-10-12 to 2023-10-13) -- the span holding ~95% of the
+    # Amazon sets' interactions, on the same calendar -- then a random 20% of
+    # those users with their full histories (numpy default_rng(42)), then
+    # iterative 5-core. Ratings as-is (half stars; the 0.5 ratings fall below
+    # cornac's rating_threshold of 1.0 at evaluation), timestamps converted from
+    # seconds to ms, split once at the 80th and 90th percentiles of interaction
+    # time. 2.61M ratings, 15,336 users, 18,807 movies. Opt-in: --datasets movielens.
+    "movielens": {
+        "path": "movielens_dataset/MovieLens-32M.csv",
+        "val_ts": 1614537679800,    # 2021-02-28
+        "test_ts": 1652827323000,   # 2022-05-17
+    },
     "healthcare": {
         "path": "healthcare_dataset/Health_and_Household.csv",
         "val_ts": 1628643414042,
