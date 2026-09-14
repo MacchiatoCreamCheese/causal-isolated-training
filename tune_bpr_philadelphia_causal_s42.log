@@ -169,3 +169,42 @@ TEST:
 BPR/tune/philadelphia/causal/s42 |      0.1871 |  0.0588 |    0.0777 | 1932.9471 |   2.7414
 
 [run]  lambda_shared=1e-05  val NDCG@20=0.0687  test=0.0588  (1938.8s)
+Early stopping:
+- best epoch = 226, stopped epoch = 239
+- best monitored value = 0.064846 (delta = -0.000757)
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/philadelphia/causal/s42 |      0.2420 |  0.0641 |    0.1000 |   2.7918
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/philadelphia/causal/s42 |      0.1914 |  0.0522 |    0.0783 | 1379.2470 |   2.3201
+
+[run]  lambda_shared=0.001  val NDCG@20=0.0641  test=0.0522  (1384.4s)
+Early stopping:
+- best epoch = 189, stopped epoch = 202
+- best monitored value = 0.053437 (delta = -0.000948)
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/philadelphia/causal/s42 |      0.2268 |  0.0525 |    0.0881 |   5.8319
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/philadelphia/causal/s42 |      0.1838 |  0.0418 |    0.0730 | 1141.4831 |   2.3115
+
+[run]  lambda_shared=0.01  val NDCG@20=0.0525  test=0.0418  (1149.7s)
+[winner@lambda_shared] lambda_shared=0.0001  NDCG@20=0.0741 (kept default)
+[users] winner per-user scores from k_embed_dim/256.json
+
+=== bpr [philadelphia x causal x seed=42] winner: {'k_embed_dim': 256, 'learning_rate': 0.05, 'lambda_shared': 0.0001, 'batch_size': 4096, 'n_epochs': 1000}  val NDCG@20=0.0741  test=0.0613 ===
+

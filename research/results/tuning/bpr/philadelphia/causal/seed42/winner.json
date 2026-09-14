@@ -1,0 +1,39 @@
+{
+  "model": "bpr",
+  "variant": "bpr",
+  "dataset": "philadelphia",
+  "seed": 42,
+  "recipe": "causal",
+  "select_metric": "NDCG@20",
+  "select_split": "validation",
+  "config": {
+    "k_embed_dim": 256,
+    "learning_rate": 0.05,
+    "lambda_shared": 0.0001,
+    "batch_size": 4096,
+    "n_epochs": 1000
+  },
+  "metric": 0.07413582739835793,
+  "test_metric": 0.06125535248120968,
+  "users_run": {
+    "source": "trial",
+    "trial": "k_embed_dim/256.json",
+    "val_metrics": {
+      "HitRatio@20": 0.23484467678697094,
+      "NDCG@20": 0.07413582739835793,
+      "Recall@20": 0.09753302086166786,
+      "Time (s)": 2.75018048286438
+    },
+    "test_metrics": {
+      "HitRatio@20": 0.18804515135967162,
+      "NDCG@20": 0.06125535248120968,
+      "Recall@20": 0.0787250321950755,
+      "Train (s)": 2687.4091227054596,
+      "Test (s)": 2.3063454627990723
+    },
+    "probes": {
+      "counterfactual_rate": 0.0,
+      "collision_rate": 3.141419776551918e-05
+    }
+  }
+}

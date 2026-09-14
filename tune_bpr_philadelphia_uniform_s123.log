@@ -1,0 +1,29 @@
+
+=== Tuning bpr on philadelphia x uniform x seed=123, selecting on validation NDCG@20 ===
+    -> /home/reno/causal-isolated-training/research/results/tuning/bpr/philadelphia/uniform/seed123
+/home/reno/miniconda3/envs/leakage24/lib/python3.12/site-packages/cornac/data/dataset.py:335: UserWarning: 18484 duplicated observations are removed!
+  warnings.warn("%d duplicated observations are removed!" % dup_count)
+/home/reno/miniconda3/envs/leakage24/lib/python3.12/site-packages/cornac/data/dataset.py:335: UserWarning: 674 duplicated observations are removed!
+  warnings.warn("%d duplicated observations are removed!" % dup_count)
+/home/reno/miniconda3/envs/leakage24/lib/python3.12/site-packages/cornac/data/dataset.py:335: UserWarning: 914 duplicated observations are removed!
+  warnings.warn("%d duplicated observations are removed!" % dup_count)
+[baseline] running with defaults: {'k_embed_dim': 64, 'learning_rate': 0.05, 'lambda_shared': 0.0001, 'batch_size': 4096, 'n_epochs': 1000}
+Early stopping:
+- best epoch = 99, stopped epoch = 112
+- best monitored value = 0.042215 (delta = -0.000132)
+
+VALIDATION:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/philadelphia/uniform/s123 |      0.1882 |  0.0421 |    0.0711 |   5.8958
+
+TEST:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/philadelphia/uniform/s123 |      0.1629 |  0.0364 |    0.0636 |  418.6310 |   2.1404
+
+[baseline] val NDCG@20=0.0421  test=0.0364  (426.7s)
+
+--- knob: k_embed_dim  grid=[32, 128, 256]  (default carries metric=0.0421) ---
