@@ -72,3 +72,23 @@ BPR/tune/cellphone/uniform/s42 |      0.0139 |  0.0046 |    0.0100 | 22881.5747 
 [skip] lambda_shared=0.01  val NDCG@20=0.0058  [cached]
 [winner@lambda_shared] lambda_shared=0.0001  NDCG@20=0.0061 (kept default)
 [users] winner was trained before per-user scores were saved; retraining it once
+Early stopping:
+- best epoch = 40, stopped epoch = 53
+- best monitored value = 0.006164 (delta = -0.000053)
+
+VALIDATION:
+...
+                               | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------------ + ----------- + ------- + --------- + --------
+BPR/tune/cellphone/uniform/s42 |      0.0198 |  0.0061 |    0.0129 | 412.9302
+
+TEST:
+...
+                               | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+------------------------------ + ----------- + ------- + --------- + ---------- + --------
+BPR/tune/cellphone/uniform/s42 |      0.0139 |  0.0046 |    0.0100 | 23018.8360 | 247.8053
+
+[users] retrained winner: val NDCG@20=0.0061  test=0.0046  (23680.7s)
+
+=== bpr [cellphone x uniform x seed=42] winner: {'k_embed_dim': 256, 'learning_rate': 0.1, 'lambda_shared': 0.0001, 'batch_size': 4096, 'n_epochs': 1000}  val NDCG@20=0.0061  test=0.0046 ===
+

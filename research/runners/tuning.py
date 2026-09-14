@@ -141,7 +141,9 @@ def _build_model(model_name: str, config: dict, scope: Scope):
             num_layers=int(config["num_layers"]),
             learning_rate=float(config["learning_rate"]),
             lambda_reg=float(config["lambda_reg"]),
-            batch_size=LIGHTGCN_BATCH[scope.dataset],
+            # Same fallback as tuning_config.lightgcn_kwargs, so a dataset
+            # without a tuned batch size (e.g. cambridge) tunes and ablates alike.
+            batch_size=LIGHTGCN_BATCH.get(scope.dataset, 1024),
             num_epochs=LIGHTGCN_EPOCHS,
             early_stopping=LIGHTGCN_EARLY_STOP,
             seed=seed,
