@@ -59,3 +59,23 @@ TEST:
 BPR/tune/cellphone/uniform/s2026 |      0.0131 |  0.0045 |    0.0094 | 18189.4313 | 182.0248
 
 [run]  k_embed_dim=128  val NDCG@20=0.0053  test=0.0045  (18677.4s)
+Early stopping:
+- best epoch = 40, stopped epoch = 53
+- best monitored value = 0.005642 (delta = -0.000289)
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/cellphone/uniform/s2026 |      0.0180 |  0.0054 |    0.0116 | 395.4058
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + ---------- + --------
+BPR/tune/cellphone/uniform/s2026 |      0.0137 |  0.0046 |    0.0097 | 21239.3743 | 242.0940
+
+[run]  k_embed_dim=256  val NDCG@20=0.0054  test=0.0046  (21879.8s)
+[winner@k_embed_dim] k_embed_dim=256  NDCG@20=0.0054
+
+--- knob: learning_rate  grid=[0.001, 0.01, 0.1]  (default carries metric=0.0054) ---
