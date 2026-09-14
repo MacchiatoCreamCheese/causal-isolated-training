@@ -2,3 +2,22 @@
 === Tuning lightgcn on cellphone x causal x seed=42, selecting on validation NDCG@20 ===
     -> /home/thinh/causal-isolated-training/research/results/tuning/lightgcn/cellphone/causal/seed42
 [baseline] running with defaults: {'lambda_reg': 0.0001, 'num_layers': 3, 'learning_rate': 0.001}
+Early stopping:
+- best epoch = 15, stopped epoch = 65
+- best monitored value = 0.023546 (delta = -0.007884)
+
+VALIDATION:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------------- + ----------- + ------- + --------- + --------
+LightGCN/tune/cellphone/causal/s42 |      0.0240 |  0.0071 |    0.0157 | 260.7752
+
+TEST:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+---------------------------------- + ----------- + ------- + --------- + ---------- + --------
+LightGCN/tune/cellphone/causal/s42 |      0.0163 |  0.0050 |    0.0116 | 30236.9487 | 156.5836
+
+[baseline] val NDCG@20=0.0071  test=0.0050  (30655.3s)
+
+--- knob: num_layers  grid=[1, 2, 4]  (default carries metric=0.0071) ---
