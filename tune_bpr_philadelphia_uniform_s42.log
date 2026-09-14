@@ -1,0 +1,210 @@
+
+=== Tuning bpr on philadelphia x uniform x seed=42, selecting on validation NDCG@20 ===
+    -> /home/reno/causal-isolated-training/research/results/tuning/bpr/philadelphia/uniform/seed42
+/home/reno/miniconda3/envs/leakage24/lib/python3.12/site-packages/cornac/data/dataset.py:335: UserWarning: 18484 duplicated observations are removed!
+  warnings.warn("%d duplicated observations are removed!" % dup_count)
+/home/reno/miniconda3/envs/leakage24/lib/python3.12/site-packages/cornac/data/dataset.py:335: UserWarning: 674 duplicated observations are removed!
+  warnings.warn("%d duplicated observations are removed!" % dup_count)
+/home/reno/miniconda3/envs/leakage24/lib/python3.12/site-packages/cornac/data/dataset.py:335: UserWarning: 914 duplicated observations are removed!
+  warnings.warn("%d duplicated observations are removed!" % dup_count)
+[baseline] running with defaults: {'k_embed_dim': 64, 'learning_rate': 0.05, 'lambda_shared': 0.0001, 'batch_size': 4096, 'n_epochs': 1000}
+Early stopping:
+- best epoch = 86, stopped epoch = 99
+- best monitored value = 0.041699 (delta = -0.000978)
+
+VALIDATION:
+...
+                                  | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/philadelphia/uniform/s42 |      0.1854 |  0.0407 |    0.0691 |   2.6556
+
+TEST:
+...
+                                  | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/philadelphia/uniform/s42 |      0.1638 |  0.0360 |    0.0635 |  328.8858 |   2.2336
+
+[baseline] val NDCG@20=0.0407  test=0.0360  (333.8s)
+
+--- knob: k_embed_dim  grid=[32, 128, 256]  (default carries metric=0.0407) ---
+Early stopping:
+- best epoch = 51, stopped epoch = 64
+- best monitored value = 0.035725 (delta = -0.000949)
+
+VALIDATION:
+...
+                                  | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/philadelphia/uniform/s42 |      0.1701 |  0.0348 |    0.0594 |   3.7861
+
+TEST:
+...
+                                  | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/philadelphia/uniform/s42 |      0.1489 |  0.0308 |    0.0550 |  143.6183 |   1.6511
+
+[run]  k_embed_dim=32  val NDCG@20=0.0348  test=0.0308  (149.1s)
+Early stopping:
+- best epoch = 278, stopped epoch = 291
+- best monitored value = 0.062496 (delta = -0.000189)
+
+VALIDATION:
+...
+                                  | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/philadelphia/uniform/s42 |      0.2193 |  0.0623 |    0.0877 |   2.8517
+
+TEST:
+...
+                                  | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/philadelphia/uniform/s42 |      0.1866 |  0.0529 |    0.0779 | 1174.1660 |   2.3512
+
+[run]  k_embed_dim=128  val NDCG@20=0.0623  test=0.0529  (1179.4s)
+Early stopping:
+- best epoch = 234, stopped epoch = 247
+- best monitored value = 0.068876 (delta = -0.000122)
+
+VALIDATION:
+...
+                                  | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/philadelphia/uniform/s42 |      0.2274 |  0.0688 |    0.0911 |   2.9768
+
+TEST:
+...
+                                  | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/philadelphia/uniform/s42 |      0.1937 |  0.0590 |    0.0827 | 1410.6181 |   2.4725
+
+[run]  k_embed_dim=256  val NDCG@20=0.0688  test=0.0590  (1416.1s)
+[winner@k_embed_dim] k_embed_dim=256  NDCG@20=0.0688
+
+--- knob: learning_rate  grid=[0.001, 0.01, 0.1]  (default carries metric=0.0688) ---
+Early stopping:
+- best epoch = 163, stopped epoch = 176
+- best monitored value = 0.021520 (delta = -0.000150)
+
+VALIDATION:
+...
+                                  | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/philadelphia/uniform/s42 |      0.1162 |  0.0214 |    0.0342 |   2.8496
+
+TEST:
+...
+                                  | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/philadelphia/uniform/s42 |      0.1060 |  0.0213 |    0.0356 | 1015.5936 |   2.3992
+
+[run]  learning_rate=0.001  val NDCG@20=0.0214  test=0.0213  (1020.9s)
+Early stopping:
+- best epoch = 24, stopped epoch = 37
+- best monitored value = 0.021970 (delta = -0.000803)
+
+VALIDATION:
+...
+                                  | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/philadelphia/uniform/s42 |      0.1181 |  0.0212 |    0.0345 |   3.0468
+
+TEST:
+...
+                                  | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/philadelphia/uniform/s42 |      0.1111 |  0.0221 |    0.0380 |  218.1940 |   2.1568
+
+[run]  learning_rate=0.01  val NDCG@20=0.0212  test=0.0221  (223.5s)
+Early stopping:
+- best epoch = 235, stopped epoch = 248
+- best monitored value = 0.074051 (delta = -0.000476)
+
+VALIDATION:
+...
+                                  | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/philadelphia/uniform/s42 |      0.2225 |  0.0736 |    0.0900 |   2.9982
+
+TEST:
+...
+                                  | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/philadelphia/uniform/s42 |      0.1887 |  0.0643 |    0.0797 | 1505.9916 |   2.4052
+
+[run]  learning_rate=0.1  val NDCG@20=0.0736  test=0.0643  (1511.5s)
+[winner@learning_rate] learning_rate=0.1  NDCG@20=0.0736
+
+--- knob: lambda_shared  grid=[1e-06, 1e-05, 0.001, 0.01]  (default carries metric=0.0736) ---
+Early stopping:
+- best epoch = 238, stopped epoch = 251
+- best monitored value = 0.069479 (delta = -0.000084)
+
+VALIDATION:
+...
+                                  | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/philadelphia/uniform/s42 |      0.2150 |  0.0694 |    0.0865 |   2.8359
+
+TEST:
+...
+                                  | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/philadelphia/uniform/s42 |      0.1818 |  0.0604 |    0.0768 | 1458.8936 |   2.4110
+
+[run]  lambda_shared=1e-06  val NDCG@20=0.0694  test=0.0604  (1464.2s)
+Early stopping:
+- best epoch = 408, stopped epoch = 421
+- best monitored value = 0.074834 (delta = -0.000316)
+
+VALIDATION:
+...
+                                  | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/philadelphia/uniform/s42 |      0.2120 |  0.0745 |    0.0855 |   3.5338
+
+TEST:
+...
+                                  | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/philadelphia/uniform/s42 |      0.1783 |  0.0640 |    0.0737 | 2384.1529 |   2.7043
+
+[run]  lambda_shared=1e-05  val NDCG@20=0.0745  test=0.0640  (2390.5s)
+Early stopping:
+- best epoch = 184, stopped epoch = 197
+- best monitored value = 0.073339 (delta = -0.000029)
+
+VALIDATION:
+...
+                                  | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/philadelphia/uniform/s42 |      0.2398 |  0.0733 |    0.0972 |   2.9294
+
+TEST:
+...
+                                  | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/philadelphia/uniform/s42 |      0.1996 |  0.0618 |    0.0851 | 1121.9832 |   2.4221
+
+[run]  lambda_shared=0.001  val NDCG@20=0.0733  test=0.0618  (1127.4s)
+Early stopping:
+- best epoch = 75, stopped epoch = 88
+- best monitored value = 0.044155 (delta = -0.000909)
+
+VALIDATION:
+...
+                                  | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/philadelphia/uniform/s42 |      0.1968 |  0.0432 |    0.0723 |   2.8785
+
+TEST:
+...
+                                  | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/philadelphia/uniform/s42 |      0.1703 |  0.0383 |    0.0659 |  497.0832 |   2.3894
+
+[run]  lambda_shared=0.01  val NDCG@20=0.0432  test=0.0383  (502.4s)
+[winner@lambda_shared] lambda_shared=1e-05  NDCG@20=0.0745
+[users] winner per-user scores from lambda_shared/1em05.json
+
+=== bpr [philadelphia x uniform x seed=42] winner: {'k_embed_dim': 256, 'learning_rate': 0.1, 'lambda_shared': 1e-05, 'batch_size': 4096, 'n_epochs': 1000}  val NDCG@20=0.0745  test=0.0640 ===
+

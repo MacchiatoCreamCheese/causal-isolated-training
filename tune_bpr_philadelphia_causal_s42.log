@@ -1,0 +1,63 @@
+
+=== Tuning bpr on philadelphia x causal x seed=42, selecting on validation NDCG@20 ===
+    -> /home/reno/causal-isolated-training/research/results/tuning/bpr/philadelphia/causal/seed42
+/home/reno/miniconda3/envs/leakage24/lib/python3.12/site-packages/cornac/data/dataset.py:335: UserWarning: 18484 duplicated observations are removed!
+  warnings.warn("%d duplicated observations are removed!" % dup_count)
+/home/reno/miniconda3/envs/leakage24/lib/python3.12/site-packages/cornac/data/dataset.py:335: UserWarning: 674 duplicated observations are removed!
+  warnings.warn("%d duplicated observations are removed!" % dup_count)
+/home/reno/miniconda3/envs/leakage24/lib/python3.12/site-packages/cornac/data/dataset.py:335: UserWarning: 914 duplicated observations are removed!
+  warnings.warn("%d duplicated observations are removed!" % dup_count)
+[baseline] running with defaults: {'k_embed_dim': 64, 'learning_rate': 0.05, 'lambda_shared': 0.0001, 'batch_size': 4096, 'n_epochs': 1000}
+Early stopping:
+- best epoch = 112, stopped epoch = 125
+- best monitored value = 0.043677 (delta = -0.000583)
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/philadelphia/causal/s42 |      0.1959 |  0.0431 |    0.0751 |   3.3946
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/philadelphia/causal/s42 |      0.1598 |  0.0362 |    0.0618 |  480.8447 |   2.5095
+
+[baseline] val NDCG@20=0.0431  test=0.0362  (486.8s)
+
+--- knob: k_embed_dim  grid=[32, 128, 256]  (default carries metric=0.0431) ---
+Early stopping:
+- best epoch = 33, stopped epoch = 46
+- best monitored value = 0.036663 (delta = -0.002227)
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/philadelphia/causal/s42 |      0.1744 |  0.0344 |    0.0596 |   1.9225
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/philadelphia/causal/s42 |      0.1515 |  0.0317 |    0.0564 |  103.7874 |   1.5920
+
+[run]  k_embed_dim=32  val NDCG@20=0.0344  test=0.0317  (107.3s)
+Early stopping:
+- best epoch = 282, stopped epoch = 295
+- best monitored value = 0.062476 (delta = -0.000475)
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/philadelphia/causal/s42 |      0.2269 |  0.0620 |    0.0922 |   3.7949
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/philadelphia/causal/s42 |      0.1850 |  0.0507 |    0.0763 | 1326.3501 |   3.4578
+
+[run]  k_embed_dim=128  val NDCG@20=0.0620  test=0.0507  (1333.7s)
