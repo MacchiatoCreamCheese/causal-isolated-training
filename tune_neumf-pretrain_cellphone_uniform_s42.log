@@ -169,3 +169,50 @@ NeuMF/tune/cellphone/uniform/s42 |      0.0089 |  0.0026 |    0.0063 | 7717.3749
 [winner@learning_rate] learning_rate=0.0005  NDCG@20=0.0038
 
 --- knob: batch_size  grid=[128, 512, 1024]  (default carries metric=0.0038) ---
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/cellphone/uniform/s42 |      0.0126 |  0.0036 |    0.0080 | 625.4534
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + ---------- + --------
+NeuMF/tune/cellphone/uniform/s42 |      0.0105 |  0.0031 |    0.0077 | 15273.9723 | 375.0539
+
+[run]  batch_size=128  val NDCG@20=0.0036  test=0.0031  (16278.9s)
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/cellphone/uniform/s42 |      0.0147 |  0.0041 |    0.0094 | 626.6312
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/cellphone/uniform/s42 |      0.0109 |  0.0032 |    0.0074 | 3884.4044 | 379.3323
+
+[run]  batch_size=512  val NDCG@20=0.0041  test=0.0032  (4892.9s)
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/cellphone/uniform/s42 |      0.0168 |  0.0048 |    0.0108 | 627.2809
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/cellphone/uniform/s42 |      0.0129 |  0.0040 |    0.0092 | 2067.3186 | 374.9797
+
+[run]  batch_size=1024  val NDCG@20=0.0048  test=0.0040  (3072.0s)
+[winner@batch_size] batch_size=1024  NDCG@20=0.0048
+[users] winner per-user scores from batch_size/1024.json
+
+=== neumf [cellphone x uniform x seed=42] winner: {'num_factors': 32, 'mlp_hidden_count': 3, 'learning_rate': 0.0005, 'num_neg': 4, 'batch_size': 1024}  val NDCG@20=0.0048  test=0.0040 ===
+

@@ -20,3 +20,4 @@ data/
 .DS_Store
 .ipynb_checkpoints/
 run_tuning*.out
+run_dataset_tuning*.out
