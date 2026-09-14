@@ -62,3 +62,25 @@ TEST:
 LightGCN/tune/cellphone/uniform/s42 |      0.0142 |  0.0045 |    0.0102 | 25640.3515 | 155.4060
 
 [run]  num_layers=2  val NDCG@20=0.0056  test=0.0045  (26055.4s)
+Early stopping:
+- best epoch = 20, stopped epoch = 70
+- best monitored value = 0.016400 (delta = -0.003122)
+
+VALIDATION:
+...
+                                    | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------------- + ----------- + ------- + --------- + --------
+LightGCN/tune/cellphone/uniform/s42 |      0.0203 |  0.0061 |    0.0133 | 261.6808
+
+TEST:
+...
+                                    | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+----------------------------------- + ----------- + ------- + --------- + ---------- + --------
+LightGCN/tune/cellphone/uniform/s42 |      0.0147 |  0.0046 |    0.0104 | 36052.8172 | 157.0325
+
+[run]  num_layers=4  val NDCG@20=0.0061  test=0.0046  (36472.5s)
+[winner@num_layers] num_layers=4  NDCG@20=0.0061
+[users] winner per-user scores from num_layers/4.json
+
+=== lightgcn [cellphone x uniform x seed=42] winner: {'lambda_reg': 0.0001, 'num_layers': 4, 'learning_rate': 0.001}  val NDCG@20=0.0061  test=0.0046 ===
+
