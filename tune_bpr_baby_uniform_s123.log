@@ -92,3 +92,40 @@ TEST:
 BPR/tune/baby/uniform/s123 |      0.0195 |  0.0040 |    0.0107 | 5782.5863 |  16.4460
 
 [run]  learning_rate=0.001  val NDCG@20=0.0052  test=0.0040  (5828.3s)
+Early stopping:
+- best epoch = 15, stopped epoch = 28
+- best monitored value = 0.005238 (delta = -0.000668)
+
+VALIDATION:
+...
+                           | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/baby/uniform/s123 |      0.0241 |  0.0046 |    0.0110 |  30.5343
+
+TEST:
+...
+                           | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/uniform/s123 |      0.0167 |  0.0031 |    0.0081 | 1055.6789 |  16.9695
+
+[run]  learning_rate=0.01  val NDCG@20=0.0046  test=0.0031  (1103.5s)
+Early stopping:
+- best epoch = 15, stopped epoch = 28
+- best monitored value = 0.009129 (delta = -0.000898)
+
+VALIDATION:
+...
+                           | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/baby/uniform/s123 |      0.0341 |  0.0082 |    0.0180 |  29.5933
+
+TEST:
+...
+                           | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/uniform/s123 |      0.0219 |  0.0054 |    0.0124 | 1024.5308 |  16.7607
+
+[run]  learning_rate=0.1  val NDCG@20=0.0082  test=0.0054  (1071.2s)
+[winner@learning_rate] learning_rate=0.05  NDCG@20=0.0089 (kept default)
+
+--- knob: lambda_shared  grid=[1e-06, 1e-05, 0.001, 0.01]  (default carries metric=0.0089) ---
