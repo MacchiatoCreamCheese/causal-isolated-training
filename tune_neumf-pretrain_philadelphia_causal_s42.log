@@ -1,0 +1,133 @@
+
+=== Tuning neumf on philadelphia x causal x seed=42, selecting on validation NDCG@20 ===
+    -> /home/thinh/causal-isolated-training/research/results/tuning/neumf-pretrain/philadelphia/causal/seed42
+/home/thinh/miniconda3/envs/leakage24/lib/python3.12/site-packages/cornac/data/dataset.py:335: UserWarning: 18484 duplicated observations are removed!
+  warnings.warn("%d duplicated observations are removed!" % dup_count)
+/home/thinh/miniconda3/envs/leakage24/lib/python3.12/site-packages/cornac/data/dataset.py:335: UserWarning: 674 duplicated observations are removed!
+  warnings.warn("%d duplicated observations are removed!" % dup_count)
+/home/thinh/miniconda3/envs/leakage24/lib/python3.12/site-packages/cornac/data/dataset.py:335: UserWarning: 914 duplicated observations are removed!
+  warnings.warn("%d duplicated observations are removed!" % dup_count)
+[baseline] running with defaults: {'num_factors': 8, 'mlp_hidden_count': 3, 'learning_rate': 0.001, 'num_neg': 4, 'batch_size': 256}
+
+VALIDATION:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/philadelphia/causal/s42 |      0.1533 |  0.0263 |    0.0527 |  13.6963
+
+TEST:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/philadelphia/causal/s42 |      0.1198 |  0.0209 |    0.0426 |  244.5701 |  11.6754
+
+[baseline] val NDCG@20=0.0263  test=0.0209  (270.0s)
+
+--- knob: num_factors  grid=[16, 32, 64]  (default carries metric=0.0263) ---
+
+VALIDATION:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/philadelphia/causal/s42 |      0.1680 |  0.0313 |    0.0602 |  10.6370
+
+TEST:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/philadelphia/causal/s42 |      0.1383 |  0.0269 |    0.0526 |  245.0588 |   8.8291
+
+[run]  num_factors=16  val NDCG@20=0.0313  test=0.0269  (264.6s)
+
+VALIDATION:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/philadelphia/causal/s42 |      0.1974 |  0.0438 |    0.0761 |  13.2798
+
+TEST:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/philadelphia/causal/s42 |      0.1544 |  0.0355 |    0.0627 |  288.0831 |  10.2991
+
+[run]  num_factors=32  val NDCG@20=0.0438  test=0.0355  (311.8s)
+
+VALIDATION:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/philadelphia/causal/s42 |      0.2256 |  0.0589 |    0.0896 |  19.6134
+
+TEST:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/philadelphia/causal/s42 |      0.1796 |  0.0474 |    0.0747 |  350.9847 |  15.6860
+
+[run]  num_factors=64  val NDCG@20=0.0589  test=0.0474  (386.4s)
+[winner@num_factors] num_factors=64  NDCG@20=0.0589
+
+--- knob: mlp_hidden_count  grid=[4]  (default carries metric=0.0589) ---
+
+VALIDATION:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/philadelphia/causal/s42 |      0.2265 |  0.0597 |    0.0886 |  47.9380
+
+TEST:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/philadelphia/causal/s42 |      0.1771 |  0.0474 |    0.0739 |  514.8920 |  38.5430
+
+[run]  mlp_hidden_count=4  val NDCG@20=0.0597  test=0.0474  (601.6s)
+[winner@mlp_hidden_count] mlp_hidden_count=4  NDCG@20=0.0597
+
+--- knob: learning_rate  grid=[0.0001, 0.0005, 0.005]  (default carries metric=0.0597) ---
+
+VALIDATION:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/philadelphia/causal/s42 |      0.1864 |  0.0453 |    0.0704 |  47.8722
+
+TEST:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/philadelphia/causal/s42 |      0.1425 |  0.0368 |    0.0568 |  515.8506 |  38.7721
+
+[run]  learning_rate=0.0001  val NDCG@20=0.0453  test=0.0368  (602.7s)
+
+VALIDATION:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/philadelphia/causal/s42 |      0.2174 |  0.0552 |    0.0851 |  48.0918
+
+TEST:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/philadelphia/causal/s42 |      0.1680 |  0.0438 |    0.0673 |  507.8464 |  38.5104
+
+[run]  learning_rate=0.0005  val NDCG@20=0.0552  test=0.0438  (594.7s)
+
+VALIDATION:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/philadelphia/causal/s42 |      0.2018 |  0.0514 |    0.0795 |  48.0250
+
+TEST:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/philadelphia/causal/s42 |      0.1582 |  0.0408 |    0.0610 |  528.7440 |  37.7499
+
+[run]  learning_rate=0.005  val NDCG@20=0.0514  test=0.0408  (614.7s)
+[winner@learning_rate] learning_rate=0.001  NDCG@20=0.0597 (kept default)
+
+--- knob: batch_size  grid=[128, 512, 1024]  (default carries metric=0.0597) ---
