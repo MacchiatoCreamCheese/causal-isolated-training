@@ -186,3 +186,25 @@ TEST:
 BPR/tune/philadelphia/uniform/s2026 |      0.2054 |  0.0648 |    0.0868 | 2018.7814 |   2.5604
 
 [run]  lambda_shared=0.001  val NDCG@20=0.0735  test=0.0648  (2024.4s)
+Early stopping:
+- best epoch = 246, stopped epoch = 259
+- best monitored value = 0.051917 (delta = -0.000057)
+
+VALIDATION:
+...
+                                    | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/philadelphia/uniform/s2026 |      0.2171 |  0.0519 |    0.0846 |   3.8508
+
+TEST:
+...
+                                    | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+----------------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/philadelphia/uniform/s2026 |      0.1861 |  0.0451 |    0.0748 | 1489.4199 |   2.5164
+
+[run]  lambda_shared=0.01  val NDCG@20=0.0519  test=0.0451  (1495.9s)
+[winner@lambda_shared] lambda_shared=0.0001  NDCG@20=0.0757 (kept default)
+[users] winner per-user scores from k_embed_dim/256.json
+
+=== bpr [philadelphia x uniform x seed=2026] winner: {'k_embed_dim': 256, 'learning_rate': 0.05, 'lambda_shared': 0.0001, 'batch_size': 4096, 'n_epochs': 1000}  val NDCG@20=0.0757  test=0.0661 ===
+
