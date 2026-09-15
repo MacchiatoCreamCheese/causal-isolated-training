@@ -21,3 +21,23 @@ LightGCN/tune/cellphone/causal/s42 |      0.0163 |  0.0050 |    0.0116 | 30236.9
 [baseline] val NDCG@20=0.0071  test=0.0050  (30655.3s)
 
 --- knob: num_layers  grid=[1, 2, 4]  (default carries metric=0.0071) ---
+Early stopping:
+- best epoch = 4, stopped epoch = 54
+- best monitored value = 0.021381 (delta = -0.010056)
+
+VALIDATION:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------------- + ----------- + ------- + --------- + --------
+LightGCN/tune/cellphone/causal/s42 |      0.0176 |  0.0050 |    0.0113 | 263.8934
+
+TEST:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+---------------------------------- + ----------- + ------- + --------- + ---------- + --------
+LightGCN/tune/cellphone/causal/s42 |      0.0129 |  0.0038 |    0.0091 | 19391.4060 | 157.7855
+
+[run]  num_layers=1  val NDCG@20=0.0050  test=0.0038  (19813.9s)
+Early stopping:
+- best epoch = 12, stopped epoch = 62
+- best monitored value = 0.025695 (delta = -0.007692)
