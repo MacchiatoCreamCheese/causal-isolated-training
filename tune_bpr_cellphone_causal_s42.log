@@ -214,3 +214,30 @@ BPR/tune/cellphone/causal/s42 |      0.0197 |  0.0056 |    0.0143 | 5318.1987 | 
 
 === bpr [cellphone x causal x seed=42] winner: {'k_embed_dim': 32, 'learning_rate': 0.05, 'lambda_shared': 0.001, 'batch_size': 4096, 'n_epochs': 1000}  val NDCG@20=0.0094  test=0.0072 ===
 
+
+=== Tuning bpr on cellphone x causal x seed=42, selecting on validation NDCG@20 ===
+    -> /home/trustrs/causal-isolated-training/research/results/tuning/bpr/cellphone/causal/seed42
+[baseline] cached: val NDCG@20=0.0088
+
+--- knob: k_embed_dim  grid=[32, 128, 256]  (default carries metric=0.0088) ---
+[skip] k_embed_dim=32  val NDCG@20=0.0092  [cached]
+[skip] k_embed_dim=128  val NDCG@20=0.0089  [cached]
+[skip] k_embed_dim=256  val NDCG@20=0.0082  [cached]
+[winner@k_embed_dim] k_embed_dim=32  NDCG@20=0.0092
+
+--- knob: learning_rate  grid=[0.001, 0.01, 0.1]  (default carries metric=0.0092) ---
+[skip] learning_rate=0.001  val NDCG@20=0.0039  [cached]
+[skip] learning_rate=0.01  val NDCG@20=0.0038  [cached]
+[skip] learning_rate=0.1  val NDCG@20=0.0092  [cached]
+[winner@learning_rate] learning_rate=0.05  NDCG@20=0.0092 (kept default)
+
+--- knob: lambda_shared  grid=[1e-06, 1e-05, 0.001, 0.01]  (default carries metric=0.0092) ---
+[skip] lambda_shared=1e-06  val NDCG@20=0.0093  [cached]
+[skip] lambda_shared=1e-05  val NDCG@20=0.0093  [cached]
+[skip] lambda_shared=0.001  val NDCG@20=0.0094  [cached]
+[skip] lambda_shared=0.01  val NDCG@20=0.0079  [cached]
+[winner@lambda_shared] lambda_shared=0.001  NDCG@20=0.0094
+[users] winner per-user scores already saved
+
+=== bpr [cellphone x causal x seed=42] winner: {'k_embed_dim': 32, 'learning_rate': 0.05, 'lambda_shared': 0.001, 'batch_size': 4096, 'n_epochs': 1000}  val NDCG@20=0.0094  test=0.0072 ===
+

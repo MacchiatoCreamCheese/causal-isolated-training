@@ -1,0 +1,204 @@
+
+=== Tuning bpr on musical x uniform x seed=123, selecting on validation NDCG@20 ===
+    -> /home/trustrs/causal-isolated-training/research/results/tuning/bpr/musical/uniform/seed123
+[baseline] running with defaults: {'k_embed_dim': 64, 'learning_rate': 0.05, 'lambda_shared': 0.0001, 'batch_size': 4096, 'n_epochs': 1000}
+Early stopping:
+- best epoch = 43, stopped epoch = 56
+- best monitored value = 0.015813 (delta = -0.000853)
+
+VALIDATION:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/musical/uniform/s123 |      0.0605 |  0.0150 |    0.0287 |   9.0480
+
+TEST:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+----------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/musical/uniform/s123 |      0.0513 |  0.0131 |    0.0275 |  536.5670 |   5.8754
+
+[baseline] val NDCG@20=0.0150  test=0.0131  (551.6s)
+
+--- knob: k_embed_dim  grid=[32, 128, 256]  (default carries metric=0.0150) ---
+Early stopping:
+- best epoch = 36, stopped epoch = 49
+- best monitored value = 0.014590 (delta = -0.000624)
+
+VALIDATION:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/musical/uniform/s123 |      0.0570 |  0.0140 |    0.0268 |   8.0542
+
+TEST:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+----------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/musical/uniform/s123 |      0.0498 |  0.0123 |    0.0248 |  438.7893 |   5.7926
+
+[run]  k_embed_dim=32  val NDCG@20=0.0140  test=0.0123  (452.7s)
+Early stopping:
+- best epoch = 37, stopped epoch = 50
+- best monitored value = 0.016538 (delta = -0.000535)
+
+VALIDATION:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/musical/uniform/s123 |      0.0652 |  0.0160 |    0.0318 |   9.4215
+
+TEST:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+----------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/musical/uniform/s123 |      0.0499 |  0.0127 |    0.0261 |  531.4856 |   6.3419
+
+[run]  k_embed_dim=128  val NDCG@20=0.0160  test=0.0127  (547.4s)
+Early stopping:
+- best epoch = 55, stopped epoch = 68
+- best monitored value = 0.017212 (delta = -0.001367)
+
+VALIDATION:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/musical/uniform/s123 |      0.0623 |  0.0158 |    0.0304 |  13.9991
+
+TEST:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+----------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/musical/uniform/s123 |      0.0485 |  0.0131 |    0.0262 | 1121.8703 |  10.7736
+
+[run]  k_embed_dim=256  val NDCG@20=0.0158  test=0.0131  (1146.8s)
+[winner@k_embed_dim] k_embed_dim=128  NDCG@20=0.0160
+
+--- knob: learning_rate  grid=[0.001, 0.01, 0.1]  (default carries metric=0.0160) ---
+Early stopping:
+- best epoch = 299, stopped epoch = 312
+- best monitored value = 0.010113 (delta = -0.000160)
+
+VALIDATION:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/musical/uniform/s123 |      0.0405 |  0.0100 |    0.0176 |   9.0233
+
+TEST:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+----------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/musical/uniform/s123 |      0.0385 |  0.0105 |    0.0185 | 3219.5774 |   6.4222
+
+[run]  learning_rate=0.001  val NDCG@20=0.0100  test=0.0105  (3235.2s)
+Early stopping:
+- best epoch = 118, stopped epoch = 131
+- best monitored value = 0.015292 (delta = -0.000443)
+
+VALIDATION:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/musical/uniform/s123 |      0.0616 |  0.0148 |    0.0280 |   9.1515
+
+TEST:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+----------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/musical/uniform/s123 |      0.0501 |  0.0127 |    0.0254 | 1353.4165 |   6.4085
+
+[run]  learning_rate=0.01  val NDCG@20=0.0148  test=0.0127  (1369.1s)
+Early stopping:
+- best epoch = 27, stopped epoch = 40
+- best monitored value = 0.016671 (delta = -0.002129)
+
+VALIDATION:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/musical/uniform/s123 |      0.0580 |  0.0145 |    0.0285 |   8.6335
+
+TEST:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+----------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/musical/uniform/s123 |      0.0489 |  0.0129 |    0.0263 |  408.3623 |   6.3382
+
+[run]  learning_rate=0.1  val NDCG@20=0.0145  test=0.0129  (423.5s)
+[winner@learning_rate] learning_rate=0.05  NDCG@20=0.0160 (kept default)
+
+--- knob: lambda_shared  grid=[1e-06, 1e-05, 0.001, 0.01]  (default carries metric=0.0160) ---
+Early stopping:
+- best epoch = 37, stopped epoch = 50
+- best monitored value = 0.016504 (delta = -0.000495)
+
+VALIDATION:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/musical/uniform/s123 |      0.0654 |  0.0160 |    0.0318 |   8.9410
+
+TEST:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+----------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/musical/uniform/s123 |      0.0495 |  0.0127 |    0.0259 |  517.5551 |   6.4183
+
+[run]  lambda_shared=1e-06  val NDCG@20=0.0160  test=0.0127  (533.0s)
+Early stopping:
+- best epoch = 37, stopped epoch = 50
+- best monitored value = 0.016517 (delta = -0.000518)
+
+VALIDATION:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/musical/uniform/s123 |      0.0652 |  0.0160 |    0.0318 |   8.9603
+
+TEST:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+----------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/musical/uniform/s123 |      0.0497 |  0.0128 |    0.0260 |  512.7011 |   6.3266
+
+[run]  lambda_shared=1e-05  val NDCG@20=0.0160  test=0.0128  (528.1s)
+Early stopping:
+- best epoch = 35, stopped epoch = 48
+- best monitored value = 0.016438 (delta = -0.000217)
+
+VALIDATION:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/musical/uniform/s123 |      0.0661 |  0.0162 |    0.0322 |   8.8373
+
+TEST:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+----------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/musical/uniform/s123 |      0.0477 |  0.0123 |    0.0240 |  483.7349 |   6.3561
+
+[run]  lambda_shared=0.001  val NDCG@20=0.0162  test=0.0123  (499.1s)
+Early stopping:
+- best epoch = 46, stopped epoch = 59
+- best monitored value = 0.016346 (delta = -0.001001)
+
+VALIDATION:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/musical/uniform/s123 |      0.0644 |  0.0153 |    0.0308 |   8.9408
+
+TEST:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+----------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/musical/uniform/s123 |      0.0501 |  0.0124 |    0.0263 |  604.3500 |   6.3435
+
+[run]  lambda_shared=0.01  val NDCG@20=0.0153  test=0.0124  (619.8s)
+[winner@lambda_shared] lambda_shared=0.001  NDCG@20=0.0162
+[users] winner per-user scores from lambda_shared/0p001.json
+
+=== bpr [musical x uniform x seed=123] winner: {'k_embed_dim': 128, 'learning_rate': 0.05, 'lambda_shared': 0.001, 'batch_size': 4096, 'n_epochs': 1000}  val NDCG@20=0.0162  test=0.0123 ===
+
