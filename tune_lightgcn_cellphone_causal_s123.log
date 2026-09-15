@@ -1,0 +1,23 @@
+
+=== Tuning lightgcn on cellphone x causal x seed=123, selecting on validation NDCG@20 ===
+    -> /home/ntuyen/causal-isolated-training/research/results/tuning/lightgcn/cellphone/causal/seed123
+[baseline] running with defaults: {'lambda_reg': 0.0001, 'num_layers': 3, 'learning_rate': 0.001}
+Early stopping:
+- best epoch = 19, stopped epoch = 69
+- best monitored value = 0.023690 (delta = -0.008652)
+
+VALIDATION:
+...
+                                    | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------------- + ----------- + ------- + --------- + --------
+LightGCN/tune/cellphone/causal/s123 |      0.0232 |  0.0067 |    0.0150 | 180.7095
+
+TEST:
+...
+                                    | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+----------------------------------- + ----------- + ------- + --------- + ---------- + --------
+LightGCN/tune/cellphone/causal/s123 |      0.0156 |  0.0047 |    0.0112 | 26047.9674 | 111.2243
+
+[baseline] val NDCG@20=0.0067  test=0.0047  (26340.6s)
+
+--- knob: num_layers  grid=[1, 2, 4]  (default carries metric=0.0067) ---
