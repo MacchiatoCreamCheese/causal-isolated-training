@@ -1,0 +1,39 @@
+{
+  "model": "neumf",
+  "variant": "neumf-pretrain",
+  "dataset": "philadelphia",
+  "seed": 123,
+  "recipe": "causal",
+  "select_metric": "NDCG@20",
+  "select_split": "validation",
+  "config": {
+    "num_factors": 64,
+    "mlp_hidden_count": 4,
+    "learning_rate": 0.001,
+    "num_neg": 4,
+    "batch_size": 128
+  },
+  "metric": 0.05784900441661462,
+  "test_metric": 0.04519777212266159,
+  "users_run": {
+    "source": "trial",
+    "trial": "batch_size/128.json",
+    "val_metrics": {
+      "HitRatio@20": 0.21684930129687344,
+      "NDCG@20": 0.05784900441661462,
+      "Recall@20": 0.08640823445857317,
+      "Time (s)": 48.273778200149536
+    },
+    "test_metrics": {
+      "HitRatio@20": 0.17047203694202154,
+      "NDCG@20": 0.04519777212266159,
+      "Recall@20": 0.0692599976381856,
+      "Train (s)": 933.587681055069,
+      "Test (s)": 38.745919704437256
+    },
+    "probes": {
+      "counterfactual_rate": 0.0,
+      "collision_rate": 3.0830174534275834e-05
+    }
+  }
+}
