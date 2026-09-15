@@ -202,3 +202,30 @@ BPR/tune/musical/uniform/s123 |      0.0501 |  0.0124 |    0.0263 |  604.3500 | 
 
 === bpr [musical x uniform x seed=123] winner: {'k_embed_dim': 128, 'learning_rate': 0.05, 'lambda_shared': 0.001, 'batch_size': 4096, 'n_epochs': 1000}  val NDCG@20=0.0162  test=0.0123 ===
 
+
+=== Tuning bpr on musical x uniform x seed=123, selecting on validation NDCG@20 ===
+    -> /home/reno/causal-isolated-training/research/results/tuning/bpr/musical/uniform/seed123
+[baseline] cached: val NDCG@20=0.0150
+
+--- knob: k_embed_dim  grid=[32, 128, 256]  (default carries metric=0.0150) ---
+[skip] k_embed_dim=32  val NDCG@20=0.0140  [cached]
+[skip] k_embed_dim=128  val NDCG@20=0.0160  [cached]
+[skip] k_embed_dim=256  val NDCG@20=0.0158  [cached]
+[winner@k_embed_dim] k_embed_dim=128  NDCG@20=0.0160
+
+--- knob: learning_rate  grid=[0.001, 0.01, 0.1]  (default carries metric=0.0160) ---
+[skip] learning_rate=0.001  val NDCG@20=0.0100  [cached]
+[skip] learning_rate=0.01  val NDCG@20=0.0148  [cached]
+[skip] learning_rate=0.1  val NDCG@20=0.0145  [cached]
+[winner@learning_rate] learning_rate=0.05  NDCG@20=0.0160 (kept default)
+
+--- knob: lambda_shared  grid=[1e-06, 1e-05, 0.001, 0.01]  (default carries metric=0.0160) ---
+[skip] lambda_shared=1e-06  val NDCG@20=0.0160  [cached]
+[skip] lambda_shared=1e-05  val NDCG@20=0.0160  [cached]
+[skip] lambda_shared=0.001  val NDCG@20=0.0162  [cached]
+[skip] lambda_shared=0.01  val NDCG@20=0.0153  [cached]
+[winner@lambda_shared] lambda_shared=0.001  NDCG@20=0.0162
+[users] winner per-user scores already saved
+
+=== bpr [musical x uniform x seed=123] winner: {'k_embed_dim': 128, 'learning_rate': 0.05, 'lambda_shared': 0.001, 'batch_size': 4096, 'n_epochs': 1000}  val NDCG@20=0.0162  test=0.0123 ===
+
