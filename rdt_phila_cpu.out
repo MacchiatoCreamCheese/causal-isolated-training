@@ -3,3 +3,4 @@ nohup: ignoring input
 [run_dataset_tuning] cornac 2.6.0 | cpu-only track
 [run_dataset_tuning] philadelphia | seeds: 42 123 2026 | cpu: bpr | gpu: none | neumf pretrain: 1 | Mon Sep 14 07:22:27 UTC 2026
 [run_dataset_tuning] progress: run_dataset_tuning_philadelphia_cpu.out, run_dataset_tuning_philadelphia_gpu.out
+[run_dataset_tuning] all done Tue Sep 15 06:09:52 UTC 2026
