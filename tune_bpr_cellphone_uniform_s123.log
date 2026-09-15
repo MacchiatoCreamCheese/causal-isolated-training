@@ -2,3 +2,56 @@
 === Tuning bpr on cellphone x uniform x seed=123, selecting on validation NDCG@20 ===
     -> /home/reno/causal-isolated-training/research/results/tuning/bpr/cellphone/uniform/seed123
 [baseline] running with defaults: {'k_embed_dim': 64, 'learning_rate': 0.05, 'lambda_shared': 0.0001, 'batch_size': 4096, 'n_epochs': 1000}
+Early stopping:
+- best epoch = 18, stopped epoch = 31
+- best monitored value = 0.005739 (delta = -0.000685)
+
+VALIDATION:
+...
+                                | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/cellphone/uniform/s123 |      0.0167 |  0.0051 |    0.0107 | 152.2744
+
+TEST:
+...
+                                | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/cellphone/uniform/s123 |      0.0131 |  0.0043 |    0.0092 | 5288.5106 |  94.6580
+
+[baseline] val NDCG@20=0.0051  test=0.0043  (5536.1s)
+
+--- knob: k_embed_dim  grid=[32, 128, 256]  (default carries metric=0.0051) ---
+Early stopping:
+- best epoch = 28, stopped epoch = 41
+- best monitored value = 0.005238 (delta = -0.000375)
+
+VALIDATION:
+...
+                                | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/cellphone/uniform/s123 |      0.0161 |  0.0049 |    0.0103 | 110.3430
+
+TEST:
+...
+                                | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/cellphone/uniform/s123 |      0.0145 |  0.0048 |    0.0100 | 4494.9955 |  67.6850
+
+[run]  k_embed_dim=32  val NDCG@20=0.0049  test=0.0048  (4673.6s)
+Early stopping:
+- best epoch = 36, stopped epoch = 49
+- best monitored value = 0.005710 (delta = -0.000203)
+
+VALIDATION:
+...
+                                | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/cellphone/uniform/s123 |      0.0181 |  0.0055 |    0.0115 | 268.1751
+
+TEST:
+...
+                                | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+------------------------------- + ----------- + ------- + --------- + ---------- + --------
+BPR/tune/cellphone/uniform/s123 |      0.0129 |  0.0042 |    0.0090 | 12467.6381 | 163.2515
+
+[run]  k_embed_dim=128  val NDCG@20=0.0055  test=0.0042  (12899.8s)
