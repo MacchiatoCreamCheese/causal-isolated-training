@@ -56,18 +56,18 @@ DATASETS = {
         "val_ts": 1537357870200,    # 2018-09-19
         "test_ts": 1572859360400,   # 2019-11-04
     },
-    # MovieLens-32M (GroupLens), same protocol as the Amazon sets. The last 10
-    # years of the log (2013-10-12 to 2023-10-13) -- the span holding ~95% of the
-    # Amazon sets' interactions, on the same calendar -- then a random 20% of
-    # those users with their full histories (numpy default_rng(42)), then
-    # iterative 5-core. Ratings as-is (half stars; the 0.5 ratings fall below
+    # MovieLens-10M (GroupLens, ml-10M100K), same protocol as the Amazon sets:
+    # the full log (1995-01-09 to 2009-01-05, uncropped, like Philadelphia),
+    # iterative 5-core, ratings as-is (half stars; the 0.5 ratings fall below
     # cornac's rating_threshold of 1.0 at evaluation), timestamps converted from
     # seconds to ms, split once at the 80th and 90th percentiles of interaction
-    # time. 2.61M ratings, 15,336 users, 18,807 movies. Opt-in: --datasets movielens.
+    # time. 10.0M ratings, 69,878 users, 10,196 movies. MovieLens users rate in
+    # bursts, so a global time split leaves few evaluable test users (~1.75k).
+    # Memory-hungry to load (~3.6x cellphone). Opt-in: --datasets movielens.
     "movielens": {
-        "path": "movielens_dataset/MovieLens-32M.csv",
-        "val_ts": 1614537679800,    # 2021-02-28
-        "test_ts": 1652827323000,   # 2022-05-17
+        "path": "movielens_dataset/MovieLens-10M.csv",
+        "val_ts": 1145393009000,    # 2006-04-18
+        "test_ts": 1188213670000,   # 2007-08-27
     },
     "healthcare": {
         "path": "healthcare_dataset/Health_and_Household.csv",
