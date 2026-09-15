@@ -131,3 +131,50 @@ NeuMF/tune/philadelphia/causal/s42 |      0.1582 |  0.0408 |    0.0610 |  528.74
 [winner@learning_rate] learning_rate=0.001  NDCG@20=0.0597 (kept default)
 
 --- knob: batch_size  grid=[128, 512, 1024]  (default carries metric=0.0597) ---
+
+VALIDATION:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/philadelphia/causal/s42 |      0.2121 |  0.0559 |    0.0835 |  46.3250
+
+TEST:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/philadelphia/causal/s42 |      0.1729 |  0.0452 |    0.0700 | 1046.6397 |  38.4038
+
+[run]  batch_size=128  val NDCG@20=0.0559  test=0.0452  (1131.6s)
+
+VALIDATION:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/philadelphia/causal/s42 |      0.2185 |  0.0551 |    0.0871 |  47.6724
+
+TEST:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/philadelphia/causal/s42 |      0.1796 |  0.0453 |    0.0713 |  306.2713 |  38.2383
+
+[run]  batch_size=512  val NDCG@20=0.0551  test=0.0453  (392.4s)
+
+VALIDATION:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/philadelphia/causal/s42 |      0.2095 |  0.0491 |    0.0808 |  47.3878
+
+TEST:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/philadelphia/causal/s42 |      0.1668 |  0.0398 |    0.0670 |  206.4581 |  37.1277
+
+[run]  batch_size=1024  val NDCG@20=0.0491  test=0.0398  (291.1s)
+[winner@batch_size] batch_size=256  NDCG@20=0.0597 (kept default)
+[users] winner per-user scores from mlp_hidden_count/4.json
+
+=== neumf [philadelphia x causal x seed=42] winner: {'num_factors': 64, 'mlp_hidden_count': 4, 'learning_rate': 0.001, 'num_neg': 4, 'batch_size': 256}  val NDCG@20=0.0597  test=0.0474 ===
+
