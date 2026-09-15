@@ -1,0 +1,39 @@
+{
+  "model": "neumf",
+  "variant": "neumf-pretrain",
+  "dataset": "musical",
+  "seed": 123,
+  "recipe": "uniform",
+  "select_metric": "NDCG@20",
+  "select_split": "validation",
+  "config": {
+    "num_factors": 64,
+    "mlp_hidden_count": 3,
+    "learning_rate": 0.0005,
+    "num_neg": 4,
+    "batch_size": 512
+  },
+  "metric": 0.014036021441525956,
+  "test_metric": 0.012765343042652753,
+  "users_run": {
+    "source": "trial",
+    "trial": "batch_size/512.json",
+    "val_metrics": {
+      "HitRatio@20": 0.05618390129259695,
+      "NDCG@20": 0.014036021441525956,
+      "Recall@20": 0.02658180049461259,
+      "Time (s)": 89.50717282295227
+    },
+    "test_metrics": {
+      "HitRatio@20": 0.0491562729273661,
+      "NDCG@20": 0.012765343042652753,
+      "Recall@20": 0.025618235370094954,
+      "Train (s)": 353.7983453273773,
+      "Test (s)": 62.97862720489502
+    },
+    "probes": {
+      "counterfactual_rate": 0.331977540967901,
+      "collision_rate": 0.0
+    }
+  }
+}
