@@ -61,3 +61,57 @@ TEST:
 BPR/tune/philadelphia/causal/s2026 |      0.1838 |  0.0502 |    0.0746 | 1298.5177 |   4.5003
 
 [run]  k_embed_dim=128  val NDCG@20=0.0603  test=0.0502  (1307.4s)
+Early stopping:
+- best epoch = 277, stopped epoch = 290
+- best monitored value = 0.068372 (delta = -0.000237)
+
+VALIDATION:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/philadelphia/causal/s2026 |      0.2312 |  0.0681 |    0.0954 |   3.0715
+
+TEST:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/philadelphia/causal/s2026 |      0.1883 |  0.0558 |    0.0777 | 1796.3800 |   2.5346
+
+[run]  k_embed_dim=256  val NDCG@20=0.0681  test=0.0558  (1802.1s)
+[winner@k_embed_dim] k_embed_dim=256  NDCG@20=0.0681
+
+--- knob: learning_rate  grid=[0.001, 0.01, 0.1]  (default carries metric=0.0681) ---
+Early stopping:
+- best epoch = 163, stopped epoch = 176
+- best monitored value = 0.021755 (delta = -0.000125)
+
+VALIDATION:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/philadelphia/causal/s2026 |      0.1160 |  0.0216 |    0.0337 |   3.0227
+
+TEST:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/philadelphia/causal/s2026 |      0.1084 |  0.0217 |    0.0362 | 1015.1310 |   2.4928
+
+[run]  learning_rate=0.001  val NDCG@20=0.0216  test=0.0217  (1020.7s)
+Early stopping:
+- best epoch = 134, stopped epoch = 147
+- best monitored value = 0.037983 (delta = -0.000320)
+
+VALIDATION:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/philadelphia/causal/s2026 |      0.1835 |  0.0377 |    0.0630 |   3.7379
+
+TEST:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/philadelphia/causal/s2026 |      0.1643 |  0.0342 |    0.0605 |  853.8826 |   2.5653
+
+[run]  learning_rate=0.01  val NDCG@20=0.0377  test=0.0342  (860.3s)
