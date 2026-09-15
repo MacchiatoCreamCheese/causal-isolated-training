@@ -1,0 +1,5 @@
+nohup: ignoring input
+[run_dataset_tuning] philadelphia: /home/thinh/causal-isolated-training/data/philadelphia_dataset/Philadelphia.csv
+[run_dataset_tuning] cornac 2.6.0 | torch 2.4.0+cu121 | cuda True
+[run_dataset_tuning] philadelphia | seeds: 42 123 2026 | cpu: none | gpu: neumf lightgcn | neumf pretrain: 1 | Tue Sep 15 10:42:31 UTC 2026
+[run_dataset_tuning] progress: run_dataset_tuning_philadelphia_cpu.out, run_dataset_tuning_philadelphia_gpu.out
