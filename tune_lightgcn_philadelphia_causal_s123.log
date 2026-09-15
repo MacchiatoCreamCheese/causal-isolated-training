@@ -8,3 +8,78 @@
 /home/thinh/miniconda3/envs/leakage24/lib/python3.12/site-packages/cornac/data/dataset.py:335: UserWarning: 914 duplicated observations are removed!
   warnings.warn("%d duplicated observations are removed!" % dup_count)
 [baseline] running with defaults: {'lambda_reg': 0.0001, 'num_layers': 3, 'learning_rate': 0.001}
+Early stopping:
+- best epoch = 178, stopped epoch = 228
+- best monitored value = 0.082532 (delta = -0.002608)
+
+VALIDATION:
+...
+                                       | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------------- + ----------- + ------- + --------- + --------
+LightGCN/tune/philadelphia/causal/s123 |      0.2056 |  0.0543 |    0.0799 |   4.7533
+
+TEST:
+...
+                                       | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------------------- + ----------- + ------- + --------- + --------- + --------
+LightGCN/tune/philadelphia/causal/s123 |      0.1675 |  0.0434 |    0.0670 | 1550.0437 |   4.2144
+
+[baseline] val NDCG@20=0.0543  test=0.0434  (1559.1s)
+
+--- knob: num_layers  grid=[1, 2, 4]  (default carries metric=0.0543) ---
+Early stopping:
+- best epoch = 66, stopped epoch = 116
+- best monitored value = 0.079703 (delta = -0.002248)
+
+VALIDATION:
+...
+                                       | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------------- + ----------- + ------- + --------- + --------
+LightGCN/tune/philadelphia/causal/s123 |      0.2020 |  0.0514 |    0.0775 |   4.6396
+
+TEST:
+...
+                                       | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------------------- + ----------- + ------- + --------- + --------- + --------
+LightGCN/tune/philadelphia/causal/s123 |      0.1651 |  0.0429 |    0.0665 |  654.1017 |   4.1197
+
+[run]  num_layers=1  val NDCG@20=0.0514  test=0.0429  (663.0s)
+Early stopping:
+- best epoch = 108, stopped epoch = 158
+- best monitored value = 0.084017 (delta = -0.001893)
+
+VALIDATION:
+...
+                                       | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------------- + ----------- + ------- + --------- + --------
+LightGCN/tune/philadelphia/causal/s123 |      0.2118 |  0.0547 |    0.0821 |   4.7502
+
+TEST:
+...
+                                       | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------------------- + ----------- + ------- + --------- + --------- + --------
+LightGCN/tune/philadelphia/causal/s123 |      0.1693 |  0.0439 |    0.0685 |  962.5642 |   4.1842
+
+[run]  num_layers=2  val NDCG@20=0.0547  test=0.0439  (971.6s)
+Early stopping:
+- best epoch = 204, stopped epoch = 254
+- best monitored value = 0.084081 (delta = -0.004355)
+
+VALIDATION:
+...
+                                       | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------------- + ----------- + ------- + --------- + --------
+LightGCN/tune/philadelphia/causal/s123 |      0.2057 |  0.0534 |    0.0797 |   4.7828
+
+TEST:
+...
+                                       | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------------------- + ----------- + ------- + --------- + --------- + --------
+LightGCN/tune/philadelphia/causal/s123 |      0.1696 |  0.0437 |    0.0680 | 1882.9741 |   4.1397
+
+[run]  num_layers=4  val NDCG@20=0.0534  test=0.0437  (1892.0s)
+[winner@num_layers] num_layers=2  NDCG@20=0.0547
+[users] winner per-user scores from num_layers/2.json
+
+=== lightgcn [philadelphia x causal x seed=123] winner: {'lambda_reg': 0.0001, 'num_layers': 2, 'learning_rate': 0.001}  val NDCG@20=0.0547  test=0.0439 ===
+

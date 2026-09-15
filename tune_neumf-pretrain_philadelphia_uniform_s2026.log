@@ -1,0 +1,88 @@
+
+=== Tuning neumf on philadelphia x uniform x seed=2026, selecting on validation NDCG@20 ===
+    -> /home/thinh/causal-isolated-training/research/results/tuning/neumf-pretrain/philadelphia/uniform/seed2026
+/home/thinh/miniconda3/envs/leakage24/lib/python3.12/site-packages/cornac/data/dataset.py:335: UserWarning: 18484 duplicated observations are removed!
+  warnings.warn("%d duplicated observations are removed!" % dup_count)
+/home/thinh/miniconda3/envs/leakage24/lib/python3.12/site-packages/cornac/data/dataset.py:335: UserWarning: 674 duplicated observations are removed!
+  warnings.warn("%d duplicated observations are removed!" % dup_count)
+/home/thinh/miniconda3/envs/leakage24/lib/python3.12/site-packages/cornac/data/dataset.py:335: UserWarning: 914 duplicated observations are removed!
+  warnings.warn("%d duplicated observations are removed!" % dup_count)
+[baseline] running with defaults: {'num_factors': 8, 'mlp_hidden_count': 3, 'learning_rate': 0.001, 'num_neg': 4, 'batch_size': 256}
+
+VALIDATION:
+...
+                                      | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/philadelphia/uniform/s2026 |      0.1642 |  0.0316 |    0.0545 |  10.1412
+
+TEST:
+...
+                                      | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/philadelphia/uniform/s2026 |      0.1408 |  0.0291 |    0.0495 |  231.4869 |   7.7866
+
+[baseline] val NDCG@20=0.0316  test=0.0291  (249.5s)
+
+--- knob: num_factors  grid=[16, 32, 64]  (default carries metric=0.0316) ---
+
+VALIDATION:
+...
+                                      | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/philadelphia/uniform/s2026 |      0.1815 |  0.0399 |    0.0676 |  10.4703
+
+TEST:
+...
+                                      | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/philadelphia/uniform/s2026 |      0.1557 |  0.0346 |    0.0611 |  217.2665 |   8.4906
+
+[run]  num_factors=16  val NDCG@20=0.0399  test=0.0346  (236.3s)
+
+VALIDATION:
+...
+                                      | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/philadelphia/uniform/s2026 |      0.1970 |  0.0466 |    0.0730 |  11.7536
+
+TEST:
+...
+                                      | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/philadelphia/uniform/s2026 |      0.1684 |  0.0403 |    0.0662 |  260.3746 |   9.3648
+
+[run]  num_factors=32  val NDCG@20=0.0466  test=0.0403  (281.6s)
+
+VALIDATION:
+...
+                                      | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/philadelphia/uniform/s2026 |      0.2103 |  0.0578 |    0.0820 |  19.8895
+
+TEST:
+...
+                                      | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/philadelphia/uniform/s2026 |      0.1764 |  0.0488 |    0.0712 |  332.9891 |  15.7504
+
+[run]  num_factors=64  val NDCG@20=0.0578  test=0.0488  (368.8s)
+[winner@num_factors] num_factors=64  NDCG@20=0.0578
+
+--- knob: mlp_hidden_count  grid=[4]  (default carries metric=0.0578) ---
+
+VALIDATION:
+...
+                                      | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/philadelphia/uniform/s2026 |      0.2068 |  0.0575 |    0.0808 |  51.3414
+
+TEST:
+...
+                                      | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/philadelphia/uniform/s2026 |      0.1760 |  0.0481 |    0.0707 |  500.9171 |  41.9219
+
+[run]  mlp_hidden_count=4  val NDCG@20=0.0575  test=0.0481  (594.4s)
+[winner@mlp_hidden_count] mlp_hidden_count=3  NDCG@20=0.0578 (kept default)
+
+--- knob: learning_rate  grid=[0.0001, 0.0005, 0.005]  (default carries metric=0.0578) ---
