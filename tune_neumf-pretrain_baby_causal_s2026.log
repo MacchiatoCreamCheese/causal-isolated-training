@@ -18,3 +18,17 @@ NeuMF/tune/baby/causal/s2026 |      0.0080 |  0.0015 |    0.0044 |  764.0656 |  
 [baseline] val NDCG@20=0.0021  test=0.0015  (820.1s)
 
 --- knob: num_factors  grid=[16, 32, 64]  (default carries metric=0.0021) ---
+
+VALIDATION:
+...
+                             | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/baby/causal/s2026 |      0.0172 |  0.0033 |    0.0082 |  40.7984
+
+TEST:
+...
+                             | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/baby/causal/s2026 |      0.0112 |  0.0024 |    0.0065 |  847.1884 |  22.7857
+
+[run]  num_factors=16  val NDCG@20=0.0033  test=0.0024  (911.2s)
