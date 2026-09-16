@@ -1,0 +1,20 @@
+
+=== Tuning neumf on baby x causal x seed=2026, selecting on validation NDCG@20 ===
+    -> /home/thinh/causal-isolated-training/research/results/tuning/neumf-pretrain/baby/causal/seed2026
+[baseline] running with defaults: {'num_factors': 8, 'mlp_hidden_count': 3, 'learning_rate': 0.001, 'num_neg': 4, 'batch_size': 256}
+
+VALIDATION:
+...
+                             | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/baby/causal/s2026 |      0.0122 |  0.0021 |    0.0056 |  35.4120
+
+TEST:
+...
+                             | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/baby/causal/s2026 |      0.0080 |  0.0015 |    0.0044 |  764.0656 |  20.3304
+
+[baseline] val NDCG@20=0.0021  test=0.0015  (820.1s)
+
+--- knob: num_factors  grid=[16, 32, 64]  (default carries metric=0.0021) ---

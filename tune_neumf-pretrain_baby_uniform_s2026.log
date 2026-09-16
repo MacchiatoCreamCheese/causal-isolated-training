@@ -108,3 +108,67 @@ TEST:
 NeuMF/tune/baby/uniform/s2026 |      0.0171 |  0.0043 |    0.0097 | 3080.1144 | 192.2190
 
 [run]  learning_rate=0.0005  val NDCG@20=0.0061  test=0.0043  (3608.4s)
+
+VALIDATION:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/baby/uniform/s2026 |      0.0230 |  0.0049 |    0.0111 | 335.4029
+
+TEST:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+----------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/baby/uniform/s2026 |      0.0168 |  0.0041 |    0.0096 | 3086.7210 | 190.5697
+
+[run]  learning_rate=0.005  val NDCG@20=0.0049  test=0.0041  (3613.6s)
+[winner@learning_rate] learning_rate=0.0005  NDCG@20=0.0061
+
+--- knob: batch_size  grid=[128, 512, 1024]  (default carries metric=0.0061) ---
+
+VALIDATION:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/baby/uniform/s2026 |      0.0214 |  0.0053 |    0.0109 | 337.8768
+
+TEST:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+----------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/baby/uniform/s2026 |      0.0140 |  0.0034 |    0.0077 | 6009.5671 | 193.9273
+
+[run]  batch_size=128  val NDCG@20=0.0053  test=0.0034  (6542.4s)
+
+VALIDATION:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/baby/uniform/s2026 |      0.0263 |  0.0063 |    0.0136 | 335.2849
+
+TEST:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+----------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/baby/uniform/s2026 |      0.0210 |  0.0053 |    0.0123 | 1657.2169 | 191.1055
+
+[run]  batch_size=512  val NDCG@20=0.0063  test=0.0053  (2184.6s)
+
+VALIDATION:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/baby/uniform/s2026 |      0.0317 |  0.0077 |    0.0159 | 335.2340
+
+TEST:
+...
+                              | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+----------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/baby/uniform/s2026 |      0.0237 |  0.0060 |    0.0134 |  971.3545 | 191.2286
+
+[run]  batch_size=1024  val NDCG@20=0.0077  test=0.0060  (1499.0s)
+[winner@batch_size] batch_size=1024  NDCG@20=0.0077
+[users] winner per-user scores from batch_size/1024.json
+
+=== neumf [baby x uniform x seed=2026] winner: {'num_factors': 64, 'mlp_hidden_count': 4, 'learning_rate': 0.0005, 'num_neg': 4, 'batch_size': 1024}  val NDCG@20=0.0077  test=0.0060 ===
+
