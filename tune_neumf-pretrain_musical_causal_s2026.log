@@ -139,3 +139,36 @@ TEST:
 NeuMF/tune/musical/causal/s2026 |      0.0479 |  0.0116 |    0.0262 | 1305.6613 | 109.2995
 
 [run]  batch_size=128  val NDCG@20=0.0119  test=0.0116  (1571.2s)
+
+VALIDATION:
+...
+                                | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/musical/causal/s2026 |      0.0608 |  0.0145 |    0.0292 | 154.6620
+
+TEST:
+...
+                                | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/musical/causal/s2026 |      0.0469 |  0.0120 |    0.0253 |  393.7276 | 108.3910
+
+[run]  batch_size=512  val NDCG@20=0.0145  test=0.0120  (657.1s)
+
+VALIDATION:
+...
+                                | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/musical/causal/s2026 |      0.0569 |  0.0132 |    0.0277 | 155.9801
+
+TEST:
+...
+                                | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/musical/causal/s2026 |      0.0455 |  0.0107 |    0.0239 |  256.8962 | 109.6147
+
+[run]  batch_size=1024  val NDCG@20=0.0132  test=0.0107  (522.9s)
+[winner@batch_size] batch_size=512  NDCG@20=0.0145
+[users] winner per-user scores from batch_size/512.json
+
+=== neumf [musical x causal x seed=2026] winner: {'num_factors': 64, 'mlp_hidden_count': 4, 'learning_rate': 0.0005, 'num_neg': 4, 'batch_size': 512}  val NDCG@20=0.0145  test=0.0120 ===
+
