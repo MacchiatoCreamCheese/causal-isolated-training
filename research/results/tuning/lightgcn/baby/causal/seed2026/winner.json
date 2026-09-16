@@ -1,0 +1,37 @@
+{
+  "model": "lightgcn",
+  "variant": "lightgcn",
+  "dataset": "baby",
+  "seed": 2026,
+  "recipe": "causal",
+  "select_metric": "NDCG@20",
+  "select_split": "validation",
+  "config": {
+    "lambda_reg": 0.0001,
+    "num_layers": 4,
+    "learning_rate": 0.001
+  },
+  "metric": 0.008773179055306345,
+  "test_metric": 0.006112040430152714,
+  "users_run": {
+    "source": "trial",
+    "trial": "num_layers/4.json",
+    "val_metrics": {
+      "HitRatio@20": 0.035838883602917856,
+      "NDCG@20": 0.008773179055306345,
+      "Recall@20": 0.018837511387713862,
+      "Time (s)": 21.221163272857666
+    },
+    "test_metrics": {
+      "HitRatio@20": 0.024565321422874462,
+      "NDCG@20": 0.006112040430152714,
+      "Recall@20": 0.01459724243922048,
+      "Train (s)": 3195.780463695526,
+      "Test (s)": 10.402190923690796
+    },
+    "probes": {
+      "counterfactual_rate": 0.0,
+      "collision_rate": 1.5538374632543148e-06
+    }
+  }
+}
