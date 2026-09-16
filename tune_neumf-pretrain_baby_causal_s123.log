@@ -1,0 +1,204 @@
+
+=== Tuning neumf on baby x causal x seed=123, selecting on validation NDCG@20 ===
+    -> /mnt/c/Users/nguye/uniyear/causal-isolated-training/research/results/tuning/neumf-pretrain/baby/causal/seed123
+[baseline] running with defaults: {'num_factors': 8, 'mlp_hidden_count': 3, 'learning_rate': 0.001, 'num_neg': 4, 'batch_size': 256}
+
+VALIDATION:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/baby/causal/s123 |      0.0136 |  0.0025 |    0.0063 |  28.2790
+
+TEST:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/baby/causal/s123 |      0.0097 |  0.0022 |    0.0061 |  753.7408 |  16.1730
+
+[baseline] val NDCG@20=0.0025  test=0.0022  (798.7s)
+
+--- knob: num_factors  grid=[16, 32, 64]  (default carries metric=0.0025) ---
+
+VALIDATION:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/baby/causal/s123 |      0.0117 |  0.0021 |    0.0057 |  32.8554
+
+TEST:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/baby/causal/s123 |      0.0078 |  0.0016 |    0.0045 |  999.2154 |  18.9510
+
+[run]  num_factors=16  val NDCG@20=0.0021  test=0.0016  (1051.7s)
+
+VALIDATION:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/baby/causal/s123 |      0.0246 |  0.0054 |    0.0127 |  54.3163
+
+TEST:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/baby/causal/s123 |      0.0152 |  0.0034 |    0.0088 | 1633.3052 |  31.0480
+
+[run]  num_factors=32  val NDCG@20=0.0054  test=0.0034  (1719.6s)
+
+VALIDATION:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/baby/causal/s123 |      0.0251 |  0.0058 |    0.0128 | 104.0146
+
+TEST:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/baby/causal/s123 |      0.0171 |  0.0042 |    0.0104 | 2879.3938 |  59.2724
+
+[run]  num_factors=64  val NDCG@20=0.0058  test=0.0042  (3044.2s)
+[winner@num_factors] num_factors=64  NDCG@20=0.0058
+
+--- knob: mlp_hidden_count  grid=[4]  (default carries metric=0.0058) ---
+
+VALIDATION:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/baby/causal/s123 |      0.0229 |  0.0053 |    0.0117 | 238.8682
+
+TEST:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/baby/causal/s123 |      0.0162 |  0.0042 |    0.0102 | 4897.0213 | 135.9316
+
+[run]  mlp_hidden_count=4  val NDCG@20=0.0053  test=0.0042  (5274.4s)
+[winner@mlp_hidden_count] mlp_hidden_count=3  NDCG@20=0.0058 (kept default)
+
+--- knob: learning_rate  grid=[0.0001, 0.0005, 0.005]  (default carries metric=0.0058) ---
+
+VALIDATION:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/baby/causal/s123 |      0.0204 |  0.0046 |    0.0105 | 104.1850
+
+TEST:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/baby/causal/s123 |      0.0147 |  0.0038 |    0.0088 | 2886.2547 |  59.3910
+
+[run]  learning_rate=0.0001  val NDCG@20=0.0046  test=0.0038  (3051.3s)
+
+VALIDATION:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/baby/causal/s123 |      0.0245 |  0.0056 |    0.0130 | 104.7354
+
+TEST:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/baby/causal/s123 |      0.0172 |  0.0045 |    0.0106 | 2878.8513 |  59.4813
+
+[run]  learning_rate=0.0005  val NDCG@20=0.0056  test=0.0045  (3044.6s)
+
+VALIDATION:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/baby/causal/s123 |      0.0209 |  0.0047 |    0.0103 | 104.2305
+
+TEST:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/baby/causal/s123 |      0.0152 |  0.0039 |    0.0093 | 2876.0074 |  59.2513
+
+[run]  learning_rate=0.005  val NDCG@20=0.0047  test=0.0039  (3041.0s)
+[winner@learning_rate] learning_rate=0.001  NDCG@20=0.0058 (kept default)
+
+--- knob: batch_size  grid=[128, 512, 1024]  (default carries metric=0.0058) ---
+
+VALIDATION:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/baby/causal/s123 |      0.0223 |  0.0048 |    0.0110 | 104.3549
+
+TEST:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/baby/causal/s123 |      0.0140 |  0.0034 |    0.0082 | 5673.9315 |  59.5664
+
+[run]  batch_size=128  val NDCG@20=0.0048  test=0.0034  (5840.3s)
+
+VALIDATION:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/baby/causal/s123 |      0.0286 |  0.0064 |    0.0142 | 104.0596
+
+TEST:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/baby/causal/s123 |      0.0190 |  0.0046 |    0.0106 | 1483.5429 |  59.3988
+
+[run]  batch_size=512  val NDCG@20=0.0064  test=0.0046  (1648.6s)
+
+VALIDATION:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/baby/causal/s123 |      0.0324 |  0.0073 |    0.0166 | 106.4263
+
+TEST:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/baby/causal/s123 |      0.0195 |  0.0046 |    0.0112 |  815.3914 |  59.3496
+
+[run]  batch_size=1024  val NDCG@20=0.0073  test=0.0046  (982.7s)
+[winner@batch_size] batch_size=1024  NDCG@20=0.0073
+[users] winner per-user scores from batch_size/1024.json
+
+=== neumf [baby x causal x seed=123] winner: {'num_factors': 64, 'mlp_hidden_count': 3, 'learning_rate': 0.001, 'num_neg': 4, 'batch_size': 1024}  val NDCG@20=0.0073  test=0.0046 ===
+
+
+=== Tuning neumf on baby x causal x seed=123, selecting on validation NDCG@20 ===
+    -> /mnt/c/Users/nguye/uniyear/causal-isolated-training/research/results/tuning/neumf-pretrain/baby/causal/seed123
+[baseline] cached: val NDCG@20=0.0025
+
+--- knob: num_factors  grid=[16, 32, 64]  (default carries metric=0.0025) ---
+[skip] num_factors=16  val NDCG@20=0.0021  [cached]
+[skip] num_factors=32  val NDCG@20=0.0054  [cached]
+[skip] num_factors=64  val NDCG@20=0.0058  [cached]
+[winner@num_factors] num_factors=64  NDCG@20=0.0058
+
+--- knob: mlp_hidden_count  grid=[4]  (default carries metric=0.0058) ---
+[skip] mlp_hidden_count=4  val NDCG@20=0.0053  [cached]
+[winner@mlp_hidden_count] mlp_hidden_count=3  NDCG@20=0.0058 (kept default)
+
+--- knob: learning_rate  grid=[0.0001, 0.0005, 0.005]  (default carries metric=0.0058) ---
+[skip] learning_rate=0.0001  val NDCG@20=0.0046  [cached]
+[skip] learning_rate=0.0005  val NDCG@20=0.0056  [cached]
+[skip] learning_rate=0.005  val NDCG@20=0.0047  [cached]
+[winner@learning_rate] learning_rate=0.001  NDCG@20=0.0058 (kept default)
+
+--- knob: batch_size  grid=[128, 512, 1024]  (default carries metric=0.0058) ---
+[skip] batch_size=128  val NDCG@20=0.0048  [cached]
+[skip] batch_size=512  val NDCG@20=0.0064  [cached]
+[skip] batch_size=1024  val NDCG@20=0.0073  [cached]
+[winner@batch_size] batch_size=1024  NDCG@20=0.0073
+[users] winner per-user scores already saved
+
+=== neumf [baby x causal x seed=123] winner: {'num_factors': 64, 'mlp_hidden_count': 3, 'learning_rate': 0.001, 'num_neg': 4, 'batch_size': 1024}  val NDCG@20=0.0073  test=0.0046 ===
+

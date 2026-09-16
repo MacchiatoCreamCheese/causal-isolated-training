@@ -216,3 +216,33 @@ NeuMF/tune/cellphone/uniform/s42 |      0.0129 |  0.0040 |    0.0092 | 2067.3186
 
 === neumf [cellphone x uniform x seed=42] winner: {'num_factors': 32, 'mlp_hidden_count': 3, 'learning_rate': 0.0005, 'num_neg': 4, 'batch_size': 1024}  val NDCG@20=0.0048  test=0.0040 ===
 
+
+=== Tuning neumf on cellphone x uniform x seed=42, selecting on validation NDCG@20 ===
+    -> /mnt/c/Users/nguye/uniyear/causal-isolated-training/research/results/tuning/neumf-pretrain/cellphone/uniform/seed42
+[baseline] cached: val NDCG@20=0.0028
+
+--- knob: num_factors  grid=[16, 32, 64]  (default carries metric=0.0028) ---
+[skip] num_factors=16  val NDCG@20=0.0032  [cached]
+[skip] num_factors=32  val NDCG@20=0.0034  [cached]
+[skip] num_factors=64  val NDCG@20=0.0032  [cached]
+[winner@num_factors] num_factors=32  NDCG@20=0.0034
+
+--- knob: mlp_hidden_count  grid=[4]  (default carries metric=0.0034) ---
+[skip] mlp_hidden_count=4  val NDCG@20=0.0033  [cached]
+[winner@mlp_hidden_count] mlp_hidden_count=3  NDCG@20=0.0034 (kept default)
+
+--- knob: learning_rate  grid=[0.0001, 0.0005, 0.005]  (default carries metric=0.0034) ---
+[skip] learning_rate=0.0001  val NDCG@20=0.0037  [cached]
+[skip] learning_rate=0.0005  val NDCG@20=0.0038  [cached]
+[skip] learning_rate=0.005  val NDCG@20=0.0031  [cached]
+[winner@learning_rate] learning_rate=0.0005  NDCG@20=0.0038
+
+--- knob: batch_size  grid=[128, 512, 1024]  (default carries metric=0.0038) ---
+[skip] batch_size=128  val NDCG@20=0.0036  [cached]
+[skip] batch_size=512  val NDCG@20=0.0041  [cached]
+[skip] batch_size=1024  val NDCG@20=0.0048  [cached]
+[winner@batch_size] batch_size=1024  NDCG@20=0.0048
+[users] winner per-user scores already saved
+
+=== neumf [cellphone x uniform x seed=42] winner: {'num_factors': 32, 'mlp_hidden_count': 3, 'learning_rate': 0.0005, 'num_neg': 4, 'batch_size': 1024}  val NDCG@20=0.0048  test=0.0040 ===
+
