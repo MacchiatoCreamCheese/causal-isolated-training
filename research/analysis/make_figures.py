@@ -11,6 +11,7 @@ Run: python -m research.analysis.make_figures [fig_name ...]
 
 import csv
 import sys
+from collections import Counter
 
 import matplotlib
 matplotlib.use("Agg")  # no display needed
@@ -18,7 +19,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from ..lib.ablation_harness import RECIPES
-from ..paths import PROJECT_ROOT as ROOT, RESULTS_DIR, FIGURES_DIR
+from ..lib.data import DATASETS as DATASETS_ALL
+from ..paths import PROJECT_ROOT as ROOT, DATA_DIR, RESULTS_DIR, FIGURES_DIR
 
 FIG_DIR = FIGURES_DIR
 FIG_DIR.mkdir(parents=True, exist_ok=True)
@@ -66,6 +68,11 @@ MODELS = ["BPR", "NeuMF", "LightGCN"]
 # add its row back here once it has been run.
 DATASETS = [("musical", "Musical Instruments"), ("baby", "Baby Products"),
             ("cellphone", "Cell Phones & Acc.")]
+
+# Every dataset the paper reports on, for figures that describe the data itself
+# and so do not wait on a finished run.
+DATASETS_FIG = DATASETS + [("philadelphia", "Yelp (Philadelphia)"),
+                           ("movielens", "MovieLens-10M")]
 
 SINGLE_COL = (3.4, 2.2)
 DOUBLE_COL = (7.0, 2.6)
@@ -174,6 +181,100 @@ def fig_counterfactual_rate():
     save(fig, "counterfactual_rate")
 
 
+def _load_cohorts(ds_key):
+    """(years, interactions_that_year, mean_interactions_per_item_born_that_year).
+
+    Read straight from the raw UIRT CSV with the stdlib: this figure describes the
+    data alone, so it must not depend on a split, a loader, or a finished run. The
+    log is streamed rather than materialized -- MovieLens-10M is ten million rows,
+    and holding them as Python lists costs more than the plot is worth.
+    """
+    import datetime as _dt
+
+    path = DATA_DIR / DATASETS_ALL[ds_key]["path"]
+    per_item = {}          # item -> [first-seen ms, interaction count]
+    per_year = Counter()   # calendar year -> interactions that year
+    with open(path, newline="", encoding="utf-8") as f:
+        r = csv.reader(f)
+        next(r)
+        for row in r:
+            item, ts = row[1], int(row[3])
+            rec = per_item.get(item)
+            if rec is None:
+                per_item[item] = [ts, 1]
+            else:
+                rec[1] += 1
+                if ts < rec[0]:
+                    rec[0] = ts
+            per_year[_dt.datetime.fromtimestamp(ts / 1000, _dt.timezone.utc).year] += 1
+
+    born = {}              # launch year -> [items born, their total interactions]
+    for first_ts, count in per_item.values():
+        y = _dt.datetime.fromtimestamp(first_ts / 1000, _dt.timezone.utc).year
+        acc = born.setdefault(y, [0, 0])
+        acc[0] += 1
+        acc[1] += count
+
+    years = sorted(set(per_year) | set(born))
+    inter = [per_year.get(y, 0) for y in years]
+    mean_per = [born[y][1] / born[y][0] if y in born else np.nan for y in years]
+    return years, inter, mean_per
+
+
+def fig_item_cohorts():
+    """What the catalogue's growth looks like, per dataset, with no model involved.
+
+    Bars: interactions per calendar year. Line: mean interactions per item, items
+    grouped by their launch year tau(i). The bars are catalogue and traffic growth;
+    the falling line is observation-window censoring, since an item appearing late
+    in the log has less remaining time in which to accumulate interactions. That
+    censoring is why every tau-derived quantity carries a cohort bias, and the
+    shape of the bars against the line is what sets rho (Proposition 3.1).
+    """
+    keys = [k for k, _ in DATASETS_FIG]
+    ncol = 3
+    nrow = -(-len(keys) // ncol)
+    fig, axes = plt.subplots(nrow, ncol, figsize=(7.0, 2.4 * nrow))
+    axes = np.atleast_1d(axes).ravel()
+
+    for ax, (ds_key, label) in zip(axes, DATASETS_FIG):
+        path = DATA_DIR / DATASETS_ALL[ds_key]["path"]
+        if not path.exists():
+            ax.set_axis_off()
+            print(f"  no {path}, skipping {ds_key}")
+            continue
+        years, inter, mean_per = _load_cohorts(ds_key)
+        # Drop the long sparse pre-history so the readable range is visible.
+        keep = [k for k, v in enumerate(inter) if v >= max(inter) * 0.005]
+        lo = keep[0]
+        years, inter, mean_per = years[lo:], inter[lo:], mean_per[lo:]
+
+        ax.bar(years, inter, color=COLOR_CELLS["uniform"], alpha=0.85,
+               edgecolor="none")
+        ax.set_title(label, fontsize=8)
+        ax.set_xlabel("year")
+        ax.tick_params(axis="x", rotation=90)
+        ax.grid(False)
+
+        ax2 = ax.twinx()
+        ax2.plot(years, mean_per, color="#333333", marker="o", markersize=2.5,
+                 lw=1.2)
+        finite = [v for v in mean_per if np.isfinite(v)]
+        if finite:
+            ax2.set_ylim(0, max(finite) * 1.15)
+        ax2.grid(False)
+        ax2.spines["right"].set_visible(True)
+        ax2.set_ylabel("mean interactions\nper item (by launch year)",
+                       fontsize=6.5)
+
+    for ax in axes[len(DATASETS_FIG):]:
+        ax.set_axis_off()
+    for ax in axes[::ncol]:
+        ax.set_ylabel("interactions")
+    fig.tight_layout()
+    save(fig, "item_cohorts")
+
+
 def _rolling(a, w):
     """Centred rolling mean, with the window shrinking at the edges.
 
@@ -261,6 +362,7 @@ def fig_prequential(metric="HitRatio@20", window=9):
 # ---------------------------------------------------------------------------
 
 ALL_FIGS = {
+    "item_cohorts":          fig_item_cohorts,
     "three_model_ablation":  fig_three_model_ablation,
     "counterfactual_rate":   fig_counterfactual_rate,
     "prequential":           fig_prequential,
