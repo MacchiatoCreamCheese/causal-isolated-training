@@ -5,3 +5,17 @@
 Early stopping:
 - best epoch = 29, stopped epoch = 79
 - best monitored value = 0.021442 (delta = -0.007205)
+
+=== Tuning lightgcn on baby x uniform x seed=123, selecting on validation NDCG@20 ===
+    -> /home/ntuyen/causal-isolated-training/research/results/tuning/lightgcn/baby/uniform/seed123
+[baseline] cached: val NDCG@20=0.0070
+
+--- knob: num_layers  grid=[1, 2, 4]  (default carries metric=0.0070) ---
+[skip] num_layers=1  val NDCG@20=0.0058  [cached]
+[skip] num_layers=2  val NDCG@20=0.0076  [cached]
+[skip] num_layers=4  val NDCG@20=0.0075  [cached]
+[winner@num_layers] num_layers=2  NDCG@20=0.0076
+[users] winner per-user scores already saved
+
+=== lightgcn [baby x uniform x seed=123] winner: {'lambda_reg': 0.0001, 'num_layers': 2, 'learning_rate': 0.001}  val NDCG@20=0.0076  test=0.0057 ===
+

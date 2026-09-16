@@ -85,3 +85,17 @@ LightGCN/tune/musical/uniform/s123 |      0.0608 |  0.0166 |    0.0337 | 1387.47
 
 === lightgcn [musical x uniform x seed=123] winner: {'lambda_reg': 0.0001, 'num_layers': 4, 'learning_rate': 0.001}  val NDCG@20=0.0187  test=0.0166 ===
 
+
+=== Tuning lightgcn on musical x uniform x seed=123, selecting on validation NDCG@20 ===
+    -> /home/ntuyen/causal-isolated-training/research/results/tuning/lightgcn/musical/uniform/seed123
+[baseline] cached: val NDCG@20=0.0177
+
+--- knob: num_layers  grid=[1, 2, 4]  (default carries metric=0.0177) ---
+[skip] num_layers=1  val NDCG@20=0.0145  [cached]
+[skip] num_layers=2  val NDCG@20=0.0172  [cached]
+[skip] num_layers=4  val NDCG@20=0.0187  [cached]
+[winner@num_layers] num_layers=4  NDCG@20=0.0187
+[users] winner per-user scores already saved
+
+=== lightgcn [musical x uniform x seed=123] winner: {'lambda_reg': 0.0001, 'num_layers': 4, 'learning_rate': 0.001}  val NDCG@20=0.0187  test=0.0166 ===
+

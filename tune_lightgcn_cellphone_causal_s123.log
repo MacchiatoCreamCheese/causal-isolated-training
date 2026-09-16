@@ -55,3 +55,33 @@ TEST:
 LightGCN/tune/cellphone/causal/s123 |      0.0206 |  0.0063 |    0.0148 | 20400.1154 | 117.9355
 
 [run]  num_layers=2  val NDCG@20=0.0079  test=0.0063  (20712.4s)
+
+=== Tuning lightgcn on cellphone x causal x seed=123, selecting on validation NDCG@20 ===
+    -> /home/ntuyen/causal-isolated-training/research/results/tuning/lightgcn/cellphone/causal/seed123
+[baseline] cached: val NDCG@20=0.0067
+
+--- knob: num_layers  grid=[1, 2, 4]  (default carries metric=0.0067) ---
+[skip] num_layers=1  val NDCG@20=0.0051  [cached]
+[skip] num_layers=2  val NDCG@20=0.0079  [cached]
+Early stopping:
+- best epoch = 19, stopped epoch = 69
+- best monitored value = 0.025474 (delta = -0.006893)
+
+VALIDATION:
+...
+                                    | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------------- + ----------- + ------- + --------- + --------
+LightGCN/tune/cellphone/causal/s123 |      0.0284 |  0.0083 |    0.0186 | 183.9315
+
+TEST:
+...
+                                    | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+----------------------------------- + ----------- + ------- + --------- + ---------- + --------
+LightGCN/tune/cellphone/causal/s123 |      0.0198 |  0.0061 |    0.0142 | 29938.9276 | 112.1883
+
+[run]  num_layers=4  val NDCG@20=0.0083  test=0.0061  (30235.7s)
+[winner@num_layers] num_layers=4  NDCG@20=0.0083
+[users] winner per-user scores from num_layers/4.json
+
+=== lightgcn [cellphone x causal x seed=123] winner: {'lambda_reg': 0.0001, 'num_layers': 4, 'learning_rate': 0.001}  val NDCG@20=0.0083  test=0.0061 ===
+

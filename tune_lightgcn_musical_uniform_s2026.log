@@ -1,0 +1,57 @@
+
+=== Tuning lightgcn on musical x uniform x seed=2026, selecting on validation NDCG@20 ===
+    -> /home/ntuyen/causal-isolated-training/research/results/tuning/lightgcn/musical/uniform/seed2026
+[baseline] running with defaults: {'lambda_reg': 0.0001, 'num_layers': 3, 'learning_rate': 0.001}
+Early stopping:
+- best epoch = 70, stopped epoch = 120
+- best monitored value = 0.037882 (delta = -0.004837)
+
+VALIDATION:
+...
+                                    | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------------- + ----------- + ------- + --------- + --------
+LightGCN/tune/musical/uniform/s2026 |      0.0655 |  0.0164 |    0.0330 |   6.9133
+
+TEST:
+...
+                                    | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+----------------------------------- + ----------- + ------- + --------- + --------- + --------
+LightGCN/tune/musical/uniform/s2026 |      0.0526 |  0.0143 |    0.0290 | 1226.8295 |   5.1128
+
+[baseline] val NDCG@20=0.0164  test=0.0143  (1239.0s)
+
+--- knob: num_layers  grid=[1, 2, 4]  (default carries metric=0.0164) ---
+Early stopping:
+- best epoch = 32, stopped epoch = 82
+- best monitored value = 0.035231 (delta = -0.007789)
+
+VALIDATION:
+...
+                                    | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------------- + ----------- + ------- + --------- + --------
+LightGCN/tune/musical/uniform/s2026 |      0.0549 |  0.0138 |    0.0274 |   6.8481
+
+TEST:
+...
+                                    | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+----------------------------------- + ----------- + ------- + --------- + --------- + --------
+LightGCN/tune/musical/uniform/s2026 |      0.0435 |  0.0115 |    0.0242 |  730.7857 |   5.1239
+
+[run]  num_layers=1  val NDCG@20=0.0138  test=0.0115  (742.9s)
+Early stopping:
+- best epoch = 53, stopped epoch = 103
+- best monitored value = 0.037325 (delta = -0.006782)
+
+VALIDATION:
+...
+                                    | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------------- + ----------- + ------- + --------- + --------
+LightGCN/tune/musical/uniform/s2026 |      0.0621 |  0.0154 |    0.0305 |   6.9116
+
+TEST:
+...
+                                    | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+----------------------------------- + ----------- + ------- + --------- + --------- + --------
+LightGCN/tune/musical/uniform/s2026 |      0.0494 |  0.0130 |    0.0276 | 1018.4907 |   5.5550
+
+[run]  num_layers=2  val NDCG@20=0.0154  test=0.0130  (1031.1s)
