@@ -1,0 +1,85 @@
+
+=== Tuning lightgcn on philadelphia x causal x seed=2026, selecting on validation NDCG@20 ===
+    -> /home/thinh/causal-isolated-training/research/results/tuning/lightgcn/philadelphia/causal/seed2026
+/home/thinh/miniconda3/envs/leakage24/lib/python3.12/site-packages/cornac/data/dataset.py:335: UserWarning: 18484 duplicated observations are removed!
+  warnings.warn("%d duplicated observations are removed!" % dup_count)
+/home/thinh/miniconda3/envs/leakage24/lib/python3.12/site-packages/cornac/data/dataset.py:335: UserWarning: 674 duplicated observations are removed!
+  warnings.warn("%d duplicated observations are removed!" % dup_count)
+/home/thinh/miniconda3/envs/leakage24/lib/python3.12/site-packages/cornac/data/dataset.py:335: UserWarning: 914 duplicated observations are removed!
+  warnings.warn("%d duplicated observations are removed!" % dup_count)
+[baseline] running with defaults: {'lambda_reg': 0.0001, 'num_layers': 3, 'learning_rate': 0.001}
+Early stopping:
+- best epoch = 151, stopped epoch = 201
+- best monitored value = 0.083641 (delta = -0.002428)
+
+VALIDATION:
+...
+                                        | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------------------- + ----------- + ------- + --------- + --------
+LightGCN/tune/philadelphia/causal/s2026 |      0.2106 |  0.0540 |    0.0812 |   4.7946
+
+TEST:
+...
+                                        | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------------------- + ----------- + ------- + --------- + --------- + --------
+LightGCN/tune/philadelphia/causal/s2026 |      0.1693 |  0.0440 |    0.0690 | 1374.7773 |   4.1885
+
+[baseline] val NDCG@20=0.0540  test=0.0440  (1383.9s)
+
+--- knob: num_layers  grid=[1, 2, 4]  (default carries metric=0.0540) ---
+Early stopping:
+- best epoch = 72, stopped epoch = 122
+- best monitored value = 0.080096 (delta = -0.001155)
+
+VALIDATION:
+...
+                                        | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------------------- + ----------- + ------- + --------- + --------
+LightGCN/tune/philadelphia/causal/s2026 |      0.2049 |  0.0520 |    0.0789 |   6.0803
+
+TEST:
+...
+                                        | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------------------- + ----------- + ------- + --------- + --------- + --------
+LightGCN/tune/philadelphia/causal/s2026 |      0.1659 |  0.0429 |    0.0677 |  694.6114 |   4.4050
+
+[run]  num_layers=1  val NDCG@20=0.0520  test=0.0429  (705.2s)
+Early stopping:
+- best epoch = 133, stopped epoch = 183
+- best monitored value = 0.084660 (delta = -0.003168)
+
+VALIDATION:
+...
+                                        | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------------------- + ----------- + ------- + --------- + --------
+LightGCN/tune/philadelphia/causal/s2026 |      0.2117 |  0.0552 |    0.0815 |   4.8061
+
+TEST:
+...
+                                        | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------------------- + ----------- + ------- + --------- + --------- + --------
+LightGCN/tune/philadelphia/causal/s2026 |      0.1666 |  0.0444 |    0.0683 | 1188.2939 |   4.2899
+
+[run]  num_layers=2  val NDCG@20=0.0552  test=0.0444  (1197.5s)
+Early stopping:
+- best epoch = 183, stopped epoch = 233
+- best monitored value = 0.084913 (delta = -0.002355)
+
+VALIDATION:
+...
+                                        | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------------------- + ----------- + ------- + --------- + --------
+LightGCN/tune/philadelphia/causal/s2026 |      0.2120 |  0.0539 |    0.0826 |   4.9712
+
+TEST:
+...
+                                        | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------------------- + ----------- + ------- + --------- + --------- + --------
+LightGCN/tune/philadelphia/causal/s2026 |      0.1689 |  0.0432 |    0.0680 | 1740.1025 |   4.5351
+
+[run]  num_layers=4  val NDCG@20=0.0539  test=0.0432  (1749.7s)
+[winner@num_layers] num_layers=2  NDCG@20=0.0552
+[users] winner per-user scores from num_layers/2.json
+
+=== lightgcn [philadelphia x causal x seed=2026] winner: {'lambda_reg': 0.0001, 'num_layers': 2, 'learning_rate': 0.001}  val NDCG@20=0.0552  test=0.0444 ===
+

@@ -1,0 +1,37 @@
+{
+  "model": "lightgcn",
+  "variant": "lightgcn",
+  "dataset": "philadelphia",
+  "seed": 2026,
+  "recipe": "uniform",
+  "select_metric": "NDCG@20",
+  "select_split": "validation",
+  "config": {
+    "lambda_reg": 0.0001,
+    "num_layers": 4,
+    "learning_rate": 0.001
+  },
+  "metric": 0.053473365039848744,
+  "test_metric": 0.043853353175848264,
+  "users_run": {
+    "source": "trial",
+    "trial": "num_layers/4.json",
+    "val_metrics": {
+      "HitRatio@20": 0.19955765557454508,
+      "NDCG@20": 0.053473365039848744,
+      "Recall@20": 0.07853967343585228,
+      "Time (s)": 4.7567138671875
+    },
+    "test_metrics": {
+      "HitRatio@20": 0.16328886608517187,
+      "NDCG@20": 0.043853353175848264,
+      "Recall@20": 0.06608661370449302,
+      "Train (s)": 2941.935665369034,
+      "Test (s)": 4.260916233062744
+    },
+    "probes": {
+      "counterfactual_rate": 0.2869099018001449,
+      "collision_rate": 1.701788875652312e-08
+    }
+  }
+}

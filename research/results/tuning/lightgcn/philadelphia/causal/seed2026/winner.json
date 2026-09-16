@@ -1,0 +1,37 @@
+{
+  "model": "lightgcn",
+  "variant": "lightgcn",
+  "dataset": "philadelphia",
+  "seed": 2026,
+  "recipe": "causal",
+  "select_metric": "NDCG@20",
+  "select_split": "validation",
+  "config": {
+    "lambda_reg": 0.0001,
+    "num_layers": 2,
+    "learning_rate": 0.001
+  },
+  "metric": 0.055239269581504186,
+  "test_metric": 0.04444153014506551,
+  "users_run": {
+    "source": "trial",
+    "trial": "num_layers/2.json",
+    "val_metrics": {
+      "HitRatio@20": 0.21172212727455514,
+      "NDCG@20": 0.055239269581504186,
+      "Recall@20": 0.08149221057570095,
+      "Time (s)": 4.806113958358765
+    },
+    "test_metrics": {
+      "HitRatio@20": 0.16662390969728066,
+      "NDCG@20": 0.04444153014506551,
+      "Recall@20": 0.06831636652828954,
+      "Train (s)": 1188.2939298152924,
+      "Test (s)": 4.289913177490234
+    },
+    "probes": {
+      "counterfactual_rate": 0.0,
+      "collision_rate": 1.3089825253378112e-05
+    }
+  }
+}
