@@ -2,3 +2,78 @@
 === Tuning lightgcn on baby x uniform x seed=2026, selecting on validation NDCG@20 ===
     -> /home/ntuyen/causal-isolated-training/research/results/tuning/lightgcn/baby/uniform/seed2026
 [baseline] running with defaults: {'lambda_reg': 0.0001, 'num_layers': 3, 'learning_rate': 0.001}
+Early stopping:
+- best epoch = 26, stopped epoch = 76
+- best monitored value = 0.021749 (delta = -0.005260)
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------- + ----------- + ------- + --------- + --------
+LightGCN/tune/baby/uniform/s2026 |      0.0316 |  0.0079 |    0.0165 |  19.1497
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + --------- + --------
+LightGCN/tune/baby/uniform/s2026 |      0.0211 |  0.0056 |    0.0127 | 2474.2852 |   8.8985
+
+[baseline] val NDCG@20=0.0079  test=0.0056  (2502.6s)
+
+--- knob: num_layers  grid=[1, 2, 4]  (default carries metric=0.0079) ---
+Early stopping:
+- best epoch = 14, stopped epoch = 64
+- best monitored value = 0.021189 (delta = -0.009536)
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------- + ----------- + ------- + --------- + --------
+LightGCN/tune/baby/uniform/s2026 |      0.0225 |  0.0055 |    0.0117 |  16.3169
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + --------- + --------
+LightGCN/tune/baby/uniform/s2026 |      0.0151 |  0.0041 |    0.0087 | 1483.8451 |   7.7773
+
+[run]  num_layers=1  val NDCG@20=0.0055  test=0.0041  (1508.2s)
+Early stopping:
+- best epoch = 8, stopped epoch = 58
+- best monitored value = 0.022433 (delta = -0.007425)
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------- + ----------- + ------- + --------- + --------
+LightGCN/tune/baby/uniform/s2026 |      0.0296 |  0.0073 |    0.0150 |  22.2595
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + --------- + --------
+LightGCN/tune/baby/uniform/s2026 |      0.0213 |  0.0057 |    0.0125 | 1584.8660 |   7.7075
+
+[run]  num_layers=2  val NDCG@20=0.0073  test=0.0057  (1615.0s)
+Early stopping:
+- best epoch = 32, stopped epoch = 82
+- best monitored value = 0.021690 (delta = -0.003844)
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------- + ----------- + ------- + --------- + --------
+LightGCN/tune/baby/uniform/s2026 |      0.0336 |  0.0084 |    0.0178 |  13.7756
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + --------- + --------
+LightGCN/tune/baby/uniform/s2026 |      0.0230 |  0.0059 |    0.0138 | 3060.8474 |  11.0184
+
+[run]  num_layers=4  val NDCG@20=0.0084  test=0.0059  (3085.9s)
+[winner@num_layers] num_layers=4  NDCG@20=0.0084
+[users] winner per-user scores from num_layers/4.json
+
+=== lightgcn [baby x uniform x seed=2026] winner: {'lambda_reg': 0.0001, 'num_layers': 4, 'learning_rate': 0.001}  val NDCG@20=0.0084  test=0.0059 ===
+
