@@ -125,3 +125,50 @@ NeuMF/tune/musical/uniform/s2026 |      0.0378 |  0.0095 |    0.0198 |  234.3019
 [winner@learning_rate] learning_rate=0.0005  NDCG@20=0.0127
 
 --- knob: batch_size  grid=[128, 512, 1024]  (default carries metric=0.0127) ---
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/musical/uniform/s2026 |      0.0499 |  0.0118 |    0.0233 |  18.8751
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/musical/uniform/s2026 |      0.0443 |  0.0116 |    0.0233 |  500.2313 |  13.3528
+
+[run]  batch_size=128  val NDCG@20=0.0118  test=0.0116  (532.6s)
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/musical/uniform/s2026 |      0.0549 |  0.0134 |    0.0254 |  19.0335
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/musical/uniform/s2026 |      0.0460 |  0.0121 |    0.0226 |  147.7850 |  13.5232
+
+[run]  batch_size=512  val NDCG@20=0.0134  test=0.0121  (180.5s)
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/musical/uniform/s2026 |      0.0525 |  0.0126 |    0.0238 |  19.1696
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/musical/uniform/s2026 |      0.0458 |  0.0121 |    0.0226 |   89.0926 |  13.6403
+
+[run]  batch_size=1024  val NDCG@20=0.0126  test=0.0121  (122.0s)
+[winner@batch_size] batch_size=512  NDCG@20=0.0134
+[users] winner per-user scores from batch_size/512.json
+
+=== neumf [musical x uniform x seed=2026] winner: {'num_factors': 16, 'mlp_hidden_count': 3, 'learning_rate': 0.0005, 'num_neg': 4, 'batch_size': 512}  val NDCG@20=0.0134  test=0.0121 ===
+
