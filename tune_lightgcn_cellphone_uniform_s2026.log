@@ -2,3 +2,22 @@
 === Tuning lightgcn on cellphone x uniform x seed=2026, selecting on validation NDCG@20 ===
     -> /home/ntuyen/causal-isolated-training/research/results/tuning/lightgcn/cellphone/uniform/seed2026
 [baseline] running with defaults: {'lambda_reg': 0.0001, 'num_layers': 3, 'learning_rate': 0.001}
+Early stopping:
+- best epoch = 14, stopped epoch = 64
+- best monitored value = 0.016127 (delta = -0.004146)
+
+VALIDATION:
+...
+                                      | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------------------- + ----------- + ------- + --------- + --------
+LightGCN/tune/cellphone/uniform/s2026 |      0.0183 |  0.0054 |    0.0120 | 211.5109
+
+TEST:
+...
+                                      | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+------------------------------------- + ----------- + ------- + --------- + ---------- + --------
+LightGCN/tune/cellphone/uniform/s2026 |      0.0138 |  0.0045 |    0.0100 | 24416.5099 | 105.6579
+
+[baseline] val NDCG@20=0.0054  test=0.0045  (24734.3s)
+
+--- knob: num_layers  grid=[1, 2, 4]  (default carries metric=0.0054) ---
