@@ -2,3 +2,56 @@
 === Tuning lightgcn on baby x causal x seed=2026, selecting on validation NDCG@20 ===
     -> /home/ntuyen/causal-isolated-training/research/results/tuning/lightgcn/baby/causal/seed2026
 [baseline] running with defaults: {'lambda_reg': 0.0001, 'num_layers': 3, 'learning_rate': 0.001}
+Early stopping:
+- best epoch = 25, stopped epoch = 75
+- best monitored value = 0.025204 (delta = -0.007785)
+
+VALIDATION:
+...
+                                | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------------- + ----------- + ------- + --------- + --------
+LightGCN/tune/baby/causal/s2026 |      0.0324 |  0.0081 |    0.0174 |  14.3888
+
+TEST:
+...
+                                | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------------- + ----------- + ------- + --------- + --------- + --------
+LightGCN/tune/baby/causal/s2026 |      0.0230 |  0.0056 |    0.0139 | 2458.9272 |   7.5134
+
+[baseline] val NDCG@20=0.0081  test=0.0056  (2481.1s)
+
+--- knob: num_layers  grid=[1, 2, 4]  (default carries metric=0.0081) ---
+Early stopping:
+- best epoch = 6, stopped epoch = 56
+- best monitored value = 0.026314 (delta = -0.013085)
+
+VALIDATION:
+...
+                                | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------------- + ----------- + ------- + --------- + --------
+LightGCN/tune/baby/causal/s2026 |      0.0252 |  0.0065 |    0.0132 |  17.7354
+
+TEST:
+...
+                                | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------------- + ----------- + ------- + --------- + --------- + --------
+LightGCN/tune/baby/causal/s2026 |      0.0178 |  0.0045 |    0.0106 | 1307.3432 |   9.1816
+
+[run]  num_layers=1  val NDCG@20=0.0065  test=0.0045  (1334.5s)
+Early stopping:
+- best epoch = 20, stopped epoch = 70
+- best monitored value = 0.026324 (delta = -0.010148)
+
+VALIDATION:
+...
+                                | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------------- + ----------- + ------- + --------- + --------
+LightGCN/tune/baby/causal/s2026 |      0.0309 |  0.0078 |    0.0162 |  17.5256
+
+TEST:
+...
+                                | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------------- + ----------- + ------- + --------- + --------- + --------
+LightGCN/tune/baby/causal/s2026 |      0.0208 |  0.0053 |    0.0126 | 1980.0089 |   7.3442
+
+[run]  num_layers=2  val NDCG@20=0.0078  test=0.0053  (2005.1s)
