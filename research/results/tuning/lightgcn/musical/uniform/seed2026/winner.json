@@ -1,0 +1,37 @@
+{
+  "model": "lightgcn",
+  "variant": "lightgcn",
+  "dataset": "musical",
+  "seed": 2026,
+  "recipe": "uniform",
+  "select_metric": "NDCG@20",
+  "select_split": "validation",
+  "config": {
+    "lambda_reg": 0.0001,
+    "num_layers": 4,
+    "learning_rate": 0.001
+  },
+  "metric": 0.018151204384735654,
+  "test_metric": 0.01680269738376635,
+  "users_run": {
+    "source": "trial",
+    "trial": "num_layers/4.json",
+    "val_metrics": {
+      "HitRatio@20": 0.07153349001175088,
+      "NDCG@20": 0.018151204384735654,
+      "Recall@20": 0.036358233350291036,
+      "Time (s)": 7.351771116256714
+    },
+    "test_metrics": {
+      "HitRatio@20": 0.06141913845508856,
+      "NDCG@20": 0.01680269738376635,
+      "Recall@20": 0.03429368035705012,
+      "Train (s)": 1251.6633841991425,
+      "Test (s)": 8.205221176147461
+    },
+    "probes": {
+      "counterfactual_rate": 0.33183794803513605,
+      "collision_rate": 0.0
+    }
+  }
+}

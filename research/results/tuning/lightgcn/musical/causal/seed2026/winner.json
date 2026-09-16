@@ -1,0 +1,37 @@
+{
+  "model": "lightgcn",
+  "variant": "lightgcn",
+  "dataset": "musical",
+  "seed": 2026,
+  "recipe": "causal",
+  "select_metric": "NDCG@20",
+  "select_split": "validation",
+  "config": {
+    "lambda_reg": 0.0001,
+    "num_layers": 4,
+    "learning_rate": 0.001
+  },
+  "metric": 0.01963550538802829,
+  "test_metric": 0.016810210715222547,
+  "users_run": {
+    "source": "trial",
+    "trial": "num_layers/4.json",
+    "val_metrics": {
+      "HitRatio@20": 0.0768213866039953,
+      "NDCG@20": 0.01963550538802829,
+      "Recall@20": 0.03911055868293928,
+      "Time (s)": 7.124301910400391
+    },
+    "test_metrics": {
+      "HitRatio@20": 0.061733570904517344,
+      "NDCG@20": 0.016810210715222547,
+      "Recall@20": 0.034731567075536034,
+      "Train (s)": 1162.919955253601,
+      "Test (s)": 9.177562952041626
+    },
+    "probes": {
+      "counterfactual_rate": 0.0,
+      "collision_rate": 5.639495413000695e-06
+    }
+  }
+}

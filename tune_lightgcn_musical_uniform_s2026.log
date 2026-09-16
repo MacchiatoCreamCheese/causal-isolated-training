@@ -55,3 +55,25 @@ TEST:
 LightGCN/tune/musical/uniform/s2026 |      0.0494 |  0.0130 |    0.0276 | 1018.4907 |   5.5550
 
 [run]  num_layers=2  val NDCG@20=0.0154  test=0.0130  (1031.1s)
+Early stopping:
+- best epoch = 60, stopped epoch = 110
+- best monitored value = 0.038460 (delta = -0.002102)
+
+VALIDATION:
+...
+                                    | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+----------------------------------- + ----------- + ------- + --------- + --------
+LightGCN/tune/musical/uniform/s2026 |      0.0715 |  0.0182 |    0.0364 |   7.3518
+
+TEST:
+...
+                                    | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+----------------------------------- + ----------- + ------- + --------- + --------- + --------
+LightGCN/tune/musical/uniform/s2026 |      0.0614 |  0.0168 |    0.0343 | 1251.6634 |   8.2052
+
+[run]  num_layers=4  val NDCG@20=0.0182  test=0.0168  (1267.3s)
+[winner@num_layers] num_layers=4  NDCG@20=0.0182
+[users] winner per-user scores from num_layers/4.json
+
+=== lightgcn [musical x uniform x seed=2026] winner: {'lambda_reg': 0.0001, 'num_layers': 4, 'learning_rate': 0.001}  val NDCG@20=0.0182  test=0.0168 ===
+

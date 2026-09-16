@@ -1,0 +1,79 @@
+
+=== Tuning lightgcn on musical x causal x seed=2026, selecting on validation NDCG@20 ===
+    -> /home/ntuyen/causal-isolated-training/research/results/tuning/lightgcn/musical/causal/seed2026
+[baseline] running with defaults: {'lambda_reg': 0.0001, 'num_layers': 3, 'learning_rate': 0.001}
+Early stopping:
+- best epoch = 53, stopped epoch = 103
+- best monitored value = 0.040372 (delta = -0.002977)
+
+VALIDATION:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------------- + ----------- + ------- + --------- + --------
+LightGCN/tune/musical/causal/s2026 |      0.0725 |  0.0186 |    0.0374 |   6.7412
+
+TEST:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------------- + ----------- + ------- + --------- + --------- + --------
+LightGCN/tune/musical/causal/s2026 |      0.0590 |  0.0159 |    0.0335 | 1091.0326 |   4.9184
+
+[baseline] val NDCG@20=0.0186  test=0.0159  (1102.8s)
+
+--- knob: num_layers  grid=[1, 2, 4]  (default carries metric=0.0186) ---
+Early stopping:
+- best epoch = 23, stopped epoch = 73
+- best monitored value = 0.037158 (delta = -0.007270)
+
+VALIDATION:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------------- + ----------- + ------- + --------- + --------
+LightGCN/tune/musical/causal/s2026 |      0.0602 |  0.0145 |    0.0299 |   7.1584
+
+TEST:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------------- + ----------- + ------- + --------- + --------- + --------
+LightGCN/tune/musical/causal/s2026 |      0.0463 |  0.0124 |    0.0264 |  658.0453 |   5.1405
+
+[run]  num_layers=1  val NDCG@20=0.0145  test=0.0124  (670.4s)
+Early stopping:
+- best epoch = 37, stopped epoch = 87
+- best monitored value = 0.040542 (delta = -0.004963)
+
+VALIDATION:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------------- + ----------- + ------- + --------- + --------
+LightGCN/tune/musical/causal/s2026 |      0.0690 |  0.0175 |    0.0356 |   6.9932
+
+TEST:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------------- + ----------- + ------- + --------- + --------- + --------
+LightGCN/tune/musical/causal/s2026 |      0.0555 |  0.0142 |    0.0306 |  895.6354 |  14.1932
+
+[run]  num_layers=2  val NDCG@20=0.0175  test=0.0142  (916.9s)
+Early stopping:
+- best epoch = 54, stopped epoch = 104
+- best monitored value = 0.041550 (delta = -0.002440)
+
+VALIDATION:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------------- + ----------- + ------- + --------- + --------
+LightGCN/tune/musical/causal/s2026 |      0.0768 |  0.0196 |    0.0391 |   7.1243
+
+TEST:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------------- + ----------- + ------- + --------- + --------- + --------
+LightGCN/tune/musical/causal/s2026 |      0.0617 |  0.0168 |    0.0347 | 1162.9200 |   9.1776
+
+[run]  num_layers=4  val NDCG@20=0.0196  test=0.0168  (1179.3s)
+[winner@num_layers] num_layers=4  NDCG@20=0.0196
+[users] winner per-user scores from num_layers/4.json
+
+=== lightgcn [musical x causal x seed=2026] winner: {'lambda_reg': 0.0001, 'num_layers': 4, 'learning_rate': 0.001}  val NDCG@20=0.0196  test=0.0168 ===
+
