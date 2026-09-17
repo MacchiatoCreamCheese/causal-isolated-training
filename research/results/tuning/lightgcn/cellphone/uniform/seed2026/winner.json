@@ -1,0 +1,37 @@
+{
+  "model": "lightgcn",
+  "variant": "lightgcn",
+  "dataset": "cellphone",
+  "seed": 2026,
+  "recipe": "uniform",
+  "select_metric": "NDCG@20",
+  "select_split": "validation",
+  "config": {
+    "lambda_reg": 0.0001,
+    "num_layers": 4,
+    "learning_rate": 0.001
+  },
+  "metric": 0.0057735526702013635,
+  "test_metric": 0.004735675059650025,
+  "users_run": {
+    "source": "trial",
+    "trial": "num_layers/4.json",
+    "val_metrics": {
+      "HitRatio@20": 0.01929350761585827,
+      "NDCG@20": 0.0057735526702013635,
+      "Recall@20": 0.012630380952636305,
+      "Time (s)": 210.19631600379944
+    },
+    "test_metrics": {
+      "HitRatio@20": 0.01488829247062237,
+      "NDCG@20": 0.004735675059650025,
+      "Recall@20": 0.01057553728651219,
+      "Train (s)": 29565.799344062805,
+      "Test (s)": 126.56660771369934
+    },
+    "probes": {
+      "counterfactual_rate": 0.44057229828478417,
+      "collision_rate": 0.0
+    }
+  }
+}
