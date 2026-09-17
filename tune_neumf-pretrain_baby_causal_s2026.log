@@ -108,3 +108,67 @@ TEST:
 NeuMF/tune/baby/causal/s2026 |      0.0162 |  0.0035 |    0.0092 | 1906.4034 |  65.6475
 
 [run]  learning_rate=0.0005  val NDCG@20=0.0057  test=0.0035  (2086.6s)
+
+VALIDATION:
+...
+                             | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/baby/causal/s2026 |      0.0275 |  0.0060 |    0.0140 | 111.4545
+
+TEST:
+...
+                             | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/baby/causal/s2026 |      0.0186 |  0.0048 |    0.0104 | 1919.9066 |  65.7994
+
+[run]  learning_rate=0.005  val NDCG@20=0.0060  test=0.0048  (2097.8s)
+[winner@learning_rate] learning_rate=0.001  NDCG@20=0.0061 (kept default)
+
+--- knob: batch_size  grid=[128, 512, 1024]  (default carries metric=0.0061) ---
+
+VALIDATION:
+...
+                             | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/baby/causal/s2026 |      0.0188 |  0.0044 |    0.0098 | 116.7647
+
+TEST:
+...
+                             | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/baby/causal/s2026 |      0.0135 |  0.0033 |    0.0081 | 3683.1081 |  66.6077
+
+[run]  batch_size=128  val NDCG@20=0.0044  test=0.0033  (3867.1s)
+
+VALIDATION:
+...
+                             | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/baby/causal/s2026 |      0.0275 |  0.0059 |    0.0135 | 117.3561
+
+TEST:
+...
+                             | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/baby/causal/s2026 |      0.0176 |  0.0046 |    0.0108 | 1011.1046 |  66.9291
+
+[run]  batch_size=512  val NDCG@20=0.0059  test=0.0046  (1196.0s)
+
+VALIDATION:
+...
+                             | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/baby/causal/s2026 |      0.0293 |  0.0064 |    0.0148 | 113.6919
+
+TEST:
+...
+                             | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/baby/causal/s2026 |      0.0202 |  0.0046 |    0.0114 |  591.4020 |  67.4959
+
+[run]  batch_size=1024  val NDCG@20=0.0064  test=0.0046  (774.5s)
+[winner@batch_size] batch_size=1024  NDCG@20=0.0064
+[users] winner per-user scores from batch_size/1024.json
+
+=== neumf [baby x causal x seed=2026] winner: {'num_factors': 64, 'mlp_hidden_count': 3, 'learning_rate': 0.001, 'num_neg': 4, 'batch_size': 1024}  val NDCG@20=0.0064  test=0.0046 ===
+

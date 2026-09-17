@@ -1,0 +1,39 @@
+{
+  "model": "neumf",
+  "variant": "neumf-pretrain",
+  "dataset": "baby",
+  "seed": 2026,
+  "recipe": "causal",
+  "select_metric": "NDCG@20",
+  "select_split": "validation",
+  "config": {
+    "num_factors": 64,
+    "mlp_hidden_count": 3,
+    "learning_rate": 0.001,
+    "num_neg": 4,
+    "batch_size": 1024
+  },
+  "metric": 0.0064225926766138496,
+  "test_metric": 0.004637763030899232,
+  "users_run": {
+    "source": "trial",
+    "trial": "batch_size/1024.json",
+    "val_metrics": {
+      "HitRatio@20": 0.029269176747768567,
+      "NDCG@20": 0.0064225926766138496,
+      "Recall@20": 0.014837842338131966,
+      "Time (s)": 113.69188666343689
+    },
+    "test_metrics": {
+      "HitRatio@20": 0.02017865688307545,
+      "NDCG@20": 0.004637763030899232,
+      "Recall@20": 0.011416018532502068,
+      "Train (s)": 591.4020471572876,
+      "Test (s)": 67.49587154388428
+    },
+    "probes": {
+      "counterfactual_rate": 0.0,
+      "collision_rate": 2.260205118884447e-06
+    }
+  }
+}
