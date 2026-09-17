@@ -245,3 +245,57 @@ BPR/tune/baby/causal/s2026 |      0.0394 |  0.0111 |    0.0232 |  502.5953 |  10
 
 === bpr [baby x causal x seed=2026] winner: {'k_embed_dim': 64, 'learning_rate': 0.05, 'lambda_shared': 1e-05, 'batch_size': 4096, 'n_epochs': 1000}  val NDCG@20=0.0125  test=0.0111 ===
 
+
+=== Tuning bpr on baby x causal x seed=2026, selecting on validation NDCG@20 ===
+    -> /home/trustrs/causal-isolated-training/research/results/tuning/bpr/baby/causal/seed2026
+[baseline] cached: val NDCG@20=0.0124
+
+--- knob: k_embed_dim  grid=[32, 128, 256]  (default carries metric=0.0124) ---
+[skip] k_embed_dim=32  val NDCG@20=0.0110  [cached]
+[skip] k_embed_dim=128  val NDCG@20=0.0119  [cached]
+[skip] k_embed_dim=256  val NDCG@20=0.0120  [cached]
+[winner@k_embed_dim] k_embed_dim=64  NDCG@20=0.0124 (kept default)
+
+--- knob: learning_rate  grid=[0.001, 0.01, 0.1]  (default carries metric=0.0124) ---
+[skip] learning_rate=0.001  val NDCG@20=0.0050  [cached]
+[skip] learning_rate=0.01  val NDCG@20=0.0046  [cached]
+[skip] learning_rate=0.1  val NDCG@20=0.0111  [cached]
+[winner@learning_rate] learning_rate=0.05  NDCG@20=0.0124 (kept default)
+
+--- knob: lambda_shared  grid=[1e-06, 1e-05, 0.001, 0.01]  (default carries metric=0.0124) ---
+[skip] lambda_shared=1e-06  val NDCG@20=0.0125  [cached]
+[skip] lambda_shared=1e-05  val NDCG@20=0.0125  [cached]
+[skip] lambda_shared=0.001  val NDCG@20=0.0124  [cached]
+[skip] lambda_shared=0.01  val NDCG@20=0.0107  [cached]
+[winner@lambda_shared] lambda_shared=1e-05  NDCG@20=0.0125
+[users] winner per-user scores already saved
+
+=== bpr [baby x causal x seed=2026] winner: {'k_embed_dim': 64, 'learning_rate': 0.05, 'lambda_shared': 1e-05, 'batch_size': 4096, 'n_epochs': 1000}  val NDCG@20=0.0125  test=0.0111 ===
+
+
+=== Tuning bpr on baby x causal x seed=2026, selecting on validation NDCG@20 ===
+    -> /home/trustrs/causal-isolated-training/research/results/tuning/bpr/baby/causal/seed2026
+[baseline] cached: val NDCG@20=0.0124
+
+--- knob: k_embed_dim  grid=[32, 128, 256]  (default carries metric=0.0124) ---
+[skip] k_embed_dim=32  val NDCG@20=0.0110  [cached]
+[skip] k_embed_dim=128  val NDCG@20=0.0119  [cached]
+[skip] k_embed_dim=256  val NDCG@20=0.0120  [cached]
+[winner@k_embed_dim] k_embed_dim=64  NDCG@20=0.0124 (kept default)
+
+--- knob: learning_rate  grid=[0.001, 0.01, 0.1]  (default carries metric=0.0124) ---
+[skip] learning_rate=0.001  val NDCG@20=0.0050  [cached]
+[skip] learning_rate=0.01  val NDCG@20=0.0046  [cached]
+[skip] learning_rate=0.1  val NDCG@20=0.0111  [cached]
+[winner@learning_rate] learning_rate=0.05  NDCG@20=0.0124 (kept default)
+
+--- knob: lambda_shared  grid=[1e-06, 1e-05, 0.001, 0.01]  (default carries metric=0.0124) ---
+[skip] lambda_shared=1e-06  val NDCG@20=0.0125  [cached]
+[skip] lambda_shared=1e-05  val NDCG@20=0.0125  [cached]
+[skip] lambda_shared=0.001  val NDCG@20=0.0124  [cached]
+[skip] lambda_shared=0.01  val NDCG@20=0.0107  [cached]
+[winner@lambda_shared] lambda_shared=1e-05  NDCG@20=0.0125
+[users] winner per-user scores already saved
+
+=== bpr [baby x causal x seed=2026] winner: {'k_embed_dim': 64, 'learning_rate': 0.05, 'lambda_shared': 1e-05, 'batch_size': 4096, 'n_epochs': 1000}  val NDCG@20=0.0125  test=0.0111 ===
+
