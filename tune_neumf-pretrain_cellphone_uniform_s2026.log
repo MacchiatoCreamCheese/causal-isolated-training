@@ -18,3 +18,31 @@ NeuMF/tune/cellphone/uniform/s2026 |      0.0158 |  0.0046 |    0.0112 | 1951.41
 [baseline] val NDCG@20=0.0052  test=0.0046  (2429.8s)
 
 --- knob: num_factors  grid=[16, 32, 64]  (default carries metric=0.0052) ---
+
+VALIDATION:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/cellphone/uniform/s2026 |      0.0115 |  0.0032 |    0.0074 | 409.5775
+
+TEST:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/cellphone/uniform/s2026 |      0.0096 |  0.0028 |    0.0067 | 2888.2278 | 247.4626
+
+[run]  num_factors=16  val NDCG@20=0.0032  test=0.0028  (3546.3s)
+
+VALIDATION:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/cellphone/uniform/s2026 |      0.0121 |  0.0034 |    0.0078 | 629.9819
+
+TEST:
+...
+                                   | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/cellphone/uniform/s2026 |      0.0090 |  0.0025 |    0.0062 | 4886.1391 | 376.0089
+
+[run]  num_factors=32  val NDCG@20=0.0034  test=0.0025  (5893.5s)
