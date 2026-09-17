@@ -79,3 +79,81 @@ BPR/tune/cellphone/uniform/s2026 |      0.0137 |  0.0046 |    0.0097 | 21239.374
 [winner@k_embed_dim] k_embed_dim=256  NDCG@20=0.0054
 
 --- knob: learning_rate  grid=[0.001, 0.01, 0.1]  (default carries metric=0.0054) ---
+
+=== Tuning bpr on cellphone x uniform x seed=2026, selecting on validation NDCG@20 ===
+    -> /home/trustrs/causal-isolated-training/research/results/tuning/bpr/cellphone/uniform/seed2026
+[baseline] cached: val NDCG@20=0.0050
+
+--- knob: k_embed_dim  grid=[32, 128, 256]  (default carries metric=0.0050) ---
+[skip] k_embed_dim=32  val NDCG@20=0.0044  [cached]
+[skip] k_embed_dim=128  val NDCG@20=0.0053  [cached]
+[skip] k_embed_dim=256  val NDCG@20=0.0054  [cached]
+[winner@k_embed_dim] k_embed_dim=256  NDCG@20=0.0054
+
+--- knob: learning_rate  grid=[0.001, 0.01, 0.1]  (default carries metric=0.0054) ---
+
+=== Tuning bpr on cellphone x uniform x seed=2026, selecting on validation NDCG@20 ===
+    -> /home/trustrs/causal-isolated-training/research/results/tuning/bpr/cellphone/uniform/seed2026
+[baseline] cached: val NDCG@20=0.0050
+
+--- knob: k_embed_dim  grid=[32, 128, 256]  (default carries metric=0.0050) ---
+[skip] k_embed_dim=32  val NDCG@20=0.0044  [cached]
+[skip] k_embed_dim=128  val NDCG@20=0.0053  [cached]
+[skip] k_embed_dim=256  val NDCG@20=0.0054  [cached]
+[winner@k_embed_dim] k_embed_dim=256  NDCG@20=0.0054
+
+--- knob: learning_rate  grid=[0.001, 0.01, 0.1]  (default carries metric=0.0054) ---
+Early stopping:
+- best epoch = 229, stopped epoch = 242
+- best monitored value = 0.003950 (delta = -0.000052)
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/cellphone/uniform/s2026 |      0.0151 |  0.0039 |    0.0096 | 370.9491
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + ---------- + --------
+BPR/tune/cellphone/uniform/s2026 |      0.0117 |  0.0031 |    0.0081 | 94280.6355 | 221.5501
+
+[run]  learning_rate=0.001  val NDCG@20=0.0039  test=0.0031  (94876.3s)
+Early stopping:
+- best epoch = 24, stopped epoch = 37
+- best monitored value = 0.003962 (delta = -0.000905)
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/cellphone/uniform/s2026 |      0.0123 |  0.0031 |    0.0078 | 373.5529
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + ---------- + --------
+BPR/tune/cellphone/uniform/s2026 |      0.0097 |  0.0025 |    0.0065 | 14422.6278 | 228.2658
+
+[run]  learning_rate=0.01  val NDCG@20=0.0031  test=0.0025  (15025.8s)
+Early stopping:
+- best epoch = 18, stopped epoch = 31
+- best monitored value = 0.005712 (delta = -0.000226)
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/cellphone/uniform/s2026 |      0.0182 |  0.0055 |    0.0118 | 376.9793
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + ---------- + --------
+BPR/tune/cellphone/uniform/s2026 |      0.0133 |  0.0043 |    0.0094 | 11941.2387 | 220.5564
+
+[run]  learning_rate=0.1  val NDCG@20=0.0055  test=0.0043  (12539.8s)
+[winner@learning_rate] learning_rate=0.1  NDCG@20=0.0055
+
+--- knob: lambda_shared  grid=[1e-06, 1e-05, 0.001, 0.01]  (default carries metric=0.0055) ---
