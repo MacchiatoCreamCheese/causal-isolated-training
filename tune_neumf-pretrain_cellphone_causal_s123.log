@@ -24,3 +24,24 @@ NeuMF/tune/cellphone/causal/s123 |      0.0069 |  0.0018 |    0.0048 | 3315.0621
 [baseline] cached: val NDCG@20=0.0029
 
 --- knob: num_factors  grid=[16, 32, 64]  (default carries metric=0.0029) ---
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/cellphone/causal/s123 |      0.0183 |  0.0045 |    0.0116 | 448.9026
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/cellphone/causal/s123 |      0.0117 |  0.0030 |    0.0083 | 4920.3912 | 263.7010
+
+[run]  num_factors=16  val NDCG@20=0.0045  test=0.0030  (5637.5s)
+
+=== Tuning neumf on cellphone x causal x seed=123, selecting on validation NDCG@20 ===
+    -> /mnt/c/Users/nguye/uniyear/causal-isolated-training/research/results/tuning/neumf-pretrain/cellphone/causal/seed123
+[baseline] cached: val NDCG@20=0.0029
+
+--- knob: num_factors  grid=[16, 32, 64]  (default carries metric=0.0029) ---
+[skip] num_factors=16  val NDCG@20=0.0045  [cached]

@@ -85,3 +85,45 @@ BPR-m2/philadelphia/causal+temporal/s123 |      0.1879 |  0.0573 |    0.0778 | 4
 
 [causal+temporal] {'HitRatio@20': 0.18791688045151358, 'NDCG@20': np.float64(0.05729571510592434), 'Recall@20': np.float64(0.0778148571866298), 'Train (s)': 4351.9785125255585, 'Test (s)': 6.861577272415161, 'counterfactual_rate': 0.0, 'collision_rate': 3.0962148880093684e-05, 'from_tuning': 0.0}  (4367.9s)  [checkpointed]
 #### BPR-m2-tunedper-arm/philadelphia/seed=123 total: 146.1 min ####
+[stale] bpr-m2-tunedper-arm_philadelphia_seed123.json [causal+coherent]: config changed, re-running
+         n_epochs: 1000 -> 452
+[stale] bpr-m2-tunedper-arm_philadelphia_seed123.json [causal+temporal]: config changed, re-running
+         n_epochs: 1000 -> 452
+
+############## BPR-m2-tunedper-arm / philadelphia / seed=123 (2/4 cells pending) ##############
+[data] loaded 586,677 rows from /mnt/c/Users/nguye/uniyear/causal-isolated-training/data/philadelphia_dataset/Philadelphia.csv
+rating_threshold = 1.0
+exclude_unknowns = True
+/home/nguye/miniconda3/envs/leakage24/lib/python3.12/site-packages/cornac/data/dataset.py:335: UserWarning: 18484 duplicated observations are removed!
+  warnings.warn("%d duplicated observations are removed!" % dup_count)
+---
+Training data:
+Number of users = 32488
+Number of items = 10085
+Number of ratings = 450857
+Max rating = 5.0
+Min rating = 1.0
+Global mean = 3.8
+/home/nguye/miniconda3/envs/leakage24/lib/python3.12/site-packages/cornac/data/dataset.py:335: UserWarning: 674 duplicated observations are removed!
+  warnings.warn("%d duplicated observations are removed!" % dup_count)
+---
+Test data:
+Number of users = 32488
+Number of items = 10085
+Number of ratings = 26968
+Number of unknown users = 0
+Number of unknown items = 0
+/home/nguye/miniconda3/envs/leakage24/lib/python3.12/site-packages/cornac/data/dataset.py:335: UserWarning: 914 duplicated observations are removed!
+  warnings.warn("%d duplicated observations are removed!" % dup_count)
+---
+Validation data:
+Number of users = 32488
+Number of items = 10085
+Number of ratings = 37868
+---
+Total users = 32488
+Total items = 10085
+
+--- causal+coherent (neg=causal, batches=coherent) ---
+
+[BPR-m2/philadelphia/causal+coherent/s123] Training started!

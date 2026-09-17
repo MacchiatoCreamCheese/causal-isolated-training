@@ -24,23 +24,23 @@
       "from_tuning": 1.0
     },
     "causal+coherent": {
-      "HitRatio@20": 0.04129546169164658,
-      "NDCG@20": 0.010944447776417598,
-      "Recall@20": 0.019988665423890727,
-      "Train (s)": 1320.2181198596954,
-      "Test (s)": 20.80355453491211,
+      "HitRatio@20": 0.061209516822136045,
+      "NDCG@20": 0.01626112766006516,
+      "Recall@20": 0.03381829527595086,
+      "Train (s)": 712.5064690113068,
+      "Test (s)": 19.715010166168213,
       "counterfactual_rate": 0.0,
-      "collision_rate": 7.238019183258496e-06,
+      "collision_rate": 7.458504457034683e-06,
       "from_tuning": 0.0
     },
     "causal+temporal": {
-      "HitRatio@20": 0.0420291374069804,
-      "NDCG@20": 0.011176134067012664,
-      "Recall@20": 0.02020792506610518,
-      "Train (s)": 1351.9009263515472,
-      "Test (s)": 21.27724313735962,
+      "HitRatio@20": 0.061733570904517344,
+      "NDCG@20": 0.01635879840051633,
+      "Recall@20": 0.03387844912455333,
+      "Train (s)": 713.1979734897614,
+      "Test (s)": 19.780247449874878,
       "counterfactual_rate": 0.0,
-      "collision_rate": 7.40899601435909e-06,
+      "collision_rate": 7.198872972770817e-06,
       "from_tuning": 0.0
     }
   },
@@ -75,7 +75,7 @@
       "lambda_j": 0.0001,
       "lambda_u": 0.0001,
       "learning_rate": 0.01,
-      "n_epochs": 1000,
+      "n_epochs": 198,
       "neg_sampling": "causal"
     },
     "causal+temporal": {
@@ -86,7 +86,7 @@
       "lambda_j": 0.0001,
       "lambda_u": 0.0001,
       "learning_rate": 0.01,
-      "n_epochs": 1000,
+      "n_epochs": 198,
       "neg_sampling": "causal"
     }
   },
@@ -96,7 +96,7 @@
     "scipy": "1.17.1",
     "torch": "2.4.1+cu121",
     "device": "NVIDIA GeForce RTX 4050 Laptop GPU",
-    "git_commit": "8f2b135",
+    "git_commit": "b980142",
     "tuned_arm": "per_arm",
     "neumf_pretrain": false
   }

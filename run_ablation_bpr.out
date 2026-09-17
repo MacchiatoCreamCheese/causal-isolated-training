@@ -9,3 +9,5 @@ nohup: ignoring input
 [run_ablation] baby/seed123 -> ablation_bpr_baby_s123.log  (09:24)
 [run_ablation] musical/seed2026 -> ablation_bpr_musical_s2026.log  (10:46)
 [run_ablation] philadelphia/seed2026 -> ablation_bpr_philadelphia_s2026.log  (11:43)
+[run_ablation] baby/seed2026 -> ablation_bpr_baby_s2026.log  (13:11)
+[run_ablation] done Thu Sep 17 13:16:51 +07 2026

@@ -1,0 +1,7 @@
+[run_ablation] bpr | env=leakage24 | data=/mnt/c/Users/nguye/uniyear/causal-isolated-training/data | Thu Sep 17 13:38:53 +07 2026
+[run_ablation] cornac 2.6.0 | torch 2.4.1+cu121
+[run_ablation] musical/seed42 -> ablation_bpr_musical_s42.log  (13:38)
+[run_ablation] philadelphia/seed42 -> ablation_bpr_philadelphia_s42.log  (13:46)
+[run_ablation] baby/seed42 -> ablation_bpr_baby_s42.log  (14:42)
+[run_ablation] musical/seed123 -> ablation_bpr_musical_s123.log  (14:48)
+[run_ablation] philadelphia/seed123 -> ablation_bpr_philadelphia_s123.log  (15:14)
