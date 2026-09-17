@@ -21,3 +21,20 @@ LightGCN/tune/cellphone/uniform/s2026 |      0.0138 |  0.0045 |    0.0100 | 2441
 [baseline] val NDCG@20=0.0054  test=0.0045  (24734.3s)
 
 --- knob: num_layers  grid=[1, 2, 4]  (default carries metric=0.0054) ---
+Early stopping:
+- best epoch = 7, stopped epoch = 57
+- best monitored value = 0.014043 (delta = -0.005368)
+
+VALIDATION:
+...
+                                      | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------------------- + ----------- + ------- + --------- + --------
+LightGCN/tune/cellphone/uniform/s2026 |      0.0132 |  0.0040 |    0.0087 | 179.1787
+
+TEST:
+...
+                                      | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+------------------------------------- + ----------- + ------- + --------- + ---------- + --------
+LightGCN/tune/cellphone/uniform/s2026 |      0.0092 |  0.0030 |    0.0067 | 15685.0809 | 114.3043
+
+[run]  num_layers=1  val NDCG@20=0.0040  test=0.0030  (15979.2s)
