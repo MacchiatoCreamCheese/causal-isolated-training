@@ -10,6 +10,7 @@ Run: python -m research.analysis.make_figures [fig_name ...]
 """
 
 import csv
+import json
 import sys
 from collections import Counter
 
@@ -275,6 +276,152 @@ def fig_item_cohorts():
     save(fig, "item_cohorts")
 
 
+#: The four ablation steps, in order, as `mecha2/runner.ARMS` names them, with the
+#: labels the paper uses.
+STEPS = [("uniform", "uniform"), ("causal", "past-only"),
+         ("causal+coherent", "+coherent"), ("causal+temporal", "+temporal")]
+
+
+def _load_ablation_cells():
+    """Every finished four-step cell: {(model, dataset, seed): {step: metrics}}.
+
+    Reads the per-cell JSON the ablation runner writes. Cells still in flight have
+    fewer than four steps recorded and are skipped, so the figure only ever shows
+    what actually completed.
+    """
+    cells = {}
+    for path in sorted((RESULTS_DIR / "ablation").glob("*tunedper-arm*.json")):
+        with open(path, encoding="utf-8") as f:
+            j = json.load(f)
+        recipes = j.get("recipes", {})
+        if not all(name in recipes for name, _ in STEPS):
+            print(f"  skipping {path.name}: {len(recipes)}/4 steps so far")
+            continue
+        model = j["model"].split("-m2")[0]
+        cells[(model, j["dataset"], j["seed"])] = recipes
+    return cells
+
+
+def fig_ablation_steps(metrics=("NDCG@20", "HitRatio@20")):
+    """The cumulative ablation, one line per finished cell.
+
+    Each line walks the four steps left to right, so the shape is the result: the
+    lift from the past-only pool is the first segment, and whether time-coherent
+    or chronological batches add anything is the rest. Values are test metrics at
+    each step's own tuned hyperparameters (steps 1-2 from tuning, 3-4 trained).
+    """
+    cells = _load_ablation_cells()
+    if not cells:
+        print("  no finished ablation cells yet, skipping")
+        return
+
+    # One panel per (model, dataset), one line per seed. Every cell on one pair of
+    # axes made the seed spread unreadable once more than a couple had finished,
+    # and the spread is half of what the ablation is for: a step that moves less
+    # than its own seeds do has not moved.
+    metric = metrics[0]
+    panels = sorted({(m, ds) for m, ds, _ in cells})
+    ncol = min(3, len(panels))
+    nrow = -(-len(panels) // ncol)
+    fig, axes = plt.subplots(nrow, ncol, figsize=(7.0, 2.6 * nrow), squeeze=False)
+    flat = axes.ravel()
+    x = np.arange(len(STEPS))
+
+    for ax, (model, ds) in zip(flat, panels):
+        for (m, d, seed), recipes in sorted(cells.items()):
+            if (m, d) != (model, ds):
+                continue
+            ax.plot(x, [recipes[name][metric] for name, _ in STEPS],
+                    marker="o", lw=1.4, label=f"seed {seed}")
+        # Steps 1-2 come from tuning, 3-4 are trained here: mark the seam so the
+        # reader knows where the hyperparameters stop changing.
+        ax.axvline(1.5, color="#999999", lw=0.6, ls=":", zorder=0)
+        ax.set_xticks(x)
+        ax.set_xticklabels([label for _, label in STEPS], rotation=30, ha="right",
+                           fontsize=6.5)
+        ax.set_title(f"{model} / {ds}", fontsize=8)
+        ax.margins(y=0.18)
+        ax.legend(loc="best", frameon=False, fontsize=6)
+    for ax in flat[len(panels):]:
+        ax.set_axis_off()
+    for ax in axes[:, 0]:
+        ax.set_ylabel(f"test {metric}")
+    fig.tight_layout()
+    save(fig, "ablation_steps")
+
+
+def fig_prequential_grid(metric="HitRatio@20", window=9):
+    """Every finished timeline on one sheet: datasets down, seeds across.
+
+    `fig_prequential` draws one cell per file, which is the right unit for a
+    close reading of a single run but hopeless for seeing whether a pattern
+    repeats. This puts them on shared axes per dataset so the seeds can be
+    compared at a glance, with the per-batch points dropped and only the rolling
+    means kept -- at this size the raw scatter is noise.
+    """
+    import json as _json
+
+    payloads = {}
+    for path in sorted((RESULTS_DIR / "prequential").glob("*tunedper-arm*.json")):
+        with open(path, encoding="utf-8") as f:
+            j = _json.load(f)
+        payloads[(j["dataset"], int(j["seed"]))] = j["arms"]
+    if not payloads:
+        print("  no results/prequential/*.json, skipping")
+        return
+
+    datasets = sorted({d for d, _ in payloads})
+    seeds = sorted({s for _, s in payloads})
+
+    # Each cell keeps the two-panel shape of the single-run figure: the metric
+    # above, `causal - uniform` below. The difference panel is the one that
+    # carries the claim -- batches differ in difficulty, and both samplers are
+    # measured on identical ones, so their difference cancels that out.
+    fig = plt.figure(figsize=(7.0, 2.7 * len(datasets)))
+    outer = fig.add_gridspec(len(datasets), len(seeds), hspace=0.55, wspace=0.3)
+
+    for r, ds in enumerate(datasets):
+        for c, seed in enumerate(seeds):
+            arms = payloads.get((ds, seed))
+            inner = outer[r, c].subgridspec(2, 1, height_ratios=(3, 1), hspace=0.08)
+            top = fig.add_subplot(inner[0])
+            bot = fig.add_subplot(inner[1], sharex=top)
+            if not arms:
+                top.set_axis_off()
+                bot.set_axis_off()
+                continue
+
+            days = [(p["ts_end"] - arms["uniform"][0]["ts_start"]) / 86_400_000
+                    for p in arms["uniform"]]
+            for arm, colour in (("uniform", COLOR_CELLS["uniform"]),
+                                ("causal", COLOR_CELLS["causal"])):
+                y = [p[metric] for p in arms[arm]]
+                top.plot(days, y, color=colour, lw=0.4, alpha=0.35)
+                top.plot(days, _rolling(y, window), color=colour, lw=1.3, label=arm)
+
+            diff = [b[metric] - a[metric]
+                    for a, b in zip(arms["uniform"], arms["causal"])]
+            bot.axhline(0, color="black", lw=0.6)
+            bot.plot(days, diff, color="#999999", lw=0.4, alpha=0.5)
+            smoothed = _rolling(diff, window)
+            bot.plot(days, smoothed, color="black", lw=1.0)
+            bot.fill_between(days, 0, smoothed, color=COLOR_CELLS["uniform"],
+                             alpha=0.5)
+
+            top.tick_params(labelsize=5.5, labelbottom=False)
+            bot.tick_params(labelsize=5.5)
+            if r == 0:
+                top.set_title(f"seed {seed}", fontsize=8)
+            if c == 0:
+                top.set_ylabel(f"{ds}\n{metric}", fontsize=6.5)
+                bot.set_ylabel("causal $-$\nuniform", fontsize=5.5)
+            if r == len(datasets) - 1:
+                bot.set_xlabel("days since first evaluated batch", fontsize=6.5)
+            if (r, c) == (0, 0):
+                top.legend(loc="best", frameon=False, fontsize=5.5)
+    save(fig, "prequential_grid")
+
+
 def _rolling(a, w):
     """Centred rolling mean, with the window shrinking at the edges.
 
@@ -363,6 +510,8 @@ def fig_prequential(metric="HitRatio@20", window=9):
 
 ALL_FIGS = {
     "item_cohorts":          fig_item_cohorts,
+    "ablation_steps":        fig_ablation_steps,
+    "prequential_grid":      fig_prequential_grid,
     "three_model_ablation":  fig_three_model_ablation,
     "counterfactual_rate":   fig_counterfactual_rate,
     "prequential":           fig_prequential,

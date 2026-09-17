@@ -535,7 +535,7 @@ TUNE_ORDER = {
         # One tied lambda, not three: coordinate descent cannot test NewBPR
         # §5.2's *interaction* claim. See BPR["lambda_shared"].
         ("lambda_shared", [1e-6, 1e-5, 1e-3, 1e-2]),     # default 1e-4
-        # n_epochs is the budget ceiling (1000); early stopping picks the stop.
+        # n_epochs is the fixed budget (1000), not tuned.
     ],
 }
 
@@ -562,21 +562,18 @@ BASELINE_CONFIG = {
         # One tied value; _build_model fans it out to lambda_u/i/j.
         "lambda_shared": BPR["lambda_shared"]["current"],
         "batch_size":    BPR["batch_size"]["current"],
-        # n_epochs is the ceiling; we set it via BPR_EARLY_STOP, not tuned.
+        # A fixed budget: every trial trains all n_epochs, no early stopping.
         "n_epochs":      BPR["n_epochs"]["current"],
+        # Recorded so a trial trained under the old early-stopping protocol
+        # never matches this config and is retrained rather than reused.
+        "early_stopping": "off",
     },
 }
 
 
-# Convenience config: pass these to BPR ctors to get the NewBPR-faithful
-# early-stopping protocol.
-BPR_EARLY_STOP = {
-    "early_stopping": {
-        "min_delta": BPR["early_stop_min_delta"]["current"],
-        "patience":  BPR["early_stop_patience"]["current"],
-    },
-    "early_stop_every": BPR["early_stop_check_every"]["current"],
-}
+# Early stopping is off for BPR (dropped 2026-09-17): every run trains the full
+# n_epochs budget. Kept as an empty dict so call sites can still splat it.
+BPR_EARLY_STOP = {}
 
 
 # Convenience config: the architecture/optimizer knobs `runners/ablation_bpr.py`
@@ -585,8 +582,7 @@ BPR_EARLY_STOP = {
 # site passed 4096, which is exactly what this closes. Pair with BPR_EARLY_STOP;
 # `sampler`, `seed`, `name`, and `verbose` stay per-call.
 #
-# n_epochs is the NewBPR §5.2 budget ceiling (1000), not a target: early stopping
-# decides the actual stop epoch, which is data-dependent.
+# n_epochs is the NewBPR §5.2 budget (1000), trained in full.
 BPR_KWARGS = dict(
     k=BPR["k_embed_dim"]["current"],
     batch_size=BPR["batch_size"]["current"],

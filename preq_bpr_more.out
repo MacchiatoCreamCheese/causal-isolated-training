@@ -1,0 +1,320 @@
+
+##### BPR-m3-tunedper-arm / philadelphia / seed=42 #####
+[data] loaded 586,677 rows from /mnt/c/Users/nguye/uniyear/causal-isolated-training/data/philadelphia_dataset/Philadelphia.csv
+rating_threshold = 1.0
+exclude_unknowns = True
+/home/nguye/miniconda3/envs/leakage24/lib/python3.12/site-packages/cornac/data/dataset.py:335: UserWarning: 18484 duplicated observations are removed!
+  warnings.warn("%d duplicated observations are removed!" % dup_count)
+---
+Training data:
+Number of users = 32488
+Number of items = 10085
+Number of ratings = 450857
+Max rating = 5.0
+Min rating = 1.0
+Global mean = 3.8
+/home/nguye/miniconda3/envs/leakage24/lib/python3.12/site-packages/cornac/data/dataset.py:335: UserWarning: 674 duplicated observations are removed!
+  warnings.warn("%d duplicated observations are removed!" % dup_count)
+---
+Test data:
+Number of users = 32488
+Number of items = 10085
+Number of ratings = 26968
+Number of unknown users = 0
+Number of unknown items = 0
+/home/nguye/miniconda3/envs/leakage24/lib/python3.12/site-packages/cornac/data/dataset.py:335: UserWarning: 914 duplicated observations are removed!
+  warnings.warn("%d duplicated observations are removed!" % dup_count)
+---
+Validation data:
+Number of users = 32488
+Number of items = 10085
+Number of ratings = 37868
+---
+Total users = 32488
+Total items = 10085
+
+--- uniform ---  {'k': 256, 'batch_size': 4096, 'learning_rate': 0.1, 'lambda_u': 1e-05, 'lambda_i': 1e-05, 'lambda_j': 1e-05, 'n_epochs': 1000}
+  [uniform] batch 0: HR@20=0.04517 scored=4096
+  [uniform] batch 10: HR@20=0.04858 scored=4096
+  [uniform] batch 20: HR@20=0.05591 scored=4096
+  [uniform] batch 30: HR@20=0.04419 scored=4096
+  [uniform] batch 40: HR@20=0.04224 scored=4096
+  [uniform] batch 50: HR@20=0.04736 scored=4096
+  [uniform] batch 60: HR@20=0.04199 scored=4096
+  [uniform] batch 70: HR@20=0.03979 scored=4096
+  [uniform] batch 80: HR@20=0.04980 scored=4096
+[uniform] 89 points  rho=44.29%  (43.7s)
+
+--- causal ---  {'k': 256, 'batch_size': 4096, 'learning_rate': 0.05, 'lambda_u': 0.0001, 'lambda_i': 0.0001, 'lambda_j': 0.0001, 'n_epochs': 1000}
+  [causal] batch 0: HR@20=0.04419 scored=4096
+  [causal] batch 10: HR@20=0.03931 scored=4096
+  [causal] batch 20: HR@20=0.04712 scored=4096
+  [causal] batch 30: HR@20=0.04272 scored=4096
+  [causal] batch 40: HR@20=0.04517 scored=4096
+  [causal] batch 50: HR@20=0.04688 scored=4096
+  [causal] batch 60: HR@20=0.04004 scored=4096
+  [causal] batch 70: HR@20=0.03955 scored=4096
+  [causal] batch 80: HR@20=0.05371 scored=4096
+[causal] 89 points  rho=0.00%  (43.9s)
+[prequential] wrote /mnt/c/Users/nguye/uniyear/causal-isolated-training/research/results/prequential/bpr-m3-tunedper-arm_philadelphia_seed42.json
+
+##### BPR-m3-tunedper-arm / philadelphia / seed=123 #####
+[data] loaded 586,677 rows from /mnt/c/Users/nguye/uniyear/causal-isolated-training/data/philadelphia_dataset/Philadelphia.csv
+rating_threshold = 1.0
+exclude_unknowns = True
+---
+Training data:
+Number of users = 32488
+Number of items = 10085
+Number of ratings = 450857
+Max rating = 5.0
+Min rating = 1.0
+Global mean = 3.8
+---
+Test data:
+Number of users = 32488
+Number of items = 10085
+Number of ratings = 26968
+Number of unknown users = 0
+Number of unknown items = 0
+---
+Validation data:
+Number of users = 32488
+Number of items = 10085
+Number of ratings = 37868
+---
+Total users = 32488
+Total items = 10085
+
+--- uniform ---  {'k': 256, 'batch_size': 4096, 'learning_rate': 0.1, 'lambda_u': 0.0001, 'lambda_i': 0.0001, 'lambda_j': 0.0001, 'n_epochs': 1000}
+  [uniform] batch 0: HR@20=0.04199 scored=4096
+  [uniform] batch 10: HR@20=0.04541 scored=4096
+  [uniform] batch 20: HR@20=0.05444 scored=4096
+  [uniform] batch 30: HR@20=0.04565 scored=4096
+  [uniform] batch 40: HR@20=0.04468 scored=4096
+  [uniform] batch 50: HR@20=0.04541 scored=4096
+  [uniform] batch 60: HR@20=0.04004 scored=4096
+  [uniform] batch 70: HR@20=0.03760 scored=4096
+  [uniform] batch 80: HR@20=0.05249 scored=4096
+[uniform] 89 points  rho=44.29%  (43.3s)
+
+--- causal ---  {'k': 256, 'batch_size': 4096, 'learning_rate': 0.05, 'lambda_u': 0.0001, 'lambda_i': 0.0001, 'lambda_j': 0.0001, 'n_epochs': 1000}
+  [causal] batch 0: HR@20=0.04272 scored=4096
+  [causal] batch 10: HR@20=0.04321 scored=4096
+  [causal] batch 20: HR@20=0.04688 scored=4096
+  [causal] batch 30: HR@20=0.04272 scored=4096
+  [causal] batch 40: HR@20=0.04346 scored=4096
+  [causal] batch 50: HR@20=0.04858 scored=4096
+  [causal] batch 60: HR@20=0.03882 scored=4096
+  [causal] batch 70: HR@20=0.04248 scored=4096
+  [causal] batch 80: HR@20=0.05493 scored=4096
+[causal] 89 points  rho=0.00%  (43.4s)
+[prequential] wrote /mnt/c/Users/nguye/uniyear/causal-isolated-training/research/results/prequential/bpr-m3-tunedper-arm_philadelphia_seed123.json
+
+##### BPR-m3-tunedper-arm / baby / seed=42 #####
+[data] loaded 1,241,083 rows from /mnt/c/Users/nguye/uniyear/causal-isolated-training/data/baby_dataset/Baby_Products.csv
+rating_threshold = 1.0
+exclude_unknowns = True
+---
+Training data:
+Number of users = 141889
+Number of items = 30754
+Number of ratings = 1067381
+Max rating = 5.0
+Min rating = 1.0
+Global mean = 4.3
+---
+Test data:
+Number of users = 141889
+Number of items = 30754
+Number of ratings = 21883
+Number of unknown users = 0
+Number of unknown items = 0
+---
+Validation data:
+Number of users = 141889
+Number of items = 30754
+Number of ratings = 43813
+---
+Total users = 141889
+Total items = 30754
+
+--- uniform ---  {'k': 256, 'batch_size': 4096, 'learning_rate': 0.05, 'lambda_u': 0.0001, 'lambda_i': 0.0001, 'lambda_j': 0.0001, 'n_epochs': 1000}
+  [uniform] batch 0: HR@20=0.03003 scored=4096
+  [uniform] batch 10: HR@20=0.03223 scored=4096
+  [uniform] batch 20: HR@20=0.02637 scored=4096
+  [uniform] batch 30: HR@20=0.02832 scored=4096
+  [uniform] batch 40: HR@20=0.02686 scored=4096
+  [uniform] batch 50: HR@20=0.02417 scored=4096
+  [uniform] batch 60: HR@20=0.01636 scored=4096
+  [uniform] batch 70: HR@20=0.02173 scored=4096
+  [uniform] batch 80: HR@20=0.02002 scored=4096
+  [uniform] batch 90: HR@20=0.01807 scored=4096
+  [uniform] batch 100: HR@20=0.01440 scored=4096
+  [uniform] batch 110: HR@20=0.01880 scored=4096
+  [uniform] batch 120: HR@20=0.01636 scored=4096
+  [uniform] batch 130: HR@20=0.01440 scored=4096
+  [uniform] batch 140: HR@20=0.01367 scored=4096
+  [uniform] batch 150: HR@20=0.01245 scored=4096
+  [uniform] batch 160: HR@20=0.00854 scored=4096
+  [uniform] batch 170: HR@20=0.00781 scored=4096
+  [uniform] batch 180: HR@20=0.00952 scored=4096
+  [uniform] batch 190: HR@20=0.01025 scored=4096
+  [uniform] batch 200: HR@20=0.01099 scored=4096
+[uniform] 209 points  rho=54.18%  (264.2s)
+
+--- causal ---  {'k': 128, 'batch_size': 4096, 'learning_rate': 0.05, 'lambda_u': 0.0001, 'lambda_i': 0.0001, 'lambda_j': 0.0001, 'n_epochs': 1000}
+  [causal] batch 0: HR@20=0.02930 scored=4096
+  [causal] batch 10: HR@20=0.03589 scored=4096
+  [causal] batch 20: HR@20=0.02563 scored=4096
+  [causal] batch 30: HR@20=0.02002 scored=4096
+  [causal] batch 40: HR@20=0.02563 scored=4096
+  [causal] batch 50: HR@20=0.02295 scored=4096
+  [causal] batch 60: HR@20=0.01807 scored=4096
+  [causal] batch 70: HR@20=0.02075 scored=4096
+  [causal] batch 80: HR@20=0.01758 scored=4096
+  [causal] batch 90: HR@20=0.01904 scored=4096
+  [causal] batch 100: HR@20=0.01245 scored=4096
+  [causal] batch 110: HR@20=0.01172 scored=4096
+  [causal] batch 120: HR@20=0.01465 scored=4096
+  [causal] batch 130: HR@20=0.01514 scored=4096
+  [causal] batch 140: HR@20=0.01514 scored=4096
+  [causal] batch 150: HR@20=0.01196 scored=4096
+  [causal] batch 160: HR@20=0.00952 scored=4096
+  [causal] batch 170: HR@20=0.01172 scored=4096
+  [causal] batch 180: HR@20=0.00928 scored=4096
+  [causal] batch 190: HR@20=0.00708 scored=4096
+  [causal] batch 200: HR@20=0.01001 scored=4096
+[causal] 209 points  rho=0.00%  (189.7s)
+[prequential] wrote /mnt/c/Users/nguye/uniyear/causal-isolated-training/research/results/prequential/bpr-m3-tunedper-arm_baby_seed42.json
+
+##### BPR-m3-tunedper-arm / baby / seed=123 #####
+[data] loaded 1,241,083 rows from /mnt/c/Users/nguye/uniyear/causal-isolated-training/data/baby_dataset/Baby_Products.csv
+rating_threshold = 1.0
+exclude_unknowns = True
+---
+Training data:
+Number of users = 141889
+Number of items = 30754
+Number of ratings = 1067381
+Max rating = 5.0
+Min rating = 1.0
+Global mean = 4.3
+---
+Test data:
+Number of users = 141889
+Number of items = 30754
+Number of ratings = 21883
+Number of unknown users = 0
+Number of unknown items = 0
+---
+Validation data:
+Number of users = 141889
+Number of items = 30754
+Number of ratings = 43813
+---
+Total users = 141889
+Total items = 30754
+
+--- uniform ---  {'k': 256, 'batch_size': 4096, 'learning_rate': 0.05, 'lambda_u': 1e-05, 'lambda_i': 1e-05, 'lambda_j': 1e-05, 'n_epochs': 1000}
+  [uniform] batch 0: HR@20=0.02979 scored=4096
+  [uniform] batch 10: HR@20=0.03516 scored=4096
+  [uniform] batch 20: HR@20=0.02637 scored=4096
+  [uniform] batch 30: HR@20=0.02637 scored=4096
+  [uniform] batch 40: HR@20=0.02734 scored=4096
+  [uniform] batch 50: HR@20=0.02832 scored=4096
+  [uniform] batch 60: HR@20=0.02466 scored=4096
+  [uniform] batch 70: HR@20=0.02295 scored=4096
+  [uniform] batch 80: HR@20=0.01782 scored=4096
+  [uniform] batch 90: HR@20=0.01978 scored=4096
+  [uniform] batch 100: HR@20=0.01392 scored=4096
+  [uniform] batch 110: HR@20=0.01538 scored=4096
+  [uniform] batch 120: HR@20=0.01465 scored=4096
+  [uniform] batch 130: HR@20=0.01514 scored=4096
+  [uniform] batch 140: HR@20=0.01367 scored=4096
+  [uniform] batch 150: HR@20=0.01465 scored=4096
+  [uniform] batch 160: HR@20=0.01025 scored=4096
+  [uniform] batch 170: HR@20=0.01123 scored=4096
+  [uniform] batch 180: HR@20=0.01147 scored=4096
+  [uniform] batch 190: HR@20=0.00879 scored=4096
+  [uniform] batch 200: HR@20=0.01172 scored=4096
+[uniform] 209 points  rho=54.24%  (257.9s)
+
+--- causal ---  {'k': 256, 'batch_size': 4096, 'learning_rate': 0.05, 'lambda_u': 1e-05, 'lambda_i': 1e-05, 'lambda_j': 1e-05, 'n_epochs': 1000}
+  [causal] batch 0: HR@20=0.02856 scored=4096
+  [causal] batch 10: HR@20=0.03320 scored=4096
+  [causal] batch 20: HR@20=0.02710 scored=4096
+  [causal] batch 30: HR@20=0.02344 scored=4096
+  [causal] batch 40: HR@20=0.02588 scored=4096
+  [causal] batch 50: HR@20=0.02832 scored=4096
+  [causal] batch 60: HR@20=0.02271 scored=4096
+  [causal] batch 70: HR@20=0.02002 scored=4096
+  [causal] batch 80: HR@20=0.01685 scored=4096
+  [causal] batch 90: HR@20=0.01904 scored=4096
+  [causal] batch 100: HR@20=0.01343 scored=4096
+  [causal] batch 110: HR@20=0.01489 scored=4096
+  [causal] batch 120: HR@20=0.01270 scored=4096
+  [causal] batch 130: HR@20=0.01440 scored=4096
+  [causal] batch 140: HR@20=0.01367 scored=4096
+  [causal] batch 150: HR@20=0.01343 scored=4096
+  [causal] batch 160: HR@20=0.01001 scored=4096
+  [causal] batch 170: HR@20=0.01123 scored=4096
+  [causal] batch 180: HR@20=0.01147 scored=4096
+  [causal] batch 190: HR@20=0.00806 scored=4096
+  [causal] batch 200: HR@20=0.01245 scored=4096
+[causal] 209 points  rho=0.00%  (251.3s)
+[prequential] wrote /mnt/c/Users/nguye/uniyear/causal-isolated-training/research/results/prequential/bpr-m3-tunedper-arm_baby_seed123.json
+[skip] BPR-m3-tunedper-arm musical seed=42 already done
+
+##### BPR-m3-tunedper-arm / musical / seed=123 #####
+[data] loaded 511,836 rows from /mnt/c/Users/nguye/uniyear/causal-isolated-training/data/musical_dataset/Musical_Instruments.csv
+rating_threshold = 1.0
+exclude_unknowns = True
+---
+Training data:
+Number of users = 54483
+Number of items = 22753
+Number of ratings = 427957
+Max rating = 5.0
+Min rating = 1.0
+Global mean = 4.5
+---
+Test data:
+Number of users = 54483
+Number of items = 22753
+Number of ratings = 19760
+Number of unknown users = 0
+Number of unknown items = 0
+---
+Validation data:
+Number of users = 54483
+Number of items = 22753
+Number of ratings = 30360
+---
+Total users = 54483
+Total items = 22753
+
+--- uniform ---  {'k': 128, 'batch_size': 4096, 'learning_rate': 0.05, 'lambda_u': 0.001, 'lambda_i': 0.001, 'lambda_j': 0.001, 'n_epochs': 1000}
+  [uniform] batch 0: HR@20=0.02954 scored=4096
+  [uniform] batch 10: HR@20=0.02441 scored=4096
+  [uniform] batch 20: HR@20=0.02002 scored=4096
+  [uniform] batch 30: HR@20=0.01636 scored=4096
+  [uniform] batch 40: HR@20=0.00952 scored=4096
+  [uniform] batch 50: HR@20=0.00879 scored=4096
+  [uniform] batch 60: HR@20=0.01050 scored=4096
+  [uniform] batch 70: HR@20=0.01099 scored=4096
+  [uniform] batch 80: HR@20=0.00952 scored=4096
+[uniform] 84 points  rho=48.74%  (57.1s)
+
+--- causal ---  {'k': 256, 'batch_size': 4096, 'learning_rate': 0.01, 'lambda_u': 0.0001, 'lambda_i': 0.0001, 'lambda_j': 0.0001, 'n_epochs': 1000}
+  [causal] batch 0: HR@20=0.00122 scored=4096
+  [causal] batch 10: HR@20=0.00122 scored=4096
+  [causal] batch 20: HR@20=0.00073 scored=4096
+  [causal] batch 30: HR@20=0.00171 scored=4096
+  [causal] batch 40: HR@20=0.00220 scored=4096
+  [causal] batch 50: HR@20=0.00024 scored=4096
+  [causal] batch 60: HR@20=0.00049 scored=4096
+  [causal] batch 70: HR@20=0.00073 scored=4096
+  [causal] batch 80: HR@20=0.00122 scored=4096
+[causal] 84 points  rho=0.00%  (75.0s)
+[prequential] wrote /mnt/c/Users/nguye/uniyear/causal-isolated-training/research/results/prequential/bpr-m3-tunedper-arm_musical_seed123.json

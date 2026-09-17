@@ -34,6 +34,7 @@
       "counterfactual_rate": 0.0,
       "collision_rate": 2.4636279169571405e-06
     },
-    "wall_seconds": 427.17987155914307
+    "wall_seconds": 427.17987155914307,
+    "epochs": 27
   }
 }

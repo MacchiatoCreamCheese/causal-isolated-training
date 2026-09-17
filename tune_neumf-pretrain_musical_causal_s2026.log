@@ -172,3 +172,33 @@ NeuMF/tune/musical/causal/s2026 |      0.0455 |  0.0107 |    0.0239 |  256.8962 
 
 === neumf [musical x causal x seed=2026] winner: {'num_factors': 64, 'mlp_hidden_count': 4, 'learning_rate': 0.0005, 'num_neg': 4, 'batch_size': 512}  val NDCG@20=0.0145  test=0.0120 ===
 
+
+=== Tuning neumf on musical x causal x seed=2026, selecting on validation NDCG@20 ===
+    -> /mnt/c/Users/nguye/uniyear/causal-isolated-training/research/results/tuning/neumf-pretrain/musical/causal/seed2026
+[baseline] cached: val NDCG@20=0.0084
+
+--- knob: num_factors  grid=[16, 32, 64]  (default carries metric=0.0084) ---
+[skip] num_factors=16  val NDCG@20=0.0103  [cached]
+[skip] num_factors=32  val NDCG@20=0.0113  [cached]
+[skip] num_factors=64  val NDCG@20=0.0121  [cached]
+[winner@num_factors] num_factors=64  NDCG@20=0.0121
+
+--- knob: mlp_hidden_count  grid=[4]  (default carries metric=0.0121) ---
+[skip] mlp_hidden_count=4  val NDCG@20=0.0125  [cached]
+[winner@mlp_hidden_count] mlp_hidden_count=4  NDCG@20=0.0125
+
+--- knob: learning_rate  grid=[0.0001, 0.0005, 0.005]  (default carries metric=0.0125) ---
+[skip] learning_rate=0.0001  val NDCG@20=0.0094  [cached]
+[skip] learning_rate=0.0005  val NDCG@20=0.0131  [cached]
+[skip] learning_rate=0.005  val NDCG@20=0.0102  [cached]
+[winner@learning_rate] learning_rate=0.0005  NDCG@20=0.0131
+
+--- knob: batch_size  grid=[128, 512, 1024]  (default carries metric=0.0131) ---
+[skip] batch_size=128  val NDCG@20=0.0119  [cached]
+[skip] batch_size=512  val NDCG@20=0.0145  [cached]
+[skip] batch_size=1024  val NDCG@20=0.0132  [cached]
+[winner@batch_size] batch_size=512  NDCG@20=0.0145
+[users] winner per-user scores already saved
+
+=== neumf [musical x causal x seed=2026] winner: {'num_factors': 64, 'mlp_hidden_count': 4, 'learning_rate': 0.0005, 'num_neg': 4, 'batch_size': 512}  val NDCG@20=0.0145  test=0.0120 ===
+

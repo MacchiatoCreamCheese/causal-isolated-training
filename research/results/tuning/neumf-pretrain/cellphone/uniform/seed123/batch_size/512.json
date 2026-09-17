@@ -1,0 +1,36 @@
+{
+  "knob": "batch_size",
+  "value": 512,
+  "probes": {
+    "counterfactual_rate": 0.4405996760801854,
+    "collision_rate": 0.0
+  },
+  "config": {
+    "num_factors": 32,
+    "mlp_hidden_count": 3,
+    "learning_rate": 0.0001,
+    "num_neg": 4,
+    "batch_size": 512
+  },
+  "select_split": "validation",
+  "val_metrics": {
+    "HitRatio@20": 0.013611321162363616,
+    "NDCG@20": 0.0037868863705159544,
+    "Recall@20": 0.008825320840234846,
+    "Time (s)": 694.8833458423615
+  },
+  "test_metrics": {
+    "HitRatio@20": 0.010898737849992747,
+    "NDCG@20": 0.003330555189571081,
+    "Recall@20": 0.007945202868041245,
+    "Train (s)": 4237.80300116539,
+    "Test (s)": 415.26760935783386
+  },
+  "metrics": {
+    "HitRatio@20": 0.013611321162363616,
+    "NDCG@20": 0.0037868863705159544,
+    "Recall@20": 0.008825320840234846,
+    "Time (s)": 694.8833458423615
+  },
+  "wall_seconds": 5351.146954774857
+}
