@@ -34,6 +34,7 @@
     "probes": {
       "counterfactual_rate": 0.2872946962313041,
       "collision_rate": 3.75931892870087e-08
-    }
+    },
+    "epochs": 354
   }
 }

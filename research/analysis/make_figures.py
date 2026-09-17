@@ -10,6 +10,7 @@ Run: python -m research.analysis.make_figures [fig_name ...]
 """
 
 import csv
+import json
 import sys
 from collections import Counter
 
@@ -275,6 +276,65 @@ def fig_item_cohorts():
     save(fig, "item_cohorts")
 
 
+#: The four ablation steps, in order, as `mecha2/runner.ARMS` names them, with the
+#: labels the paper uses.
+STEPS = [("uniform", "uniform"), ("causal", "past-only"),
+         ("causal+coherent", "+coherent"), ("causal+temporal", "+temporal")]
+
+
+def _load_ablation_cells():
+    """Every finished four-step cell: {(model, dataset, seed): {step: metrics}}.
+
+    Reads the per-cell JSON the ablation runner writes. Cells still in flight have
+    fewer than four steps recorded and are skipped, so the figure only ever shows
+    what actually completed.
+    """
+    cells = {}
+    for path in sorted((RESULTS_DIR / "ablation").glob("*tunedper-arm*.json")):
+        with open(path, encoding="utf-8") as f:
+            j = json.load(f)
+        recipes = j.get("recipes", {})
+        if not all(name in recipes for name, _ in STEPS):
+            print(f"  skipping {path.name}: {len(recipes)}/4 steps so far")
+            continue
+        model = j["model"].split("-m2")[0]
+        cells[(model, j["dataset"], j["seed"])] = recipes
+    return cells
+
+
+def fig_ablation_steps(metrics=("NDCG@20", "HitRatio@20")):
+    """The cumulative ablation, one line per finished cell.
+
+    Each line walks the four steps left to right, so the shape is the result: the
+    lift from the past-only pool is the first segment, and whether time-coherent
+    or chronological batches add anything is the rest. Values are test metrics at
+    each step's own tuned hyperparameters (steps 1-2 from tuning, 3-4 trained).
+    """
+    cells = _load_ablation_cells()
+    if not cells:
+        print("  no finished ablation cells yet, skipping")
+        return
+
+    x = np.arange(len(STEPS))
+    fig, axes = plt.subplots(1, len(metrics), figsize=(7.0, 2.8))
+    axes = np.atleast_1d(axes)
+    for ax, metric in zip(axes, metrics):
+        for i, ((model, ds, seed), recipes) in enumerate(sorted(cells.items())):
+            y = [recipes[name][metric] for name, _ in STEPS]
+            ax.plot(x, y, marker="o", lw=1.4,
+                    label=f"{model} / {ds} / seed {seed}")
+            # Steps 1-2 come from tuning, 3-4 are trained here: mark the seam so
+            # the reader knows where the hyperparameters stop changing.
+            ax.axvline(1.5, color="#999999", lw=0.6, ls=":", zorder=0)
+        ax.set_xticks(x)
+        ax.set_xticklabels([label for _, label in STEPS], rotation=20, ha="right")
+        ax.set_ylabel(f"test {metric}")
+        ax.margins(y=0.15)
+    axes[0].legend(loc="best", frameon=False, fontsize=6)
+    fig.tight_layout()
+    save(fig, "ablation_steps")
+
+
 def _rolling(a, w):
     """Centred rolling mean, with the window shrinking at the edges.
 
@@ -363,6 +423,7 @@ def fig_prequential(metric="HitRatio@20", window=9):
 
 ALL_FIGS = {
     "item_cohorts":          fig_item_cohorts,
+    "ablation_steps":        fig_ablation_steps,
     "three_model_ablation":  fig_three_model_ablation,
     "counterfactual_rate":   fig_counterfactual_rate,
     "prequential":           fig_prequential,

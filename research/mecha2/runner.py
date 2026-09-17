@@ -93,6 +93,22 @@ def per_user_path(label, ds_name, seed, rung):
     return PER_USER_DIR / f"{label.lower()}_{ds_name}_seed{seed}_{rung}.npz"
 
 
+def _winner_epochs(model_name, ds_name, arm, seed):
+    """How many epochs that arm's tuning winner trained for, if it is recorded.
+
+    `runners/winner_epochs.py` stamps this from the tuning logs. Absent for
+    winners whose log this machine does not have, in which case the caller falls
+    back to early stopping.
+    """
+    wpath = winner_dir(model_name, ds_name, arm, seed) / "winner.json"
+    if not wpath.exists():
+        return None
+    with open(wpath, encoding="utf-8-sig") as f:
+        winner = json.load(f)
+    epochs = (winner.get("users_run") or {}).get("epochs")
+    return int(epochs) if epochs else None
+
+
 def _build(model_name, ds_name, rung, seed, tuned_as, neg_sampling):
     """Model plus the exact kwargs it was built from, for the provenance stamp."""
     kwargs = KWARGS_FOR[model_name](ds_name, tuned_as, seed)
@@ -108,8 +124,22 @@ def _build(model_name, ds_name, rung, seed, tuned_as, neg_sampling):
         # TemporalBPR, not BPRMiniBatch: our BPR batches itself, so it only picks
         # up batch order through the `_epoch_batches` seam. See mecha2/bpr.py.
         from .bpr import TemporalBPR
+        # Equal budget, not equal stopping rule. Early stopping quits when the
+        # validation curve flattens, and reordering the batches flattens it
+        # sooner: on musical/causal/s123 the winner trained 198 epochs and both
+        # reordered steps stopped at 41, which loses on training length alone
+        # and confounds the one variable this ablation is supposed to isolate.
+        # So when the winner's epoch count is known, the trained steps run that
+        # many epochs with early stopping off. Without it we cannot equalize, and
+        # the old behaviour (each step stops on its own rule) stands.
+        epochs = _winner_epochs(model_name, ds_name, tuned_as, seed)
+        if epochs and rung not in FROM_TUNING:
+            kwargs = {**kwargs, "n_epochs": epochs}
+            stopping = {}
+        else:
+            stopping = BPR_EARLY_STOP
         model = TemporalBPR(name=f"BPR-m2/{ds_name}/{rung}/s{seed}",
-                            **kwargs, **BPR_EARLY_STOP,
+                            **kwargs, **stopping,
                             sampler=neg_sampling, seed=seed, verbose=False)
     else:
         raise SystemExit(
@@ -149,6 +179,14 @@ def run_one(model_name: str, label: str, ds_name: str, seed: int) -> None:
                "batch_order": order, "neg_sampling": neg}
         for rung, neg, order, tuned_as in ARMS
     }
+    # The equal-budget epoch count belongs in the recorded config too, or a cell
+    # trained under early stopping would look cached to `load_partial` and the
+    # two protocols would mix inside one table row.
+    if model_name == "bpr":
+        for rung, neg, order, tuned_as in ARMS:
+            epochs = _winner_epochs(model_name, ds_name, tuned_as, seed)
+            if epochs and rung not in FROM_TUNING:
+                configs[rung]["n_epochs"] = epochs
 
     recipes_out = load_partial(label, ds_name, seed, configs)
     for rung in list(recipes_out):

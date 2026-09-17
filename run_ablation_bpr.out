@@ -1,0 +1,11 @@
+nohup: ignoring input
+[run_ablation] bpr | env=leakage24 | data=/mnt/c/Users/nguye/uniyear/causal-isolated-training/data | Thu Sep 17 02:09:00 +07 2026
+[run_ablation] cornac 2.6.0 | torch 2.4.1+cu121
+[run_ablation] musical/seed42 -> ablation_bpr_musical_s42.log  (02:09)
+[run_ablation] philadelphia/seed42 -> ablation_bpr_philadelphia_s42.log  (02:59)
+[run_ablation] baby/seed42 -> ablation_bpr_baby_s42.log  (05:32)
+[run_ablation] musical/seed123 -> ablation_bpr_musical_s123.log  (06:11)
+[run_ablation] philadelphia/seed123 -> ablation_bpr_philadelphia_s123.log  (06:57)
+[run_ablation] baby/seed123 -> ablation_bpr_baby_s123.log  (09:24)
+[run_ablation] musical/seed2026 -> ablation_bpr_musical_s2026.log  (10:46)
+[run_ablation] philadelphia/seed2026 -> ablation_bpr_philadelphia_s2026.log  (11:43)

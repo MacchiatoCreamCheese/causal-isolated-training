@@ -1,0 +1,103 @@
+{
+  "model": "BPR-m2-tunedper-arm",
+  "dataset": "baby",
+  "seed": 42,
+  "recipes": {
+    "uniform": {
+      "HitRatio@20": 0.025522411867921518,
+      "NDCG@20": 0.0066930966736123065,
+      "Recall@20": 0.01482657043343733,
+      "Train (s)": 1347.2822196483612,
+      "Test (s)": 11.761134147644043,
+      "counterfactual_rate": 0.38434857066232925,
+      "collision_rate": 0.0,
+      "from_tuning": 1.0
+    },
+    "causal": {
+      "HitRatio@20": 0.0327803477428617,
+      "NDCG@20": 0.010088429482304631,
+      "Recall@20": 0.01970006044062091,
+      "Train (s)": 408.11255049705505,
+      "Test (s)": 6.681934356689453,
+      "counterfactual_rate": 0.0,
+      "collision_rate": 2.4636279169571405e-06,
+      "from_tuning": 1.0
+    },
+    "causal+coherent": {
+      "HitRatio@20": 0.03341840803955974,
+      "NDCG@20": 0.009615801755139545,
+      "Recall@20": 0.019769841375601054,
+      "Train (s)": 1022.8465292453766,
+      "Test (s)": 21.366315603256226,
+      "counterfactual_rate": 0.0,
+      "collision_rate": 1.8737451762772618e-06,
+      "from_tuning": 0.0
+    },
+    "causal+temporal": {
+      "HitRatio@20": 0.03995852608071463,
+      "NDCG@20": 0.010892162888720774,
+      "Recall@20": 0.024675552855180895,
+      "Train (s)": 1180.626412153244,
+      "Test (s)": 21.368190050125122,
+      "counterfactual_rate": 0.0,
+      "collision_rate": 2.326028494689015e-06,
+      "from_tuning": 0.0
+    }
+  },
+  "configs": {
+    "uniform": {
+      "batch_order": "shuffle",
+      "batch_size": 4096,
+      "k": 256,
+      "lambda_i": 0.0001,
+      "lambda_j": 0.0001,
+      "lambda_u": 0.0001,
+      "learning_rate": 0.05,
+      "n_epochs": 1000,
+      "neg_sampling": "uniform"
+    },
+    "causal": {
+      "batch_order": "shuffle",
+      "batch_size": 4096,
+      "k": 128,
+      "lambda_i": 0.0001,
+      "lambda_j": 0.0001,
+      "lambda_u": 0.0001,
+      "learning_rate": 0.05,
+      "n_epochs": 1000,
+      "neg_sampling": "causal"
+    },
+    "causal+coherent": {
+      "batch_order": "coherent",
+      "batch_size": 4096,
+      "k": 128,
+      "lambda_i": 0.0001,
+      "lambda_j": 0.0001,
+      "lambda_u": 0.0001,
+      "learning_rate": 0.05,
+      "n_epochs": 1000,
+      "neg_sampling": "causal"
+    },
+    "causal+temporal": {
+      "batch_order": "temporal",
+      "batch_size": 4096,
+      "k": 128,
+      "lambda_i": 0.0001,
+      "lambda_j": 0.0001,
+      "lambda_u": 0.0001,
+      "learning_rate": 0.05,
+      "n_epochs": 1000,
+      "neg_sampling": "causal"
+    }
+  },
+  "env": {
+    "cornac": "2.6.0",
+    "numpy": "2.4.4",
+    "scipy": "1.17.1",
+    "torch": "2.4.1+cu121",
+    "device": "NVIDIA GeForce RTX 4050 Laptop GPU",
+    "git_commit": "8f2b135",
+    "tuned_arm": "per_arm",
+    "neumf_pretrain": false
+  }
+}

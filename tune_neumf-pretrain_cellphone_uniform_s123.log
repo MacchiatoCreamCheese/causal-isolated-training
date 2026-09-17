@@ -112,3 +112,67 @@ TEST:
 NeuMF/tune/cellphone/uniform/s123 |      0.0109 |  0.0034 |    0.0079 | 7738.0685 | 388.6765
 
 [run]  learning_rate=0.0005  val NDCG@20=0.0038  test=0.0034  (8779.1s)
+
+VALIDATION:
+...
+                                  | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/cellphone/uniform/s123 |      0.0116 |  0.0034 |    0.0075 | 675.9665
+
+TEST:
+...
+                                  | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/cellphone/uniform/s123 |      0.0090 |  0.0027 |    0.0064 | 7923.8140 | 401.3643
+
+[run]  learning_rate=0.005  val NDCG@20=0.0034  test=0.0027  (9006.6s)
+[winner@learning_rate] learning_rate=0.0001  NDCG@20=0.0039
+
+--- knob: batch_size  grid=[128, 512, 1024]  (default carries metric=0.0039) ---
+
+VALIDATION:
+...
+                                  | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/cellphone/uniform/s123 |      0.0124 |  0.0035 |    0.0080 | 695.6159
+
+TEST:
+...
+                                  | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+--------------------------------- + ----------- + ------- + --------- + ---------- + --------
+NeuMF/tune/cellphone/uniform/s123 |      0.0098 |  0.0030 |    0.0072 | 16171.7669 | 415.8497
+
+[run]  batch_size=128  val NDCG@20=0.0035  test=0.0030  (17288.8s)
+
+VALIDATION:
+...
+                                  | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/cellphone/uniform/s123 |      0.0136 |  0.0038 |    0.0088 | 694.8833
+
+TEST:
+...
+                                  | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/cellphone/uniform/s123 |      0.0109 |  0.0033 |    0.0079 | 4237.8030 | 415.2676
+
+[run]  batch_size=512  val NDCG@20=0.0038  test=0.0033  (5351.1s)
+
+VALIDATION:
+...
+                                  | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/cellphone/uniform/s123 |      0.0151 |  0.0042 |    0.0099 | 692.7037
+
+TEST:
+...
+                                  | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/cellphone/uniform/s123 |      0.0118 |  0.0037 |    0.0084 | 2278.1225 | 418.4790
+
+[run]  batch_size=1024  val NDCG@20=0.0042  test=0.0037  (3392.2s)
+[winner@batch_size] batch_size=1024  NDCG@20=0.0042
+[users] winner per-user scores from batch_size/1024.json
+
+=== neumf [cellphone x uniform x seed=123] winner: {'num_factors': 32, 'mlp_hidden_count': 3, 'learning_rate': 0.0001, 'num_neg': 4, 'batch_size': 1024}  val NDCG@20=0.0042  test=0.0037 ===
+

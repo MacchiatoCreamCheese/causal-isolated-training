@@ -1,0 +1,82 @@
+{
+  "model": "BPR-m2-tunedper-arm",
+  "dataset": "philadelphia",
+  "seed": 2026,
+  "recipes": {
+    "uniform": {
+      "HitRatio@20": 0.19420215495125706,
+      "NDCG@20": 0.0661212092949845,
+      "Recall@20": 0.08111580598567532,
+      "Train (s)": 2325.112058877945,
+      "Test (s)": 2.305424928665161,
+      "counterfactual_rate": 0.2873525732497157,
+      "collision_rate": 4.349016015555908e-08,
+      "from_tuning": 1.0
+    },
+    "causal": {
+      "HitRatio@20": 0.17945100051308363,
+      "NDCG@20": 0.05846761959369855,
+      "Recall@20": 0.07387747331344717,
+      "Train (s)": 1631.6030912399292,
+      "Test (s)": 2.9714648723602295,
+      "counterfactual_rate": 0.0,
+      "collision_rate": 3.147031564252996e-05,
+      "from_tuning": 1.0
+    },
+    "causal+coherent": {
+      "HitRatio@20": 0.18137506413545407,
+      "NDCG@20": 0.05924801770246868,
+      "Recall@20": 0.07595561967485885,
+      "Train (s)": 2926.087620973587,
+      "Test (s)": 7.530299186706543,
+      "counterfactual_rate": 0.0,
+      "collision_rate": 3.088321362090033e-05,
+      "from_tuning": 0.0
+    }
+  },
+  "configs": {
+    "uniform": {
+      "batch_order": "shuffle",
+      "batch_size": 4096,
+      "k": 256,
+      "lambda_i": 0.0001,
+      "lambda_j": 0.0001,
+      "lambda_u": 0.0001,
+      "learning_rate": 0.05,
+      "n_epochs": 1000,
+      "neg_sampling": "uniform"
+    },
+    "causal": {
+      "batch_order": "shuffle",
+      "batch_size": 4096,
+      "k": 256,
+      "lambda_i": 1e-05,
+      "lambda_j": 1e-05,
+      "lambda_u": 1e-05,
+      "learning_rate": 0.1,
+      "n_epochs": 1000,
+      "neg_sampling": "causal"
+    },
+    "causal+coherent": {
+      "batch_order": "coherent",
+      "batch_size": 4096,
+      "k": 256,
+      "lambda_i": 1e-05,
+      "lambda_j": 1e-05,
+      "lambda_u": 1e-05,
+      "learning_rate": 0.1,
+      "n_epochs": 1000,
+      "neg_sampling": "causal"
+    }
+  },
+  "env": {
+    "cornac": "2.6.0",
+    "numpy": "2.4.4",
+    "scipy": "1.17.1",
+    "torch": "2.4.1+cu121",
+    "device": "NVIDIA GeForce RTX 4050 Laptop GPU",
+    "git_commit": "ae00cff",
+    "tuned_arm": "per_arm",
+    "neumf_pretrain": false
+  }
+}

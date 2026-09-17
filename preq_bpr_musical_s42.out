@@ -1,0 +1,53 @@
+
+##### BPR-m3-tunedper-arm / musical / seed=42 #####
+[data] loaded 511,836 rows from /mnt/c/Users/nguye/uniyear/causal-isolated-training/data/musical_dataset/Musical_Instruments.csv
+rating_threshold = 1.0
+exclude_unknowns = True
+---
+Training data:
+Number of users = 54483
+Number of items = 22753
+Number of ratings = 427957
+Max rating = 5.0
+Min rating = 1.0
+Global mean = 4.5
+---
+Test data:
+Number of users = 54483
+Number of items = 22753
+Number of ratings = 19760
+Number of unknown users = 0
+Number of unknown items = 0
+---
+Validation data:
+Number of users = 54483
+Number of items = 22753
+Number of ratings = 30360
+---
+Total users = 54483
+Total items = 22753
+
+--- uniform ---  {'k': 256, 'batch_size': 4096, 'learning_rate': 0.05, 'lambda_u': 0.001, 'lambda_i': 0.001, 'lambda_j': 0.001, 'n_epochs': 1000}
+  [uniform] batch 0: HR@20=0.02783 scored=4096
+  [uniform] batch 10: HR@20=0.02466 scored=4096
+  [uniform] batch 20: HR@20=0.02051 scored=4096
+  [uniform] batch 30: HR@20=0.01562 scored=4096
+  [uniform] batch 40: HR@20=0.01196 scored=4096
+  [uniform] batch 50: HR@20=0.01270 scored=4096
+  [uniform] batch 60: HR@20=0.01001 scored=4096
+  [uniform] batch 70: HR@20=0.01196 scored=4096
+  [uniform] batch 80: HR@20=0.01025 scored=4096
+[uniform] 84 points  rho=48.80%  (72.7s)
+
+--- causal ---  {'k': 256, 'batch_size': 4096, 'learning_rate': 0.05, 'lambda_u': 1e-06, 'lambda_i': 1e-06, 'lambda_j': 1e-06, 'n_epochs': 1000}
+  [causal] batch 0: HR@20=0.02661 scored=4096
+  [causal] batch 10: HR@20=0.02441 scored=4096
+  [causal] batch 20: HR@20=0.02075 scored=4096
+  [causal] batch 30: HR@20=0.01562 scored=4096
+  [causal] batch 40: HR@20=0.01343 scored=4096
+  [causal] batch 50: HR@20=0.01270 scored=4096
+  [causal] batch 60: HR@20=0.00952 scored=4096
+  [causal] batch 70: HR@20=0.01392 scored=4096
+  [causal] batch 80: HR@20=0.01074 scored=4096
+[causal] 84 points  rho=0.00%  (71.2s)
+[prequential] wrote /mnt/c/Users/nguye/uniyear/causal-isolated-training/research/results/prequential/bpr-m3-tunedper-arm_musical_seed42.json
