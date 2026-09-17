@@ -92,3 +92,20 @@ TEST:
 BPR/tune/cellphone/uniform/s123 |      0.0116 |  0.0032 |    0.0080 | 77638.3538 | 269.7082
 
 [run]  learning_rate=0.001  val NDCG@20=0.0038  test=0.0032  (78351.4s)
+Early stopping:
+- best epoch = 24, stopped epoch = 37
+- best monitored value = 0.003867 (delta = -0.000780)
+
+VALIDATION:
+...
+                                | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/cellphone/uniform/s123 |      0.0122 |  0.0031 |    0.0076 | 419.8652
+
+TEST:
+...
+                                | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+------------------------------- + ----------- + ------- + --------- + ---------- + --------
+BPR/tune/cellphone/uniform/s123 |      0.0098 |  0.0027 |    0.0066 | 15829.9460 | 268.0673
+
+[run]  learning_rate=0.01  val NDCG@20=0.0031  test=0.0027  (16518.9s)
