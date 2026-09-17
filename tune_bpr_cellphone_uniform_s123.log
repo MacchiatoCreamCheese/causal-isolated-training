@@ -75,3 +75,20 @@ BPR/tune/cellphone/uniform/s123 |      0.0137 |  0.0045 |    0.0098 | 36882.3168
 [winner@k_embed_dim] k_embed_dim=256  NDCG@20=0.0059
 
 --- knob: learning_rate  grid=[0.001, 0.01, 0.1]  (default carries metric=0.0059) ---
+Early stopping:
+- best epoch = 166, stopped epoch = 179
+- best monitored value = 0.003781 (delta = -0.000001)
+
+VALIDATION:
+...
+                                | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/cellphone/uniform/s123 |      0.0142 |  0.0038 |    0.0091 | 442.0878
+
+TEST:
+...
+                                | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+------------------------------- + ----------- + ------- + --------- + ---------- + --------
+BPR/tune/cellphone/uniform/s123 |      0.0116 |  0.0032 |    0.0080 | 77638.3538 | 269.7082
+
+[run]  learning_rate=0.001  val NDCG@20=0.0038  test=0.0032  (78351.4s)
