@@ -38,3 +38,20 @@ TEST:
 LightGCN/tune/cellphone/uniform/s2026 |      0.0092 |  0.0030 |    0.0067 | 15685.0809 | 114.3043
 
 [run]  num_layers=1  val NDCG@20=0.0040  test=0.0030  (15979.2s)
+Early stopping:
+- best epoch = 7, stopped epoch = 57
+- best monitored value = 0.015686 (delta = -0.004421)
+
+VALIDATION:
+...
+                                      | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------------------- + ----------- + ------- + --------- + --------
+LightGCN/tune/cellphone/uniform/s2026 |      0.0172 |  0.0051 |    0.0113 | 183.8350
+
+TEST:
+...
+                                      | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+------------------------------------- + ----------- + ------- + --------- + ---------- + --------
+LightGCN/tune/cellphone/uniform/s2026 |      0.0140 |  0.0044 |    0.0099 | 18410.2985 | 111.1619
+
+[run]  num_layers=2  val NDCG@20=0.0051  test=0.0044  (18705.9s)
