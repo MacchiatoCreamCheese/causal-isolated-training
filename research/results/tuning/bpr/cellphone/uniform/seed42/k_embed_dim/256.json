@@ -1,31 +1,37 @@
 {
   "knob": "k_embed_dim",
   "value": 256,
+  "probes": {
+    "counterfactual_rate": 0.44058661131433124,
+    "collision_rate": 0.0
+  },
   "config": {
     "k_embed_dim": 256,
     "learning_rate": 0.05,
     "lambda_shared": 0.0001,
     "batch_size": 4096,
-    "n_epochs": 1000
-  },
-  "metrics": {
-    "HitRatio@20": 0.0187,
-    "NDCG@20": 0.0058,
-    "Recall@20": 0.0121
-  },
-  "wall_seconds": 27880.078155994415,
-  "test_metrics": {
-    "HitRatio@20": 0.0133106049615552,
-    "NDCG@20": 0.004469445484298375,
-    "Recall@20": 0.0095641360832842,
-    "Train (s)": 27206.735086917877,
-    "Test (s)": 251.50952696800232
-  },
-  "val_metrics": {
-    "HitRatio@20": 0.0187,
-    "NDCG@20": 0.0058,
-    "Recall@20": 0.0121
+    "n_epochs": 1000,
+    "early_stopping": "off"
   },
   "select_split": "validation",
-  "val_metrics_source": "backfilled from tune_bpr_cellphone_uniform.log, 4 d.p."
+  "val_metrics": {
+    "HitRatio@20": 0.019585178783623203,
+    "NDCG@20": 0.006140879890714457,
+    "Recall@20": 0.012755114455719427,
+    "Time (s)": 420.3914031982422
+  },
+  "test_metrics": {
+    "HitRatio@20": 0.014416799651820687,
+    "NDCG@20": 0.004982850899139296,
+    "Recall@20": 0.01056161050632464,
+    "Train (s)": 13966.087721347809,
+    "Test (s)": 253.58382511138916
+  },
+  "metrics": {
+    "HitRatio@20": 0.019585178783623203,
+    "NDCG@20": 0.006140879890714457,
+    "Recall@20": 0.012755114455719427,
+    "Time (s)": 420.3914031982422
+  },
+  "wall_seconds": 14641.232331514359
 }
