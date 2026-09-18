@@ -197,3 +197,190 @@ BPR/tune/musical/uniform/s42 |      0.0533 |  0.0133 |    0.0292 |  645.4694 |  
 
 === bpr [musical x uniform x seed=42] winner: {'k_embed_dim': 256, 'learning_rate': 0.05, 'lambda_shared': 0.001, 'batch_size': 4096, 'n_epochs': 1000}  val NDCG@20=0.0163  test=0.0133 ===
 
+
+=== Tuning bpr on musical x uniform x seed=42, selecting on validation NDCG@20 ===
+    -> /home/trustrs/causal-isolated-training/research/results/tuning/bpr/musical/uniform/seed42
+[stale] baseline: selected on test or trained at another config; re-running
+[baseline] running with defaults: {'k_embed_dim': 64, 'learning_rate': 0.05, 'lambda_shared': 0.0001, 'batch_size': 4096, 'n_epochs': 1000, 'early_stopping': 'off'}
+
+=== Tuning bpr on musical x uniform x seed=42, selecting on validation NDCG@20 ===
+    -> /home/trustrs/causal-isolated-training/research/results/tuning/bpr/musical/uniform/seed42
+[stale] baseline: selected on test or trained at another config; re-running
+[baseline] running with defaults: {'k_embed_dim': 64, 'learning_rate': 0.05, 'lambda_shared': 0.0001, 'batch_size': 4096, 'n_epochs': 1000, 'early_stopping': 'off'}
+
+VALIDATION:
+...
+                             | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/musical/uniform/s42 |      0.0449 |  0.0109 |    0.0216 |   8.4885
+
+TEST:
+...
+                             | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/musical/uniform/s42 |      0.0330 |  0.0087 |    0.0172 |  792.5077 |   6.2660
+
+[baseline] val NDCG@20=0.0109  test=0.0087  (807.4s)
+
+--- knob: k_embed_dim  grid=[32, 128, 256]  (default carries metric=0.0109) ---
+[stale] k_embed_dim=32: selected on test or trained at another config; re-running
+
+VALIDATION:
+...
+                             | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/musical/uniform/s42 |      0.0424 |  0.0107 |    0.0211 |   8.3041
+
+TEST:
+...
+                             | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/musical/uniform/s42 |      0.0313 |  0.0079 |    0.0169 |  414.4986 |   5.9666
+
+[run]  k_embed_dim=32  val NDCG@20=0.0107  test=0.0079  (428.9s)
+[stale] k_embed_dim=128: selected on test or trained at another config; re-running
+
+VALIDATION:
+...
+                             | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/musical/uniform/s42 |      0.0494 |  0.0122 |    0.0241 |   8.9107
+
+TEST:
+...
+                             | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/musical/uniform/s42 |      0.0392 |  0.0103 |    0.0205 | 1558.8873 |   7.0998
+
+[run]  k_embed_dim=128  val NDCG@20=0.0122  test=0.0103  (1575.0s)
+[stale] k_embed_dim=256: selected on test or trained at another config; re-running
+
+VALIDATION:
+...
+                             | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/musical/uniform/s42 |      0.0541 |  0.0137 |    0.0264 |  25.8429
+
+TEST:
+...
+                             | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/musical/uniform/s42 |      0.0394 |  0.0111 |    0.0223 | 3176.6576 |  18.9102
+
+[run]  k_embed_dim=256  val NDCG@20=0.0137  test=0.0111  (3222.0s)
+[winner@k_embed_dim] k_embed_dim=256  NDCG@20=0.0137
+
+--- knob: learning_rate  grid=[0.001, 0.01, 0.1]  (default carries metric=0.0137) ---
+[stale] learning_rate=0.001: selected on test or trained at another config; re-running
+
+VALIDATION:
+...
+                             | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/musical/uniform/s42 |      0.0592 |  0.0143 |    0.0279 |  25.3068
+
+TEST:
+...
+                             | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/musical/uniform/s42 |      0.0510 |  0.0134 |    0.0260 | 3243.2287 |  18.4365
+
+[run]  learning_rate=0.001  val NDCG@20=0.0143  test=0.0134  (3287.5s)
+[stale] learning_rate=0.01: selected on test or trained at another config; re-running
+
+VALIDATION:
+...
+                             | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/musical/uniform/s42 |      0.0582 |  0.0146 |    0.0286 |  17.3125
+
+TEST:
+...
+                             | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/musical/uniform/s42 |      0.0449 |  0.0126 |    0.0252 | 3338.7826 |  11.7394
+
+[run]  learning_rate=0.01  val NDCG@20=0.0146  test=0.0126  (3368.0s)
+[stale] learning_rate=0.1: selected on test or trained at another config; re-running
+
+VALIDATION:
+...
+                             | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/musical/uniform/s42 |      0.0543 |  0.0134 |    0.0262 |  16.2248
+
+TEST:
+...
+                             | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/musical/uniform/s42 |      0.0430 |  0.0119 |    0.0240 | 3306.1290 |  11.8536
+
+[run]  learning_rate=0.1  val NDCG@20=0.0134  test=0.0119  (3334.7s)
+[winner@learning_rate] learning_rate=0.01  NDCG@20=0.0146
+
+--- knob: lambda_shared  grid=[1e-06, 1e-05, 0.001, 0.01]  (default carries metric=0.0146) ---
+[stale] lambda_shared=1e-06: selected on test or trained at another config; re-running
+
+VALIDATION:
+...
+                             | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/musical/uniform/s42 |      0.0570 |  0.0142 |    0.0279 |  15.8296
+
+TEST:
+...
+                             | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/musical/uniform/s42 |      0.0445 |  0.0126 |    0.0255 | 3424.9349 |  11.3095
+
+[run]  lambda_shared=1e-06  val NDCG@20=0.0142  test=0.0126  (3452.2s)
+[stale] lambda_shared=1e-05: selected on test or trained at another config; re-running
+
+VALIDATION:
+...
+                             | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/musical/uniform/s42 |      0.0574 |  0.0143 |    0.0281 |  16.2779
+
+TEST:
+...
+                             | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/musical/uniform/s42 |      0.0445 |  0.0126 |    0.0254 | 3389.8291 |  11.5718
+
+[run]  lambda_shared=1e-05  val NDCG@20=0.0143  test=0.0126  (3417.8s)
+[stale] lambda_shared=0.001: selected on test or trained at another config; re-running
+
+VALIDATION:
+...
+                             | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/musical/uniform/s42 |      0.0601 |  0.0150 |    0.0291 |  16.0538
+
+TEST:
+...
+                             | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/musical/uniform/s42 |      0.0480 |  0.0132 |    0.0267 | 3362.5004 |  11.2042
+
+[run]  lambda_shared=0.001  val NDCG@20=0.0150  test=0.0132  (3389.9s)
+[stale] lambda_shared=0.01: selected on test or trained at another config; re-running
+
+VALIDATION:
+...
+                             | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+---------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/musical/uniform/s42 |      0.0709 |  0.0173 |    0.0351 |  16.1104
+
+TEST:
+...
+                             | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+---------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/musical/uniform/s42 |      0.0559 |  0.0151 |    0.0308 | 3369.5782 |  11.6883
+
+[run]  lambda_shared=0.01  val NDCG@20=0.0173  test=0.0151  (3397.5s)
+[winner@lambda_shared] lambda_shared=0.01  NDCG@20=0.0173
+[users] winner per-user scores from lambda_shared/0p01.json
+
+=== bpr [musical x uniform x seed=42] winner: {'k_embed_dim': 256, 'learning_rate': 0.01, 'lambda_shared': 0.01, 'batch_size': 4096, 'n_epochs': 1000, 'early_stopping': 'off'}  val NDCG@20=0.0173  test=0.0151 ===
+
