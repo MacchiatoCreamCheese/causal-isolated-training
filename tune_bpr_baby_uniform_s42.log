@@ -95,3 +95,8 @@ BPR/tune/baby/uniform/s42 |      0.0255 |  0.0067 |    0.0148 | 1347.2822 |  11.
 
 === bpr [baby x uniform x seed=42] winner: {'k_embed_dim': 256, 'learning_rate': 0.05, 'lambda_shared': 0.0001, 'batch_size': 4096, 'n_epochs': 1000}  val NDCG@20=0.0085  test=0.0067 ===
 
+
+=== Tuning bpr on baby x uniform x seed=42, selecting on validation NDCG@20 ===
+    -> /home/trustrs/causal-isolated-training/research/results/tuning/bpr/baby/uniform/seed42
+[stale] baseline: selected on test or trained at another config; re-running
+[baseline] running with defaults: {'k_embed_dim': 64, 'learning_rate': 0.05, 'lambda_shared': 0.0001, 'batch_size': 4096, 'n_epochs': 1000, 'early_stopping': 'off'}

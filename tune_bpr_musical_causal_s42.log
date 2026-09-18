@@ -258,3 +258,22 @@ BPR/tune/musical/causal/s42 |      0.0527 |  0.0142 |    0.0292 | 3300.5808 |  1
 
 [run]  lambda_shared=0.001  val NDCG@20=0.0168  test=0.0142  (3338.5s)
 [stale] lambda_shared=0.01: selected on test or trained at another config; re-running
+
+VALIDATION:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/musical/causal/s42 |      0.0803 |  0.0198 |    0.0405 |  32.2711
+
+TEST:
+...
+                            | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/musical/causal/s42 |      0.0630 |  0.0167 |    0.0356 | 3179.1081 |  16.4879
+
+[run]  lambda_shared=0.01  val NDCG@20=0.0198  test=0.0167  (3228.5s)
+[winner@lambda_shared] lambda_shared=0.01  NDCG@20=0.0198
+[users] winner per-user scores from lambda_shared/0p01.json
+
+=== bpr [musical x causal x seed=42] winner: {'k_embed_dim': 256, 'learning_rate': 0.01, 'lambda_shared': 0.01, 'batch_size': 4096, 'n_epochs': 1000, 'early_stopping': 'off'}  val NDCG@20=0.0198  test=0.0167 ===
+

@@ -3,3 +3,4 @@ nohup: ignoring input
 [run_tuning] cornac 3.0.0 | torch 2.4.0+cu121
 [run_tuning] musical/uniform/seed42 -> tune_bpr_musical_uniform_s42.log  (18:58)
 [run_tuning] musical/causal/seed42 -> tune_bpr_musical_causal_s42.log  (03:13)
+[run_tuning] baby/uniform/seed42 -> tune_bpr_baby_uniform_s42.log  (11:35)
