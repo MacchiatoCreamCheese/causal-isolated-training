@@ -1,31 +1,37 @@
 {
   "knob": "k_embed_dim",
   "value": 128,
+  "probes": {
+    "counterfactual_rate": 0.0,
+    "collision_rate": 7.168944543493855e-06
+  },
   "config": {
     "k_embed_dim": 128,
     "learning_rate": 0.05,
     "lambda_shared": 0.0001,
     "batch_size": 4096,
-    "n_epochs": 1000
-  },
-  "metrics": {
-    "HitRatio@20": 0.0746,
-    "NDCG@20": 0.0187,
-    "Recall@20": 0.0368
-  },
-  "wall_seconds": 346.42259550094604,
-  "test_metrics": {
-    "HitRatio@20": 0.06183838172099361,
-    "NDCG@20": 0.015729859204780625,
-    "Recall@20": 0.033233953007087,
-    "Train (s)": 336.1743929386139,
-    "Test (s)": 4.196275234222412
-  },
-  "val_metrics": {
-    "HitRatio@20": 0.0746,
-    "NDCG@20": 0.0187,
-    "Recall@20": 0.0368
+    "n_epochs": 1000,
+    "early_stopping": "off"
   },
   "select_split": "validation",
-  "val_metrics_source": "backfilled from tune_bpr_musical_causal.log, 4 d.p."
+  "val_metrics": {
+    "HitRatio@20": 0.05331962397179788,
+    "NDCG@20": 0.013791575179702337,
+    "Recall@20": 0.027940112562099537,
+    "Time (s)": 11.380521535873413
+  },
+  "test_metrics": {
+    "HitRatio@20": 0.04003773189393146,
+    "NDCG@20": 0.010329567431164541,
+    "Recall@20": 0.022227365753663214,
+    "Train (s)": 1735.5858948230743,
+    "Test (s)": 8.117618322372437
+  },
+  "metrics": {
+    "HitRatio@20": 0.05331962397179788,
+    "NDCG@20": 0.013791575179702337,
+    "Recall@20": 0.027940112562099537,
+    "Time (s)": 11.380521535873413
+  },
+  "wall_seconds": 1755.225680589676
 }
