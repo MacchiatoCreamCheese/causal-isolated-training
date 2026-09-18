@@ -100,3 +100,116 @@ BPR/tune/baby/uniform/s42 |      0.0255 |  0.0067 |    0.0148 | 1347.2822 |  11.
     -> /home/trustrs/causal-isolated-training/research/results/tuning/bpr/baby/uniform/seed42
 [stale] baseline: selected on test or trained at another config; re-running
 [baseline] running with defaults: {'k_embed_dim': 64, 'learning_rate': 0.05, 'lambda_shared': 0.0001, 'batch_size': 4096, 'n_epochs': 1000, 'early_stopping': 'off'}
+
+VALIDATION:
+...
+                          | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/baby/uniform/s42 |      0.0224 |  0.0054 |    0.0109 |  18.4077
+
+TEST:
+...
+                          | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/uniform/s42 |      0.0164 |  0.0039 |    0.0091 | 2240.3836 |  12.4269
+
+[baseline] val NDCG@20=0.0054  test=0.0039  (2272.2s)
+
+--- knob: k_embed_dim  grid=[32, 128, 256]  (default carries metric=0.0054) ---
+[stale] k_embed_dim=32: selected on test or trained at another config; re-running
+
+VALIDATION:
+...
+                          | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/baby/uniform/s42 |      0.0215 |  0.0052 |    0.0105 |  17.6291
+
+TEST:
+...
+                          | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/uniform/s42 |      0.0174 |  0.0047 |    0.0103 | 1125.1443 |  10.2398
+
+[run]  k_embed_dim=32  val NDCG@20=0.0052  test=0.0047  (1153.3s)
+[stale] k_embed_dim=128: selected on test or trained at another config; re-running
+
+VALIDATION:
+...
+                          | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/baby/uniform/s42 |      0.0258 |  0.0058 |    0.0128 |  23.9750
+
+TEST:
+...
+                          | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/uniform/s42 |      0.0175 |  0.0045 |    0.0098 | 3985.9005 |  15.1480
+
+[run]  k_embed_dim=128  val NDCG@20=0.0058  test=0.0045  (4025.4s)
+[stale] k_embed_dim=256: selected on test or trained at another config; re-running
+
+VALIDATION:
+...
+                          | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/baby/uniform/s42 |      0.0296 |  0.0072 |    0.0154 |  33.4612
+
+TEST:
+...
+                          | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/uniform/s42 |      0.0192 |  0.0052 |    0.0111 | 7709.6893 |  20.0760
+
+[run]  k_embed_dim=256  val NDCG@20=0.0072  test=0.0052  (7764.5s)
+[winner@k_embed_dim] k_embed_dim=256  NDCG@20=0.0072
+
+--- knob: learning_rate  grid=[0.001, 0.01, 0.1]  (default carries metric=0.0072) ---
+[stale] learning_rate=0.001: selected on test or trained at another config; re-running
+
+VALIDATION:
+...
+                          | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/baby/uniform/s42 |      0.0377 |  0.0084 |    0.0179 |  29.0368
+
+TEST:
+...
+                          | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/uniform/s42 |      0.0268 |  0.0063 |    0.0141 | 7798.5026 |  17.1491
+
+[run]  learning_rate=0.001  val NDCG@20=0.0084  test=0.0063  (7845.8s)
+[stale] learning_rate=0.01: selected on test or trained at another config; re-running
+
+VALIDATION:
+...
+                          | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/baby/uniform/s42 |      0.0281 |  0.0068 |    0.0142 |  39.2543
+
+TEST:
+...
+                          | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/uniform/s42 |      0.0183 |  0.0050 |    0.0108 | 7593.6994 |  26.9463
+
+[run]  learning_rate=0.01  val NDCG@20=0.0068  test=0.0050  (7661.1s)
+[stale] learning_rate=0.1: selected on test or trained at another config; re-running
+
+VALIDATION:
+...
+                          | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/baby/uniform/s42 |      0.0311 |  0.0073 |    0.0157 |  33.1120
+
+TEST:
+...
+                          | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/uniform/s42 |      0.0201 |  0.0054 |    0.0118 | 7837.5236 |  19.4977
+
+[run]  learning_rate=0.1  val NDCG@20=0.0073  test=0.0054  (7891.6s)
+[winner@learning_rate] learning_rate=0.001  NDCG@20=0.0084
+
+--- knob: lambda_shared  grid=[1e-06, 1e-05, 0.001, 0.01]  (default carries metric=0.0084) ---
+[stale] lambda_shared=1e-06: selected on test or trained at another config; re-running
