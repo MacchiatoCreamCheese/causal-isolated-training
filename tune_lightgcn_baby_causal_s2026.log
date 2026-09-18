@@ -77,3 +77,17 @@ LightGCN/tune/baby/causal/s2026 |      0.0246 |  0.0061 |    0.0146 | 3195.7805 
 
 === lightgcn [baby x causal x seed=2026] winner: {'lambda_reg': 0.0001, 'num_layers': 4, 'learning_rate': 0.001}  val NDCG@20=0.0088  test=0.0061 ===
 
+
+=== Tuning lightgcn on baby x causal x seed=2026, selecting on validation NDCG@20 ===
+    -> /home/ntuyen/causal-isolated-training/research/results/tuning/lightgcn/baby/causal/seed2026
+[baseline] cached: val NDCG@20=0.0081
+
+--- knob: num_layers  grid=[1, 2, 4]  (default carries metric=0.0081) ---
+[skip] num_layers=1  val NDCG@20=0.0065  [cached]
+[skip] num_layers=2  val NDCG@20=0.0078  [cached]
+[skip] num_layers=4  val NDCG@20=0.0088  [cached]
+[winner@num_layers] num_layers=4  NDCG@20=0.0088
+[users] winner per-user scores already saved
+
+=== lightgcn [baby x causal x seed=2026] winner: {'lambda_reg': 0.0001, 'num_layers': 4, 'learning_rate': 0.001}  val NDCG@20=0.0088  test=0.0061 ===
+

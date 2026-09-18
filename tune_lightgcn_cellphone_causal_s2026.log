@@ -2,3 +2,43 @@
 === Tuning lightgcn on cellphone x causal x seed=2026, selecting on validation NDCG@20 ===
     -> /home/ntuyen/causal-isolated-training/research/results/tuning/lightgcn/cellphone/causal/seed2026
 [baseline] running with defaults: {'lambda_reg': 0.0001, 'num_layers': 3, 'learning_rate': 0.001}
+
+=== Tuning lightgcn on cellphone x causal x seed=2026, selecting on validation NDCG@20 ===
+    -> /home/ntuyen/causal-isolated-training/research/results/tuning/lightgcn/cellphone/causal/seed2026
+[baseline] running with defaults: {'lambda_reg': 0.0001, 'num_layers': 3, 'learning_rate': 0.001}
+Early stopping:
+- best epoch = 14, stopped epoch = 64
+- best monitored value = 0.022900 (delta = -0.007195)
+
+VALIDATION:
+...
+                                     | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------------------ + ----------- + ------- + --------- + --------
+LightGCN/tune/cellphone/causal/s2026 |      0.0241 |  0.0071 |    0.0157 | 191.8911
+
+TEST:
+...
+                                     | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+------------------------------------ + ----------- + ------- + --------- + ---------- + --------
+LightGCN/tune/cellphone/causal/s2026 |      0.0167 |  0.0051 |    0.0119 | 24600.3127 | 107.2955
+
+[baseline] val NDCG@20=0.0071  test=0.0051  (24900.1s)
+
+--- knob: num_layers  grid=[1, 2, 4]  (default carries metric=0.0071) ---
+Early stopping:
+- best epoch = 5, stopped epoch = 55
+- best monitored value = 0.020329 (delta = -0.008623)
+
+VALIDATION:
+...
+                                     | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------------------ + ----------- + ------- + --------- + --------
+LightGCN/tune/cellphone/causal/s2026 |      0.0180 |  0.0051 |    0.0117 | 176.5508
+
+TEST:
+...
+                                     | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+------------------------------------ + ----------- + ------- + --------- + ---------- + --------
+LightGCN/tune/cellphone/causal/s2026 |      0.0131 |  0.0039 |    0.0095 | 16211.9148 | 104.3691
+
+[run]  num_layers=1  val NDCG@20=0.0051  test=0.0039  (16493.5s)
