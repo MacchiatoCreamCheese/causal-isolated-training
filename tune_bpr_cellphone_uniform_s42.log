@@ -209,3 +209,66 @@ BPR/tune/cellphone/uniform/s42 |      0.0139 |  0.0042 |    0.0096 | 14162.0900 
 
 [run]  learning_rate=0.001  val NDCG@20=0.0047  test=0.0042  (14832.6s)
 [stale] learning_rate=0.01: selected on test or trained at another config; re-running
+
+VALIDATION:
+...
+                               | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------------ + ----------- + ------- + --------- + --------
+BPR/tune/cellphone/uniform/s42 |      0.0186 |  0.0059 |    0.0121 | 420.5255
+
+TEST:
+...
+                               | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+------------------------------ + ----------- + ------- + --------- + ---------- + --------
+BPR/tune/cellphone/uniform/s42 |      0.0134 |  0.0045 |    0.0097 | 14026.2313 | 251.3048
+
+[run]  learning_rate=0.01  val NDCG@20=0.0059  test=0.0045  (14699.1s)
+[stale] learning_rate=0.1: selected on test or trained at another config; re-running
+
+VALIDATION:
+...
+                               | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------------ + ----------- + ------- + --------- + --------
+BPR/tune/cellphone/uniform/s42 |      0.0211 |  0.0066 |    0.0139 | 417.8963
+
+TEST:
+...
+                               | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+------------------------------ + ----------- + ------- + --------- + ---------- + --------
+BPR/tune/cellphone/uniform/s42 |      0.0155 |  0.0052 |    0.0113 | 14050.4544 | 249.8696
+
+[run]  learning_rate=0.1  val NDCG@20=0.0066  test=0.0052  (14719.6s)
+[winner@learning_rate] learning_rate=0.1  NDCG@20=0.0066
+
+--- knob: lambda_shared  grid=[1e-06, 1e-05, 0.001, 0.01]  (default carries metric=0.0066) ---
+[stale] lambda_shared=1e-06: selected on test or trained at another config; re-running
+
+VALIDATION:
+...
+                               | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------------ + ----------- + ------- + --------- + --------
+BPR/tune/cellphone/uniform/s42 |      0.0176 |  0.0056 |    0.0115 | 419.9260
+
+TEST:
+...
+                               | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+------------------------------ + ----------- + ------- + --------- + ---------- + --------
+BPR/tune/cellphone/uniform/s42 |      0.0130 |  0.0045 |    0.0093 | 14203.1769 | 248.1588
+
+[run]  lambda_shared=1e-06  val NDCG@20=0.0056  test=0.0045  (14872.4s)
+[stale] lambda_shared=1e-05: selected on test or trained at another config; re-running
+
+VALIDATION:
+...
+                               | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------------ + ----------- + ------- + --------- + --------
+BPR/tune/cellphone/uniform/s42 |      0.0188 |  0.0059 |    0.0122 | 416.5131
+
+TEST:
+...
+                               | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+------------------------------ + ----------- + ------- + --------- + ---------- + --------
+BPR/tune/cellphone/uniform/s42 |      0.0139 |  0.0047 |    0.0099 | 14127.4805 | 249.9719
+
+[run]  lambda_shared=1e-05  val NDCG@20=0.0059  test=0.0047  (14795.0s)
+[stale] lambda_shared=0.001: selected on test or trained at another config; re-running
