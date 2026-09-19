@@ -1,9 +1,3 @@
-"""Seed-combined numbers for the paper: mean ± SD over seeds 42, 123, 2026.
-
-A cell is reported only when all three seeds exist; otherwise it reads
-``missing [seedX, ...]``.  Writes results/combined_summary.csv and the LaTeX
-table bodies that paper.tex \\input's from reports/tables/.
-"""
 import csv
 import json
 import math
@@ -23,7 +17,6 @@ DATASETS = [("musical", "Musical Instruments"), ("baby", "Baby Products"),
 ARMS = [("uniform", "uniform"), ("causal", "past-only")]
 METRICS = [("N", "NDCG@20"), ("H", "HitRatio@20")]
 
-# Proposition 1 evaluated on each training split (research.analysis.rho_closed_form).
 CLOSED_FORM = {"musical": 33.18, "baby": 38.42, "cellphone": 44.06,
                "philadelphia": 28.60, "movielens": 46.63}
 
@@ -34,8 +27,6 @@ OUT_CSV = RESULTS_DIR / "combined_summary.csv"
 USER_LEAKAGE = RESULTS_DIR / "diagnostics" / "user_leakage.json"
 TABLES = REPORTS_DIR / "tables"
 
-
-# ---------------------------------------------------------------- formatting
 
 def missing(by_seed):
     return [f"seed{s}" for s in SEEDS if s not in by_seed]
@@ -78,10 +69,7 @@ def p_tex(p):
     return f"${p / 10 ** e:.1f}{{\\times}}10^{{{e}}}$"
 
 
-# ---------------------------------------------------------------- loading
-
 def load_static():
-    """{(model, ds, arm): {"NDCG@20": {seed: v}, ..., "rho": {...}, "collision": {...}}}"""
     out = {}
     for model, _ in MODELS:
         for ds, _ in DATASETS:
@@ -116,7 +104,6 @@ def load_signif():
 
 
 def load_prequential(tuned_per_arm):
-    """{(model, ds): {seed: arms}} for the chosen protocol."""
     out = {}
     for path in sorted(PREQ_DIR.glob("*.json")):
         if ("tunedper-arm" in path.name) != tuned_per_arm:
@@ -136,8 +123,6 @@ def decay_stats(arms, metric="HitRatio@20", frac=0.10):
     change = lambda y: float(y[-k:].mean() - y[:k].mean())  # noqa: E731
     return change(u), change(c), float((c > u).mean())
 
-
-# ---------------------------------------------------------------- tables
 
 def ladder_tex(static, signif):
     lines = []
@@ -233,8 +218,6 @@ def signif_tex(signif, gone_map):
     return "\n".join(lines) + "\n"
 
 
-# ---------------------------------------------------------------- csv
-
 def write_csv(static):
     OUT_CSV.parent.mkdir(parents=True, exist_ok=True)
     with open(OUT_CSV, "w", newline="", encoding="utf-8") as f:
@@ -252,8 +235,6 @@ def write_csv(static):
                            + [f"{by_seed[s]:.6g}" if s in by_seed else "" for s in SEEDS])
     print(f"[combine_seeds] wrote {OUT_CSV}")
 
-
-# ---------------------------------------------------------------- user groups
 
 AXIS_LABEL = {"review": "reviews", "join": "joined"}
 

@@ -233,7 +233,6 @@ STEPS = [("uniform", "uniform"), ("causal", "past-only"),
          ("causal+coherent", "+coherent"), ("causal+temporal", "+temporal")]
 
 
-
 def _missing(seeds_present):
     return [f"seed{s}" for s in SEEDS if s not in seeds_present]
 
@@ -297,7 +296,6 @@ def fig_ablation_steps(metrics=("NDCG@20", "HitRatio@20")):
 
 
 def _load_prequential(pattern):
-    """{(model, dataset): {seed: arms}}"""
     groups = {}
     for path in sorted((RESULTS_DIR / "prequential").glob(pattern)):
         with open(path, encoding="utf-8-sig") as f:
@@ -309,7 +307,6 @@ def _load_prequential(pattern):
 
 
 def _seed_stack(by_seed, metric):
-    """Per-arm (seeds x batches) arrays; batches must be identical across seeds."""
     ref = by_seed[SEEDS[0]]["uniform"]
     key = [(p["ts_start"], p["ts_end"]) for p in ref]
     for s in SEEDS:
@@ -441,7 +438,7 @@ def fig_user_leakage(axis="review"):
         if axis == "join":
             ticks = [g["group"] for g in groups]
         if axis == "join_fine":
-            ticks = [g["range"].split(" – ")[0] for g in groups]   # group's first month
+            ticks = [g["range"].split(" – ")[0] for g in groups]
         x = np.arange(len(groups))
 
         ax = axes[0][c]

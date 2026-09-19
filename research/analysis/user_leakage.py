@@ -1,17 +1,3 @@
-"""Future-negative rate by user group, plus the accuracy change per group.
-
-No model is trained.  Under uniform sampling a training row at time t draws a
-future negative with probability p(t) = |{j : tau(j) > t}| / |I| (Proposition 1),
-so each user's expected leakage follows from the training split alone.  The
-per-group accuracy change reuses the seed-stacked per-user scores written by
-``research.analysis.significance``.
-
-Axes:
-  review  number of training interactions, 3 groups cut on a doubling scale
-  join    date of the user's first training interaction, equal thirds
-  fine       number of training interactions, full doubling scale (appendix)
-  join_fine  date of first training interaction, equal sixths (appendix)
-"""
 import csv
 import datetime as dt
 import json
@@ -25,22 +11,18 @@ from .significance import ALPHA, MODELS, N_BOOT, SEEDS, STACKED, holm
 
 DATASETS = ("musical", "baby", "cellphone", "philadelphia", "movielens")
 
-# Lower bounds of the few / medium / many groups, powers of two per data source:
-# MovieLens users rate about ten times more than Amazon or Yelp users.
 AMAZON = (1, 5, 17)
 GROUPS = {"musical": AMAZON, "baby": AMAZON, "cellphone": AMAZON,
           "philadelphia": (1, 5, 33), "movielens": (1, 65, 257)}
 GROUP_NAMES = ("few", "medium", "many")
-FINE_EDGES = tuple([1] + [2 ** k + 1 for k in range(1, 14)])   # 1, 3, 5, 9, 17, ...
+FINE_EDGES = tuple([1] + [2 ** k + 1 for k in range(1, 14)])
 MIN_SHARE = 0.01
-JOIN_FINE = 6          # appendix: equal sixths by joining date
+JOIN_FINE = 6
 
 OUT_JSON = RESULTS_DIR / "diagnostics" / "user_leakage.json"
 OUT_USERS = RESULTS_DIR / "diagnostics" / "user_leakage_users.csv"
 SIGNIF = RESULTS_DIR / "diagnostics" / "significance.json"
 
-
-# ---------------------------------------------------------------- per-user facts
 
 def user_facts(ds):
     train = build_eval_method(ds, neg_sampling="uniform", seed=42).train_set
@@ -66,8 +48,6 @@ def user_facts(ds):
             "rho_total": float(p.mean())}
 
 
-# ---------------------------------------------------------------- grouping
-
 def _date(ms):
     return dt.datetime.fromtimestamp(ms / 1000, dt.timezone.utc).strftime("%Y-%m")
 
@@ -77,7 +57,6 @@ def _count_label(lo, hi):
 
 
 def count_groups(n, lowers):
-    """Group index per user from ascending lower bounds; returns (idx, labels)."""
     idx = np.searchsorted(np.asarray(lowers), n, side="right") - 1
     uppers = [b - 1 for b in lowers[1:]] + [None]
     labels = [_count_label(lo, hi) for lo, hi in zip(lowers, uppers)]
@@ -85,7 +64,6 @@ def count_groups(n, lowers):
 
 
 def fine_lowers(n):
-    """Doubling-scale lower bounds, merging any group under MIN_SHARE of users."""
     lowers = [b for b in FINE_EDGES if b <= n.max()]
     while True:
         idx, _ = count_groups(n, lowers)
@@ -94,12 +72,10 @@ def fine_lowers(n):
         if not small or len(lowers) == 1:
             return lowers
         k = small[0]
-        # merge into the lower neighbour; the first group merges upward
         del lowers[k if k > 0 else 1]
 
 
 def join_groups(join, k_groups=3):
-    """Equal-size groups by date of first training interaction."""
     cuts = np.quantile(join, [q / k_groups for q in range(1, k_groups)])
     idx = np.searchsorted(cuts, join, side="right")
     labels = []
@@ -126,8 +102,6 @@ def summarize(facts, idx, labels, names):
     assert sum(g["users"] for g in out) == total_users
     return out
 
-
-# ---------------------------------------------------------------- accuracy change
 
 def load_stacked(model, ds):
     path = STACKED / f"sampler_{model}_{ds}.csv"
@@ -175,15 +149,12 @@ def gain_rows(ds, model, stacked, group_of, names, axis, rng):
 
 
 def apply_holm(rows):
-    """Holm across all tests of one family, for both p and p_rows."""
     tested = [r for r in rows if r.get("diff") is not None]
     for col, flag in (("p", "significant"), ("p_rows", "significant_rows")):
         for r, a in zip(tested, holm(np.asarray([r[col] for r in tested]))):
             r[f"{col}_holm"] = float(a)
             r[flag] = bool(a < ALPHA)
 
-
-# ---------------------------------------------------------------- main
 
 def main():
     rng = np.random.default_rng(0)

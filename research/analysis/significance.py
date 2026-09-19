@@ -28,18 +28,12 @@ def missing_seeds(paths_a, paths_b):
 
 
 def _aligned(runs):
-    """Per-user METRIC arrays for every run, restricted to users present in all."""
     index = [{u: i for i, u in enumerate(r["raw_user_id"])} for r in runs]
     common = sorted(set.intersection(*(set(ix) for ix in index)))
     return [np.asarray([r[METRIC][ix[u]] for u in common]) for r, ix in zip(runs, index)]
 
 
 def stack(paths_a, paths_b, out_csv, names=("a", "b")):
-    """Append the three seeds into one table: one row per (user, seed).
-
-    Written to out_csv so the pooled data can be inspected; returns
-    (user_idx, seed, a, b) arrays aligned row by row.
-    """
     loaded = [user_scores.load(p) for p in list(paths_a) + list(paths_b)]
     runs = _aligned(loaded)
     index = [{u: i for i, u in enumerate(r["raw_user_id"])} for r in loaded]
@@ -61,14 +55,6 @@ def stack(paths_a, paths_b, out_csv, names=("a", "b")):
 
 
 def compare(user_idx, seed, a, b, rng):
-    """Paired test on the seed-stacked table.
-
-    Primary: users are the unit.  The same user appears once per seed and those
-    rows are correlated, so each user's rows are averaged, d_u = mean_s(b_su - a_su),
-    and a two-sided t-test over users tests mean(d) = 0; the bootstrap CI resamples
-    users.  Also reported: the plain paired t-test over all stacked rows, which
-    treats the rows as independent and so understates p.
-    """
     diff = b - a
     n = int(user_idx.max()) + 1
     d = np.bincount(user_idx, weights=diff, minlength=n) / np.bincount(user_idx, minlength=n)
@@ -148,7 +134,6 @@ def main():
     if not rows:
         raise SystemExit("no complete per-user score groups found")
 
-    # Holm within each family, so adding --order never moves the sampler p-values.
     for kind in sorted({r["kind"] for r in rows}):
         fam = [r for r in rows if r["kind"] == kind]
         for col, flag in (("p", "significant"), ("p_rows", "significant_rows")):

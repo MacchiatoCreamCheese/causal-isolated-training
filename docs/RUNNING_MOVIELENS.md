@@ -1,6 +1,10 @@
 # Running MovieLens-10M
 
-Tuning only: 3 models x 2 samplers x 3 seeds = **18 cells**.
+Thank you very much for helping us run MovieLens. This page collects everything we know about setting it up, so that it takes as little of your time as possible. If anything here is unclear or doesn't match what you see on your machine, please don't hesitate to message me; I'm happy to debug it together.
+
+## What we are hoping to run
+
+Only the hyperparameter tuning: 3 models × 2 samplers × 3 seeds = **18 cells**.
 
 | | |
 |---|---|
@@ -8,78 +12,116 @@ Tuning only: 3 models x 2 samplers x 3 seeds = **18 cells**.
 | samplers (`--recipe`) | `uniform`, `causal` |
 | seeds | 42, 123, 2026 |
 
-Each cell writes its own directory, so cells never collide and can be split
-across jobs however you like. Finished trials are cached: a cell killed on
-walltime resumes where it stopped (`[skip] ... [cached]`) when resubmitted.
+Each cell writes to its own directory, so cells never collide and can be split across jobs in whatever way suits your cluster. Finished trials are cached: if a cell is stopped by a walltime limit, resubmitting the same command resumes where it stopped (the log shows `[skip] ... [cached]`).
 
 ## 1. Environment
 
-There is no environment file in the repo; build it by hand. What we run:
-python 3.12, cornac 2.6.0, torch 2.4.1+cu121.
+There is no environment file in the repository yet, sorry about that. This is the setup we use: python 3.12, cornac 2.6.0, torch 2.4.1+cu121.
 
 ```bash
 conda create -n leakage24 python=3.12 -y
 conda activate leakage24
 pip install -r requirements.txt
-pip install dgl          # LightGCN only -- see gotchas
+pip install dgl          # needed for LightGCN only; see "Known issues" below
 ```
 
 ## 2. Data
 
-Put the CSV we sent you at exactly this path:
+The CSV can be downloaded here: [MovieLens-10M.csv](https://drive.google.com/file/d/1PJ3A_HOQpC9RmVbO2iI0gUl5yOX2EKKK/view?usp=sharing). Please place it at this path:
 
 ```
 data/movielens_dataset/MovieLens-10M.csv
 ```
 
-Check it arrived whole: **290,971,576 bytes**, header
-`user_id,item_id,rating,timestamp`, timestamps in **milliseconds**
-(`1,122,5.0,838985046000`).
+To confirm the file arrived intact: it should be **290,971,576 bytes**, with the header `user_id,item_id,rating,timestamp` and timestamps in **milliseconds** (first row: `1,122,5.0,838985046000`).
 
-Use our file, not a fresh conversion of GroupLens' `ratings.dat`. It is already
-iteratively 5-cored and converted to milliseconds, and nothing filters at load
-time, so a re-export would quietly produce different numbers. The validation and
-test cutoffs are fixed in code (2006-04-18 and 2007-08-27); nothing to configure.
+We would be grateful if you could use this file rather than a fresh conversion of GroupLens' `ratings.dat`. It has already been iteratively 5-cored and converted to milliseconds, and nothing filters it at load time, so a new export would give slightly different numbers from ours. The validation and test cutoffs (2006-04-18 and 2007-08-27) are fixed in the code, so nothing needs to be configured.
 
-## 3. Preflight
+## 3. Preflight check
 
-From the repo root. Checks the dataset key, the CSV, cornac, torch and CUDA,
-lists all 18 cells, runs nothing:
+From the repository root, this checks the dataset key, the CSV, cornac, torch and CUDA, and lists all 18 cells without running anything:
 
 ```bash
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-}
 DRY_RUN=1 bash run_dataset_tuning.sh movielens
 ```
 
-## 4. Run
+## 4. Running
 
-**One cell per job — use this for an sbatch array.**
+**One cell per job**, which should fit an sbatch array:
 
 ```bash
-cd <repo root>                        # python -m needs the repo root
+cd <repo root>                        # python -m needs the repository root
 export RESEARCH_DATA_DIR=$PWD/data
-export RESEARCH_NEUMF_PRETRAIN=1      # NeuMF only, see gotchas
+export RESEARCH_NEUMF_PRETRAIN=1      # NeuMF only; see "Known issues"
 
 python -u -m research.runners.tuning \
     --model neumf --dataset movielens --recipe uniform --seed 42
 ```
 
-`--model bpr|neumf|lightgcn`, `--recipe uniform|causal`, `--seed 42|123|2026`.
-Add `--restart-from <knob>` to resume a part-finished cell at a given knob.
+The options are `--model bpr|neumf|lightgcn`, `--recipe uniform|causal` and `--seed 42|123|2026`. To resume a partly finished cell from a particular knob, add `--restart-from <knob>`.
 
-Resource request per job:
+### sbatch array
+
+In case it saves some time, here is a template that runs one model's 6 cells (2 samplers × 3 seeds) as a 6-task array. Please save it as `movielens_tune.sbatch` in the repository root. The partition, account, memory and time lines are placeholders; please adjust them to your cluster.
+
+```bash
+#!/bin/bash
+#SBATCH --job-name=ml-tune
+#SBATCH --partition=<partition>
+#SBATCH --account=<account>
+#SBATCH --array=0-5
+#SBATCH --cpus-per-task=2
+#SBATCH --mem=64G
+#SBATCH --time=2-00:00:00
+#SBATCH --output=slurm_logs/%x_%A_%a.out
+
+RECIPES=(uniform causal)
+SEEDS=(42 123 2026)
+RECIPE=${RECIPES[$((SLURM_ARRAY_TASK_ID % 2))]}
+SEED=${SEEDS[$((SLURM_ARRAY_TASK_ID / 2))]}
+
+source "$(conda info --base)/etc/profile.d/conda.sh"
+conda activate leakage24
+
+cd "$SLURM_SUBMIT_DIR"
+export RESEARCH_DATA_DIR="$PWD/data"
+
+LABEL=$MODEL
+if [ "$MODEL" = "neumf" ]; then
+    export RESEARCH_NEUMF_PRETRAIN=1
+    LABEL=neumf-pretrain
+fi
+
+python -u -m research.runners.tuning \
+    --model "$MODEL" --dataset movielens --recipe "$RECIPE" --seed "$SEED" \
+    >> "tune_${LABEL}_movielens_${RECIPE}_s${SEED}.log" 2>&1
+```
+
+Submitting, from the repository root:
+
+```bash
+mkdir -p slurm_logs
+sbatch --export=ALL,MODEL=neumf    --gres=gpu:1 movielens_tune.sbatch
+sbatch --export=ALL,MODEL=lightgcn --gres=gpu:1 movielens_tune.sbatch
+sbatch --export=ALL,MODEL=bpr      --cpus-per-task=1 movielens_tune.sbatch
+```
+
+If a task stops at the time limit, submitting the same line again is safe: finished trials are skipped, and it continues from the next one. To resubmit only particular tasks, `--array=3,5` works as usual (task *i* is sampler `uniform`/`causal` for even/odd *i*, and seed 42, 123, 2026 for *i* = 0–1, 2–3, 4–5).
+
+Resources per job:
 
 | model | device | notes |
 |---|---|---|
-| `bpr` | CPU | NumPy, single-threaded. Extra cores do not help. |
+| `bpr` | CPU | NumPy, single-threaded, so extra cores do not help. |
 | `neumf` | 1 GPU | torch |
 | `lightgcn` | 1 GPU | torch + dgl |
 
-Budget memory generously: MovieLens costs roughly 3.6x our largest Amazon
-dataset to load.
+Memory: loading MovieLens takes roughly 3.6× our largest Amazon dataset, so a generous memory request would be safest.
 
-**Interactive smoke test** (one long-lived session, not for the scheduler — it
-backgrounds a CPU and a GPU track and waits on both):
+**Runtime, especially for BPR.** BPR now trains for the full epoch budget (early stopping is off), and one BPR trial on our Baby Products dataset (about 1M training rows) takes up to about 2.5 hours on our machine. MovieLens has about 8M training rows, so we expect a BPR trial there could take on the order of a day, and each cell runs 11 trials. This is only an estimate from our own runs. Because trials are cached, it is safe to run BPR under repeated walltime-limited jobs; each resubmission continues from the last finished trial. If BPR turns out to be too heavy for the cluster, please just let me know, and we can prioritise NeuMF and LightGCN or discuss another plan.
+
+**Interactive smoke test** (for one long-lived session rather than the scheduler; it runs a CPU track and a GPU track in the background and waits for both):
 
 ```bash
 bash run_dataset_tuning.sh movielens gpu     # or: cpu, all
@@ -87,21 +129,23 @@ bash run_dataset_tuning.sh movielens gpu     # or: cpu, all
 
 ## 5. Sending results back
 
+When convenient, these are the files we need:
+
 ```
 research/results/tuning/*/movielens/     # JSON + winner.users.npz
-tune_*_movielens_*.log                   # written to the repo root
+tune_*_movielens_*.log                   # written to the repository root
 ```
 
-## Gotchas
+Partial results are also very welcome; everything is cached per trial, so we can merge whatever is finished.
+
+## Known issues
 
 | symptom | fix |
 |---|---|
-| `LD_LIBRARY_PATH: unbound variable` on `conda activate` | The scripts run under `set -u`. `export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-}` before launching. |
-| conda not found by the scripts | They hard-code `$HOME/miniconda3/etc/profile.d/conda.sh`. With a module-loaded conda, skip the scripts and use the `python -m` form. |
-| `ModuleNotFoundError: dgl` at the first LightGCN fit | cornac imports dgl lazily and it is not in `requirements.txt`. `pip install dgl`, CUDA build matching torch. |
-| NeuMF results land in `neumf/` | `RESEARCH_NEUMF_PRETRAIN=1` was not set. That variant is not the one we report; delete the directory and re-run with it set. |
-| `No module named research` | Launch from the repo root. |
+| `LD_LIBRARY_PATH: unbound variable` on `conda activate` | The scripts run under `set -u`. Running `export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-}` before launching fixes it. |
+| conda not found by the scripts | They hard-code `$HOME/miniconda3/etc/profile.d/conda.sh`. With a module-loaded conda, the `python -m` form above works without the scripts. |
+| `ModuleNotFoundError: dgl` at the first LightGCN fit | cornac imports dgl lazily and it is not in `requirements.txt`. `pip install dgl`, with the CUDA build matching torch. |
+| NeuMF results land in `neumf/` instead of `neumf-pretrain/` | `RESEARCH_NEUMF_PRETRAIN=1` was not set. That variant is not the one we report; the `neumf/` directory can be deleted and the cell re-run with the variable set. |
+| `No module named research` | The command needs to be launched from the repository root. |
 
-Two things that are expected, not bugs: MovieLens' rating burst leaves only
-about 1,750 evaluable test users, and LightGCN runs at batch size 1024 here (the
-per-dataset table has no MovieLens entry, so it falls back).
+Thank you again for your time and help. It makes a real difference to the paper.
