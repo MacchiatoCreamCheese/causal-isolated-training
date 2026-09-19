@@ -42,3 +42,42 @@ TEST:
 LightGCN/tune/cellphone/causal/s2026 |      0.0131 |  0.0039 |    0.0095 | 16211.9148 | 104.3691
 
 [run]  num_layers=1  val NDCG@20=0.0051  test=0.0039  (16493.5s)
+Early stopping:
+- best epoch = 11, stopped epoch = 61
+- best monitored value = 0.024760 (delta = -0.007137)
+
+VALIDATION:
+...
+                                     | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------------------ + ----------- + ------- + --------- + --------
+LightGCN/tune/cellphone/causal/s2026 |      0.0271 |  0.0078 |    0.0176 | 177.0918
+
+TEST:
+...
+                                     | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+------------------------------------ + ----------- + ------- + --------- + ---------- + --------
+LightGCN/tune/cellphone/causal/s2026 |      0.0214 |  0.0065 |    0.0153 | 20027.0315 | 109.5622
+
+[run]  num_layers=2  val NDCG@20=0.0078  test=0.0065  (20314.2s)
+Early stopping:
+- best epoch = 17, stopped epoch = 67
+- best monitored value = 0.024368 (delta = -0.005553)
+
+VALIDATION:
+...
+                                     | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------------------ + ----------- + ------- + --------- + --------
+LightGCN/tune/cellphone/causal/s2026 |      0.0287 |  0.0085 |    0.0188 | 181.7720
+
+TEST:
+...
+                                     | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+------------------------------------ + ----------- + ------- + --------- + ---------- + --------
+LightGCN/tune/cellphone/causal/s2026 |      0.0209 |  0.0064 |    0.0151 | 29134.8652 | 104.8950
+
+[run]  num_layers=4  val NDCG@20=0.0085  test=0.0064  (29422.2s)
+[winner@num_layers] num_layers=4  NDCG@20=0.0085
+[users] winner per-user scores from num_layers/4.json
+
+=== lightgcn [cellphone x causal x seed=2026] winner: {'lambda_reg': 0.0001, 'num_layers': 4, 'learning_rate': 0.001}  val NDCG@20=0.0085  test=0.0064 ===
+
