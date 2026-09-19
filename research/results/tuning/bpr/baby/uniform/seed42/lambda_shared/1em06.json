@@ -1,31 +1,37 @@
 {
   "knob": "lambda_shared",
   "value": 1e-06,
+  "probes": {
+    "counterfactual_rate": 0.38433686003404594,
+    "collision_rate": 0.0
+  },
   "config": {
     "k_embed_dim": 256,
-    "learning_rate": 0.05,
+    "learning_rate": 0.001,
     "lambda_shared": 1e-06,
     "batch_size": 4096,
-    "n_epochs": 1000
-  },
-  "metrics": {
-    "HitRatio@20": 0.0351,
-    "NDCG@20": 0.0084,
-    "Recall@20": 0.0179
-  },
-  "wall_seconds": 1434.0669634342194,
-  "test_metrics": {
-    "HitRatio@20": 0.02536289679374701,
-    "NDCG@20": 0.006681876129334095,
-    "Recall@20": 0.014767689602104752,
-    "Train (s)": 1398.8632264137268,
-    "Test (s)": 12.286026000976562
-  },
-  "val_metrics": {
-    "HitRatio@20": 0.0351,
-    "NDCG@20": 0.0084,
-    "Recall@20": 0.0179
+    "n_epochs": 1000,
+    "early_stopping": "off"
   },
   "select_split": "validation",
-  "val_metrics_source": "backfilled from tune_bpr_baby_uniform.log, 4 d.p."
+  "val_metrics": {
+    "HitRatio@20": 0.03756059988219836,
+    "NDCG@20": 0.008470849257260334,
+    "Recall@20": 0.01784731573887497,
+    "Time (s)": 33.34093403816223
+  },
+  "test_metrics": {
+    "HitRatio@20": 0.027197320146753867,
+    "NDCG@20": 0.006294256321502462,
+    "Recall@20": 0.01428496649750508,
+    "Train (s)": 8597.198418140411,
+    "Test (s)": 21.481903553009033
+  },
+  "metrics": {
+    "HitRatio@20": 0.03756059988219836,
+    "NDCG@20": 0.008470849257260334,
+    "Recall@20": 0.01784731573887497,
+    "Time (s)": 33.34093403816223
+  },
+  "wall_seconds": 8652.529446840286
 }
