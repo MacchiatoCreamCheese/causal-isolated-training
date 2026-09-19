@@ -213,3 +213,53 @@ BPR/tune/baby/uniform/s42 |      0.0201 |  0.0054 |    0.0118 | 7837.5236 |  19.
 
 --- knob: lambda_shared  grid=[1e-06, 1e-05, 0.001, 0.01]  (default carries metric=0.0084) ---
 [stale] lambda_shared=1e-06: selected on test or trained at another config; re-running
+
+VALIDATION:
+...
+                          | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/baby/uniform/s42 |      0.0376 |  0.0085 |    0.0178 |  33.3409
+
+TEST:
+...
+                          | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/uniform/s42 |      0.0272 |  0.0063 |    0.0143 | 8597.1984 |  21.4819
+
+[run]  lambda_shared=1e-06  val NDCG@20=0.0085  test=0.0063  (8652.5s)
+[stale] lambda_shared=1e-05: selected on test or trained at another config; re-running
+
+=== Tuning bpr on baby x uniform x seed=42, selecting on validation NDCG@20 ===
+    -> /home/trustrs/causal-isolated-training/research/results/tuning/bpr/baby/uniform/seed42
+[baseline] cached: val NDCG@20=0.0054
+
+--- knob: k_embed_dim  grid=[32, 128, 256]  (default carries metric=0.0054) ---
+[skip] k_embed_dim=32  val NDCG@20=0.0052  [cached]
+[skip] k_embed_dim=128  val NDCG@20=0.0058  [cached]
+[skip] k_embed_dim=256  val NDCG@20=0.0072  [cached]
+[winner@k_embed_dim] k_embed_dim=256  NDCG@20=0.0072
+
+--- knob: learning_rate  grid=[0.001, 0.01, 0.1]  (default carries metric=0.0072) ---
+[skip] learning_rate=0.001  val NDCG@20=0.0084  [cached]
+[skip] learning_rate=0.01  val NDCG@20=0.0068  [cached]
+[skip] learning_rate=0.1  val NDCG@20=0.0073  [cached]
+[winner@learning_rate] learning_rate=0.001  NDCG@20=0.0084
+
+--- knob: lambda_shared  grid=[1e-06, 1e-05, 0.001, 0.01]  (default carries metric=0.0084) ---
+[skip] lambda_shared=1e-06  val NDCG@20=0.0085  [cached]
+[stale] lambda_shared=1e-05: selected on test or trained at another config; re-running
+
+VALIDATION:
+...
+                          | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/baby/uniform/s42 |      0.0375 |  0.0085 |    0.0178 |  33.7494
+
+TEST:
+...
+                          | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/uniform/s42 |      0.0272 |  0.0063 |    0.0143 | 7789.9476 |  20.0555
+
+[run]  lambda_shared=1e-05  val NDCG@20=0.0085  test=0.0063  (7845.0s)
+[stale] lambda_shared=0.001: selected on test or trained at another config; re-running
