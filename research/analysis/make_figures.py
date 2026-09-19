@@ -1,21 +1,10 @@
-"""Generate the paper's figures from the aggregated ablation CSV.
-
-Outputs to research/figures/ as PDF (for LaTeX inclusion) and PNG (for quick
-previewing). One function per figure; a top-level dispatcher generates all.
-
-Requires `research/results/ablation_summary.csv` — run
-`python -m research.analysis.aggregate_ablation` first.
-
-Run: python -m research.analysis.make_figures [fig_name ...]
-"""
-
 import csv
 import json
 import sys
 from collections import Counter
 
 import matplotlib
-matplotlib.use("Agg")  # no display needed
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -29,10 +18,6 @@ FIG_DIR.mkdir(parents=True, exist_ok=True)
 SUMMARY_CSV = RESULTS_DIR / "ablation_summary.csv"
 
 
-# ---------------------------------------------------------------------------
-# Styling — IEEEtran-friendly defaults
-# ---------------------------------------------------------------------------
-
 plt.rcParams.update({
     "font.family": "serif",
     "font.size": 8,
@@ -44,7 +29,6 @@ plt.rcParams.update({
     "figure.dpi": 150,
     "savefig.dpi": 300,
     "savefig.bbox": "tight",
-    # ACM rejects Type 3 fonts; 42 embeds TrueType instead.
     "pdf.fonttype": 42,
     "ps.fonttype": 42,
     "axes.spines.top": False,
@@ -56,22 +40,16 @@ plt.rcParams.update({
     "lines.markersize": 4,
 })
 
-# Colors — ColorBrewer, grayscale-distinguishable
 COLOR_CELLS = {
     "uniform": "#a6cee3",
     "causal":  "#1f78b4",
 }
 
 MODELS = ["BPR", "NeuMF", "LightGCN"]
-# The datasets the runners actually sweep by default -- kept in step with
-# `ablation_harness.DEFAULT_DATASETS`. Healthcare (7.18M) is opt-in via an
-# explicit `--datasets healthcare` and is left out of the figures for now;
-# add its row back here once it has been run.
+SEEDS = (42, 123, 2026)
 DATASETS = [("musical", "Musical Instruments"), ("baby", "Baby Products"),
             ("cellphone", "Cell Phones & Acc.")]
 
-# Every dataset the paper reports on, for figures that describe the data itself
-# and so do not wait on a finished run.
 DATASETS_FIG = DATASETS + [("philadelphia", "Yelp (Philadelphia)"),
                            ("movielens", "MovieLens-10M")]
 
@@ -89,7 +67,6 @@ def save(fig, name):
 
 
 def load_summary():
-    """{(model, dataset, recipe, metric): (mean, std, n)} or None if absent."""
     if not SUMMARY_CSV.exists():
         print(f"  no {SUMMARY_CSV}, skipping "
               f"(run `python -m research.analysis.aggregate_ablation` first)")
@@ -97,21 +74,13 @@ def load_summary():
     data = {}
     with open(SUMMARY_CSV, encoding="utf-8") as f:
         for row in csv.DictReader(f):
+            gone = (row.get("missing_seeds") or "").split()
             data[(row["model"], row["dataset"], row["recipe"], row["metric"])] = (
-                float(row["mean"]), float(row["std"]), int(row["n"]))
+                float(row["mean"]), float(row["std"]), 0 if gone else int(row["n"]), gone)
     return data
 
 
-# ---------------------------------------------------------------------------
-# Figures
-# ---------------------------------------------------------------------------
-
 def fig_three_model_ablation():
-    """Multi-seed uniform-vs-causal ablation across models and datasets.
-
-    Layout: rows = datasets, columns = models, two bars per panel with
-    mean +/- std error bars. Cells with no seeds are marked TBD.
-    """
     data = load_summary()
     if data is None:
         return
@@ -121,11 +90,13 @@ def fig_three_model_ablation():
     for r, (ds_key, ds_label) in enumerate(DATASETS):
         for c, model in enumerate(MODELS):
             ax = axes[r][c]
-            means, stds = [], []
+            means, stds, gones = [], [], []
             for recipe in RECIPES:
-                m, s, n = data.get((model, ds_key, recipe, "HR@20"), (0.0, 0.0, 0))
+                m, s, n, gone = data.get((model, ds_key, recipe, "HR@20"),
+                                         (0.0, 0.0, 0, [f"seed{x}" for x in SEEDS]))
                 means.append(m if n > 0 else 0.0)
                 stds.append(s if n > 0 else 0.0)
+                gones.append(gone)
             x = np.arange(len(RECIPES))
             ax.bar(x, means, width=0.6,
                    yerr=stds, capsize=2,
@@ -133,13 +104,13 @@ def fig_three_model_ablation():
                    edgecolor="black", lw=0.4,
                    error_kw=dict(elinewidth=0.6, ecolor="black"))
             ymax = max(means) if max(means) > 0 else 1.0
-            for xi, v, s in zip(x, means, stds):
+            for xi, v, s, gone in zip(x, means, stds, gones):
                 if v > 0:
                     ax.text(xi, v + s + ymax * 0.04, f"{v:.4f}",
                             ha="center", va="bottom", fontsize=6.0)
                 else:
-                    ax.text(xi, ymax * 0.5, "TBD", ha="center", va="center",
-                            fontsize=6.5, color="gray")
+                    ax.text(xi, ymax * 0.5, "missing\n" + "\n".join(gone),
+                            ha="center", va="center", fontsize=5.5, color="gray")
             ax.set_xticks(x)
             ax.set_xticklabels(list(RECIPES), rotation=0, fontsize=6.5)
             ax.set_ylim(0, ymax * 1.35 if ymax > 0 else 1.0)
@@ -152,12 +123,6 @@ def fig_three_model_ablation():
 
 
 def fig_counterfactual_rate():
-    """Counterfactual-negative rate ρ under the vanilla (uniform) arm.
-
-    ρ is 0 by construction under `causal`, so only the uniform arm carries
-    information: it measures how much of vanilla training is spent on
-    comparisons that could not have been made at the time.
-    """
     data = load_summary()
     if data is None:
         return
@@ -166,12 +131,17 @@ def fig_counterfactual_rate():
     width = 0.25
     x = np.arange(len(DATASETS))
     for i, model in enumerate(MODELS):
-        vals = []
+        vals, errs = [], []
         for ds_key, _ in DATASETS:
-            m, _s, n = data.get((model, ds_key, "uniform", "rho"), (0.0, 0.0, 0))
+            m, s, n, _gone = data.get((model, ds_key, "uniform", "rho"), (0.0, 0.0, 0, []))
             vals.append(m * 100 if n > 0 else 0.0)
-        ax.bar(x + (i - 1) * width, vals, width=width, label=model,
-               edgecolor="black", lw=0.4)
+            errs.append(s * 100 if n > 0 else 0.0)
+        ax.bar(x + (i - 1) * width, vals, width=width, yerr=errs, capsize=2,
+               label=model, edgecolor="black", lw=0.4)
+        for xi, v in zip(x + (i - 1) * width, vals):
+            if v == 0:
+                ax.text(xi, 1, "missing", rotation=90, ha="center", va="bottom",
+                        fontsize=5.5, color="gray")
     ax.set_xticks(x)
     ax.set_xticklabels([lbl for _, lbl in DATASETS], fontsize=7)
     ax.set_ylabel(r"counterfactual rate $\rho$ (\%)")
@@ -183,18 +153,11 @@ def fig_counterfactual_rate():
 
 
 def _load_cohorts(ds_key):
-    """(years, interactions_that_year, mean_interactions_per_item_born_that_year).
-
-    Read straight from the raw UIRT CSV with the stdlib: this figure describes the
-    data alone, so it must not depend on a split, a loader, or a finished run. The
-    log is streamed rather than materialized -- MovieLens-10M is ten million rows,
-    and holding them as Python lists costs more than the plot is worth.
-    """
     import datetime as _dt
 
     path = DATA_DIR / DATASETS_ALL[ds_key]["path"]
-    per_item = {}          # item -> [first-seen ms, interaction count]
-    per_year = Counter()   # calendar year -> interactions that year
+    per_item = {}
+    per_year = Counter()
     with open(path, newline="", encoding="utf-8") as f:
         r = csv.reader(f)
         next(r)
@@ -209,7 +172,7 @@ def _load_cohorts(ds_key):
                     rec[0] = ts
             per_year[_dt.datetime.fromtimestamp(ts / 1000, _dt.timezone.utc).year] += 1
 
-    born = {}              # launch year -> [items born, their total interactions]
+    born = {}
     for first_ts, count in per_item.values():
         y = _dt.datetime.fromtimestamp(first_ts / 1000, _dt.timezone.utc).year
         acc = born.setdefault(y, [0, 0])
@@ -223,15 +186,6 @@ def _load_cohorts(ds_key):
 
 
 def fig_item_cohorts():
-    """What the catalogue's growth looks like, per dataset, with no model involved.
-
-    Bars: interactions per calendar year. Line: mean interactions per item, items
-    grouped by their launch year tau(i). The bars are catalogue and traffic growth;
-    the falling line is observation-window censoring, since an item appearing late
-    in the log has less remaining time in which to accumulate interactions. That
-    censoring is why every tau-derived quantity carries a cohort bias, and the
-    shape of the bars against the line is what sets rho (Proposition 3.1).
-    """
     keys = [k for k, _ in DATASETS_FIG]
     ncol = 3
     nrow = -(-len(keys) // ncol)
@@ -245,7 +199,6 @@ def fig_item_cohorts():
             print(f"  no {path}, skipping {ds_key}")
             continue
         years, inter, mean_per = _load_cohorts(ds_key)
-        # Drop the long sparse pre-history so the readable range is visible.
         keep = [k for k, v in enumerate(inter) if v >= max(inter) * 0.005]
         lo = keep[0]
         years, inter, mean_per = years[lo:], inter[lo:], mean_per[lo:]
@@ -276,19 +229,21 @@ def fig_item_cohorts():
     save(fig, "item_cohorts")
 
 
-#: The four ablation steps, in order, as `mecha2/runner.ARMS` names them, with the
-#: labels the paper uses.
 STEPS = [("uniform", "uniform"), ("causal", "past-only"),
          ("causal+coherent", "+coherent"), ("causal+temporal", "+temporal")]
 
 
-def _load_ablation_cells():
-    """Every finished four-step cell: {(model, dataset, seed): {step: metrics}}.
 
-    Reads the per-cell JSON the ablation runner writes. Cells still in flight have
-    fewer than four steps recorded and are skipped, so the figure only ever shows
-    what actually completed.
-    """
+def _missing(seeds_present):
+    return [f"seed{s}" for s in SEEDS if s not in seeds_present]
+
+
+def _missing_text(ax, gone, **kw):
+    ax.text(0.5, 0.5, f"missing [{', '.join(gone)}]", transform=ax.transAxes,
+            ha="center", va="center", fontsize=6.5, color="gray", **kw)
+
+
+def _load_ablation_cells():
     cells = {}
     for path in sorted((RESULTS_DIR / "ablation").glob("*tunedper-arm*.json")):
         with open(path, encoding="utf-8") as f:
@@ -298,29 +253,18 @@ def _load_ablation_cells():
             print(f"  skipping {path.name}: {len(recipes)}/4 steps so far")
             continue
         model = j["model"].split("-m2")[0]
-        cells[(model, j["dataset"], j["seed"])] = recipes
+        cells.setdefault((model, j["dataset"]), {})[int(j["seed"])] = recipes
     return cells
 
 
 def fig_ablation_steps(metrics=("NDCG@20", "HitRatio@20")):
-    """The cumulative ablation, one line per finished cell.
-
-    Each line walks the four steps left to right, so the shape is the result: the
-    lift from the past-only pool is the first segment, and whether time-coherent
-    or chronological batches add anything is the rest. Values are test metrics at
-    each step's own tuned hyperparameters (steps 1-2 from tuning, 3-4 trained).
-    """
     cells = _load_ablation_cells()
     if not cells:
         print("  no finished ablation cells yet, skipping")
         return
 
-    # One panel per (model, dataset), one line per seed. Every cell on one pair of
-    # axes made the seed spread unreadable once more than a couple had finished,
-    # and the spread is half of what the ablation is for: a step that moves less
-    # than its own seeds do has not moved.
     metric = metrics[0]
-    panels = sorted({(m, ds) for m, ds, _ in cells})
+    panels = sorted(cells)
     ncol = min(3, len(panels))
     nrow = -(-len(panels) // ncol)
     fig, axes = plt.subplots(nrow, ncol, figsize=(7.0, 2.6 * nrow), squeeze=False)
@@ -328,18 +272,20 @@ def fig_ablation_steps(metrics=("NDCG@20", "HitRatio@20")):
     x = np.arange(len(STEPS))
 
     for ax, (model, ds) in zip(flat, panels):
-        for (m, d, seed), recipes in sorted(cells.items()):
-            if (m, d) != (model, ds):
-                continue
-            ax.plot(x, [recipes[name][metric] for name, _ in STEPS],
-                    marker="o", lw=1.4, label=f"seed {seed}")
-        # Steps 1-2 come from tuning, 3-4 are trained here: mark the seam so the
-        # reader knows where the hyperparameters stop changing.
-        ax.axvline(1.5, color="#999999", lw=0.6, ls=":", zorder=0)
+        by_seed = cells[(model, ds)]
+        ax.set_title(f"{model} / {ds}", fontsize=8)
         ax.set_xticks(x)
         ax.set_xticklabels([label for _, label in STEPS], rotation=30, ha="right",
                            fontsize=6.5)
-        ax.set_title(f"{model} / {ds}", fontsize=8)
+        gone = _missing(by_seed)
+        if gone:
+            _missing_text(ax, gone)
+            continue
+        y = np.array([[by_seed[s][name][metric] for name, _ in STEPS] for s in SEEDS])
+        ax.errorbar(x, y.mean(axis=0), yerr=y.std(axis=0, ddof=1), marker="o", lw=1.4,
+                    capsize=2.5, elinewidth=0.8, color=COLOR_CELLS["causal"],
+                    label=f"mean ± SD, seeds {', '.join(map(str, SEEDS))}")
+        ax.axvline(1.5, color="#999999", lw=0.6, ls=":", zorder=0)
         ax.margins(y=0.18)
         ax.legend(loc="best", frameon=False, fontsize=6)
     for ax in flat[len(panels):]:
@@ -350,85 +296,91 @@ def fig_ablation_steps(metrics=("NDCG@20", "HitRatio@20")):
     save(fig, "ablation_steps")
 
 
+def _load_prequential(pattern):
+    """{(model, dataset): {seed: arms}}"""
+    groups = {}
+    for path in sorted((RESULTS_DIR / "prequential").glob(pattern)):
+        with open(path, encoding="utf-8-sig") as f:
+            j = json.load(f)
+        if not {"uniform", "causal"} <= set(j["arms"]):
+            continue
+        groups.setdefault((j["model"], j["dataset"]), {})[int(j["seed"])] = j["arms"]
+    return groups
+
+
+def _seed_stack(by_seed, metric):
+    """Per-arm (seeds x batches) arrays; batches must be identical across seeds."""
+    ref = by_seed[SEEDS[0]]["uniform"]
+    key = [(p["ts_start"], p["ts_end"]) for p in ref]
+    for s in SEEDS:
+        for arm in ("uniform", "causal"):
+            got = [(p["ts_start"], p["ts_end"]) for p in by_seed[s][arm]]
+            if got != key:
+                raise ValueError(f"seed {s} / {arm}: batches differ from seed {SEEDS[0]}")
+    days = np.array([(p["ts_end"] - ref[0]["ts_start"]) / 86_400_000 for p in ref])
+    u = np.array([[p[metric] for p in by_seed[s]["uniform"]] for s in SEEDS])
+    c = np.array([[p[metric] for p in by_seed[s]["causal"]] for s in SEEDS])
+    return days, u, c
+
+
+def _plot_seed_mean(top, bot, days, u, c, window):
+    for y, arm in ((u, "uniform"), (c, "causal")):
+        colour = COLOR_CELLS[arm]
+        m, sd = y.mean(axis=0), y.std(axis=0, ddof=1)
+        top.plot(days, m, color=colour, lw=0.4, alpha=0.35)
+        rm, rsd = _rolling(m, window), _rolling(sd, window)
+        top.fill_between(days, rm - rsd, rm + rsd, color=colour, alpha=0.25, lw=0)
+        top.plot(days, rm, color=colour, lw=1.3,
+                 label="past-only" if arm == "causal" else arm)
+
+    diff = c - u
+    m, sd = diff.mean(axis=0), diff.std(axis=0, ddof=1)
+    rm, rsd = _rolling(m, window), _rolling(sd, window)
+    bot.axhline(0, color="black", lw=0.6)
+    bot.plot(days, m, color="#999999", lw=0.4, alpha=0.5)
+    bot.fill_between(days, rm - rsd, rm + rsd, color="#999999", alpha=0.35, lw=0)
+    bot.plot(days, rm, color="black", lw=1.0)
+
+
 def fig_prequential_grid(metric="HitRatio@20", window=9):
-    """Every finished timeline on one sheet: datasets down, seeds across.
-
-    `fig_prequential` draws one cell per file, which is the right unit for a
-    close reading of a single run but hopeless for seeing whether a pattern
-    repeats. This puts them on shared axes per dataset so the seeds can be
-    compared at a glance, with the per-batch points dropped and only the rolling
-    means kept -- at this size the raw scatter is noise.
-    """
-    import json as _json
-
-    payloads = {}
-    for path in sorted((RESULTS_DIR / "prequential").glob("*tunedper-arm*.json")):
-        with open(path, encoding="utf-8") as f:
-            j = _json.load(f)
-        payloads[(j["dataset"], int(j["seed"]))] = j["arms"]
-    if not payloads:
+    groups = _load_prequential("*tunedper-arm*.json")
+    if not groups:
         print("  no results/prequential/*.json, skipping")
         return
 
-    datasets = sorted({d for d, _ in payloads})
-    seeds = sorted({s for _, s in payloads})
+    panels = sorted(groups)
+    ncol = min(3, len(panels))
+    nrow = -(-len(panels) // ncol)
+    fig = plt.figure(figsize=(7.0, 2.7 * nrow))
+    outer = fig.add_gridspec(nrow, ncol, hspace=0.55, wspace=0.3)
 
-    # Each cell keeps the two-panel shape of the single-run figure: the metric
-    # above, `causal - uniform` below. The difference panel is the one that
-    # carries the claim -- batches differ in difficulty, and both samplers are
-    # measured on identical ones, so their difference cancels that out.
-    fig = plt.figure(figsize=(7.0, 2.7 * len(datasets)))
-    outer = fig.add_gridspec(len(datasets), len(seeds), hspace=0.55, wspace=0.3)
+    for k, (model, ds) in enumerate(panels):
+        r, c = divmod(k, ncol)
+        inner = outer[r, c].subgridspec(2, 1, height_ratios=(3, 1), hspace=0.08)
+        top = fig.add_subplot(inner[0])
+        bot = fig.add_subplot(inner[1], sharex=top)
+        top.set_title(ds, fontsize=8)
+        gone = _missing(groups[(model, ds)])
+        if gone:
+            _missing_text(top, gone)
+            bot.set_axis_off()
+            continue
+        days, u, cz = _seed_stack(groups[(model, ds)], metric)
+        _plot_seed_mean(top, bot, days, u, cz, window)
 
-    for r, ds in enumerate(datasets):
-        for c, seed in enumerate(seeds):
-            arms = payloads.get((ds, seed))
-            inner = outer[r, c].subgridspec(2, 1, height_ratios=(3, 1), hspace=0.08)
-            top = fig.add_subplot(inner[0])
-            bot = fig.add_subplot(inner[1], sharex=top)
-            if not arms:
-                top.set_axis_off()
-                bot.set_axis_off()
-                continue
-
-            days = [(p["ts_end"] - arms["uniform"][0]["ts_start"]) / 86_400_000
-                    for p in arms["uniform"]]
-            for arm, colour in (("uniform", COLOR_CELLS["uniform"]),
-                                ("causal", COLOR_CELLS["causal"])):
-                y = [p[metric] for p in arms[arm]]
-                top.plot(days, y, color=colour, lw=0.4, alpha=0.35)
-                top.plot(days, _rolling(y, window), color=colour, lw=1.3, label=arm)
-
-            diff = [b[metric] - a[metric]
-                    for a, b in zip(arms["uniform"], arms["causal"])]
-            bot.axhline(0, color="black", lw=0.6)
-            bot.plot(days, diff, color="#999999", lw=0.4, alpha=0.5)
-            smoothed = _rolling(diff, window)
-            bot.plot(days, smoothed, color="black", lw=1.0)
-            bot.fill_between(days, 0, smoothed, color=COLOR_CELLS["uniform"],
-                             alpha=0.5)
-
-            top.tick_params(labelsize=5.5, labelbottom=False)
-            bot.tick_params(labelsize=5.5)
-            if r == 0:
-                top.set_title(f"seed {seed}", fontsize=8)
-            if c == 0:
-                top.set_ylabel(f"{ds}\n{metric}", fontsize=6.5)
-                bot.set_ylabel("causal $-$\nuniform", fontsize=5.5)
-            if r == len(datasets) - 1:
-                bot.set_xlabel("days since first evaluated batch", fontsize=6.5)
-            if (r, c) == (0, 0):
-                top.legend(loc="best", frameon=False, fontsize=5.5)
+        top.tick_params(labelsize=5.5, labelbottom=False)
+        bot.tick_params(labelsize=5.5)
+        if c == 0:
+            top.set_ylabel(metric, fontsize=6.5)
+            bot.set_ylabel("past-only $-$\nuniform", fontsize=5.5)
+        if r == nrow - 1:
+            bot.set_xlabel("days since first evaluated batch", fontsize=6.5)
+        if k == 0:
+            top.legend(loc="best", frameon=False, fontsize=5.5)
     save(fig, "prequential_grid")
 
 
 def _rolling(a, w):
-    """Centred rolling mean, with the window shrinking at the edges.
-
-    A per-batch metric over a few hundred interactions is jumpy by construction;
-    the smoothed line is what is readable and the raw points are what is honest,
-    so the figure shows both.
-    """
     a = np.asarray(a, dtype=float)
     out = np.empty_like(a)
     for i in range(len(a)):
@@ -438,77 +390,125 @@ def _rolling(a, w):
 
 
 def fig_prequential(metric="HitRatio@20", window=9):
-    """Performance along the deployment timeline, one line per arm.
-
-    Top panel: each arm's metric per batch, raw points faint behind a rolling
-    mean. Bottom panel: `causal - uniform` against a zero line.
-
-    The bottom panel is the one that carries the claim. Batches differ in
-    difficulty -- different users, different catalogue size, different counts --
-    so an absolute curve confounds "the arms diverged" with "this stretch of the
-    timeline was harder". Both arms are measured on *identical* batches, so their
-    difference cancels that out, and a crossover is simply a sign change.
-    """
-    import json
-
-    paths = sorted((RESULTS_DIR / "prequential").glob("*.json"))
-    if not paths:
+    groups = _load_prequential("*.json")
+    if not groups:
         print("  no results/prequential/*.json, skipping "
               "(run `python -m research.mecha3.runner` first)")
         return
 
-    for path in paths:
-        with open(path, encoding="utf-8-sig") as f:
-            payload = json.load(f)
-        arms = payload["arms"]
-        if not {"uniform", "causal"} <= set(arms):
+    for (model, ds), by_seed in sorted(groups.items()):
+        gone = _missing(by_seed)
+        if gone:
+            print(f"  skipping {model} / {ds}: missing [{', '.join(gone)}]")
             continue
-
-        # Batches are identical across arms by construction; take the x-axis from
-        # either and assert rather than assume.
-        u_rec, c_rec = arms["uniform"], arms["causal"]
-        n = min(len(u_rec), len(c_rec))
-        mid = np.array([(r["ts_start"] + r["ts_end"]) / 2 for r in u_rec[:n]])
-        x = (mid - mid.min()) / (1000 * 60 * 60 * 24)   # days since the first point
-        u = np.array([r[metric] for r in u_rec[:n]])
-        c = np.array([r[metric] for r in c_rec[:n]])
-
+        days, u, c = _seed_stack(by_seed, metric)
         fig, (ax, dax) = plt.subplots(
             2, 1, figsize=(7.0, 4.2), sharex=True,
             gridspec_kw={"height_ratios": [2.2, 1]})
-
-        for vals, arm in ((u, "uniform"), (c, "causal")):
-            ax.plot(x, vals, lw=0.5, alpha=0.25, color=COLOR_CELLS[arm])
-            ax.plot(x, _rolling(vals, window), lw=1.6,
-                    color=COLOR_CELLS[arm], label=arm)
+        _plot_seed_mean(ax, dax, days, u, c, window)
         ax.set_ylabel(metric)
         ax.legend(loc="upper right", frameon=False, fontsize=6.5)
-        ax.set_title(f"{payload['model']} / {payload['dataset']} / "
-                     f"seed {payload['seed']}", fontsize=8)
-
-        gap = c - u
-        dax.axhline(0.0, color="black", lw=0.6)
-        dax.plot(x, gap, lw=0.5, alpha=0.25, color="black")
-        dax.plot(x, _rolling(gap, window), lw=1.6, color="black")
-        dax.fill_between(x, 0, _rolling(gap, window),
-                         where=_rolling(gap, window) >= 0,
-                         color=COLOR_CELLS["causal"], alpha=0.25, lw=0)
-        dax.set_ylabel("causal - uniform")
+        ax.set_title(f"{model} / {ds} / mean ± SD over seeds "
+                     f"{', '.join(map(str, SEEDS))}", fontsize=8)
+        dax.set_ylabel("past-only - uniform")
         dax.set_xlabel("days since first evaluated batch")
-
         fig.tight_layout()
-        # The model label belongs in the filename: two models on the same
-        # dataset and seed are two different figures, and keying only on
-        # dataset+seed silently overwrote the first with the second.
-        save(fig, f"prequential_{payload['model'].lower()}_"
-                  f"{payload['dataset']}_seed{payload['seed']}")
+        save(fig, f"prequential_{model.lower()}_{ds}")
 
 
-# ---------------------------------------------------------------------------
-# Dispatcher
-# ---------------------------------------------------------------------------
+MODEL_STYLE = {"bpr": ("BPR", "#1b9e77", "o"),
+               "neumf-pretrain": ("NeuMF", "#d95f02", "s"),
+               "lightgcn": ("LightGCN", "#7570b3", "^")}
+
+
+def fig_user_leakage(axis="review"):
+    path = RESULTS_DIR / "diagnostics" / "user_leakage.json"
+    if not path.exists():
+        print(f"  no {path.name}, skipping (run `python -m research.analysis.user_leakage`)")
+        return
+    with open(path, encoding="utf-8") as f:
+        ul = json.load(f)
+
+    datasets = [(k, lbl) for k, lbl in DATASETS_FIG if k in ul["datasets"]]
+    fig, axes = plt.subplots(3, len(datasets), figsize=(7.0, 5.6), squeeze=False,
+                             gridspec_kw={"hspace": 0.45, "wspace": 0.35})
+    for c, (ds, label) in enumerate(datasets):
+        d = ul["datasets"][ds]
+        groups = d["axes"][axis]
+        names = [g["group"] for g in groups]
+        fine = axis in ("fine", "join_fine")
+        ticks = [g["range"] if fine else f"{g['group']}\n{g['range']}" for g in groups]
+        if axis == "join":
+            ticks = [g["group"] for g in groups]
+        if axis == "join_fine":
+            ticks = [g["range"].split(" – ")[0] for g in groups]   # group's first month
+        x = np.arange(len(groups))
+
+        ax = axes[0][c]
+        ax.bar(x, [100 * g["rho"] for g in groups], width=0.6,
+               color=COLOR_CELLS["causal"], edgecolor="black", lw=0.4)
+        ax.axhline(100 * d["rho_total"], color="black", lw=0.6, ls="--")
+        ax.set_title(label, fontsize=7.5)
+
+        ax = axes[1][c]
+        w = 0.36
+        ax.bar(x - w / 2, [100 * g["share_users"] for g in groups], width=w,
+               color="#dddddd", edgecolor="black", lw=0.4, label="share of users")
+        ax.bar(x + w / 2, [100 * g["share_leak"] for g in groups], width=w,
+               color=COLOR_CELLS["causal"], edgecolor="black", lw=0.4,
+               label="share of future negatives")
+
+        ax = axes[2][c]
+        ax.axhline(0, color="black", lw=0.6)
+        rows = {(g["model"], g["group"]): g for g in ul["gains"]
+                if g["dataset"] == ds and g["axis"] == axis and g.get("diff") is not None}
+        present = [m for m in MODEL_STYLE if any(k[0] == m for k in rows)]
+        if not present:
+            ax.text(0.5, 0.5, "no trained\nmodels", transform=ax.transAxes,
+                    ha="center", va="center", fontsize=6, color="gray")
+        for i, m in enumerate(present):
+            name, colour, marker = MODEL_STYLE[m]
+            off = (i - (len(present) - 1) / 2) * 0.18
+            ys = [rows.get((m, n)) for n in names]
+            for xi, g in zip(x, ys):
+                if g is None:
+                    continue
+                ax.errorbar(xi + off, 1000 * g["diff"],
+                            yerr=[[1000 * (g["diff"] - g["ci_low"])],
+                                  [1000 * (g["ci_high"] - g["diff"])]],
+                            fmt=marker, ms=3, color=colour, elinewidth=0.7, capsize=1.5,
+                            mfc=colour if g["significant"] else "white",
+                            label=name if xi == 0 else None)
+
+        for r in range(3):
+            axes[r][c].set_xlim(-0.6, len(x) - 0.4)
+            axes[r][c].set_xticks(x)
+            axes[r][c].set_xticklabels(ticks if r == 2 else [""] * len(x), fontsize=5.5,
+                                       rotation=90 if fine else 0)
+            axes[r][c].tick_params(axis="y", labelsize=6)
+
+    axes[0][0].set_ylabel(r"$\rho$ (%)", fontsize=7)
+    axes[1][0].set_ylabel("share (%)", fontsize=7)
+    axes[2][0].set_ylabel(r"$\Delta$ NDCG@20 ($\times10^{-3}$)", fontsize=7)
+    handles, labels = [], []
+    for ax in [axes[1][0], *axes[2]]:
+        for h, l in zip(*ax.get_legend_handles_labels()):
+            if l not in labels:
+                handles.append(h)
+                labels.append(l)
+    if handles:
+        fig.legend(handles, labels, loc="lower center", ncol=len(handles), frameon=False,
+                   fontsize=6, bbox_to_anchor=(0.5, -0.02))
+    save(fig, f"user_leakage_{axis}")
+
+
+def fig_user_leakage_all():
+    for axis in ("review", "join", "fine", "join_fine"):
+        fig_user_leakage(axis)
+
 
 ALL_FIGS = {
+    "user_leakage":          fig_user_leakage_all,
     "item_cohorts":          fig_item_cohorts,
     "ablation_steps":        fig_ablation_steps,
     "prequential_grid":      fig_prequential_grid,

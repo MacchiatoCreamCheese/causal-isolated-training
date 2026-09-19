@@ -1,18 +1,3 @@
-"""Collect every tuning trial into one readable spreadsheet.
-
-Inputs:  research/results/tuning/<model>/<dataset>/<recipe>/seed<n>/
-             baseline.json, <knob>/<value>.json, winner.json
-         (written by research.runners.tuning).
-Outputs: research/results/tuning_summary.xlsx  (sheets: Trials, Winners, Coverage)
-         research/results/tuning_summary.csv   (the Trials sheet, flat)
-
-Trials the grid in tuning_config.TUNE_ORDER calls for but that are not on disk
-are listed with status "missing", so an unfinished cell shows its gaps instead of
-looking complete.
-
-    python -m research.analysis.aggregate_tuning
-"""
-
 import json
 
 import pandas as pd
@@ -38,8 +23,6 @@ STALE_FILL = PatternFill("solid", fgColor="FFEB9C")
 
 
 def _value_slug(value) -> str:
-    # Same encoding as runners/tuning.py:_value_slug -- copied rather than
-    # imported, because importing the runner pulls in cornac and torch.
     s = repr(value) if isinstance(value, bool) else str(value)
     return (s.replace(".", "p").replace("-", "m").replace("+", "")
              .replace("(", "").replace(")", "").replace(",", "_").replace(" ", ""))
@@ -51,7 +34,6 @@ def _load(path):
 
 
 def _base_model(model_dir: str) -> str:
-    """`neumf-pretrain` -> `neumf`, the key TUNE_ORDER is written under."""
     return model_dir.split("-")[0]
 
 
@@ -83,8 +65,6 @@ def _trial_row(ident, knob, value, payload, winner_cfg):
     cfg = payload.get("config", {})
     val = payload.get("val_metrics")
     test = payload.get("test_metrics", {})
-    # Pre-2026-09-11 files have no val_metrics: they were selected on test and
-    # the tuner treats them as stale.
     row["status"] = "done" if val else "stale"
     row["winner"] = "yes" if winner_cfg is not None and _same_config(cfg, winner_cfg) else ""
     for disp, key in METRICS:
@@ -117,7 +97,6 @@ def collect():
                 seen.add(path)
                 trials.append(_trial_row(ident, knob, value,
                                          _load(path) if path.exists() else None, winner_cfg))
-        # Trials for knobs no longer in TUNE_ORDER (e.g. lambda_reg before the trim).
         for path in sorted(cell.glob("*/*.json")):
             if path not in seen:
                 row = _trial_row(ident, path.parent.name, path.stem, _load(path), winner_cfg)
@@ -141,7 +120,6 @@ def collect():
 
 
 def add_arm_gap(winners: pd.DataFrame) -> pd.DataFrame:
-    """causal vs uniform winner, as % of uniform, where both arms finished."""
     key = ["model", "dataset", "seed"]
     uni = (winners[winners["arm"] == "uniform"]
            .set_index(key)[["val NDCG@20", "test NDCG@20"]])
@@ -161,7 +139,6 @@ def add_arm_gap(winners: pd.DataFrame) -> pd.DataFrame:
 
 
 def coverage(winners: pd.DataFrame) -> pd.DataFrame:
-    """One row per model/dataset/arm, one column per seed: trials done / expected."""
     models = sorted(set(winners["model"]) | set(MODELS))
     datasets = [d for d in DATASETS if d in set(winners["dataset"])] or DATASETS
     lookup = {(r["model"], r["dataset"], r["arm"], r["seed"]): r

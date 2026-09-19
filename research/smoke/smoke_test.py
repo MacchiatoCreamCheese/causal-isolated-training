@@ -1,11 +1,3 @@
-"""Smoke test: confirm BPRMiniBatch runs at all and benchmark one epoch.
-
-Needs the baby CSV under RESEARCH_DATA_DIR — it is a hand-run benchmark, not a
-pytest case, so it stays out of the automated suite (pytest imports it, because
-the name matches `*_test.py`, and finds nothing to run).
-
-Usage:  python -m research.smoke.smoke_test
-"""
 import time
 
 from ..lib.bpr_cpu import BPRMiniBatch

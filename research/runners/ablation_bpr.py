@@ -1,20 +1,3 @@
-"""BPR causal-sampling ablation across datasets, multi-seed.
-
-Two cells per (dataset, seed) — `uniform` vs `causal` — dumping
-HR@20 / NDCG@20 / Recall@20 plus the counterfactual-negative rate to
-research/results/ablation/bpr_<dataset>_seed<n>.json. Aggregation across
-seeds is done by research.analysis.aggregate_ablation.
-
-BPR is the one model that does not take its negatives from the data loader:
-cornac's BPR trains in compiled Cython over `train_set.matrix`, a CSR that
-carries no timestamps, so the causal rule cannot reach it. We therefore use
-our own NumPy BPR, which reads the same first-seen index via
-`lib.causal_negative_sampler.NumpyCausalSampler` and reports the probe itself.
-
-Usage:
-  python -m research.runners.ablation_bpr --seeds 42,123,2026 --datasets baby
-"""
-
 import time
 
 import cornac
@@ -31,23 +14,10 @@ from ..lib.tuning_config import ablation_label
 from ..paths import logs_dir
 
 
-#: Encodes any non-default switches (see tuning_config.ablation_label),
-#: so a variant run cannot overwrite the baseline's seed JSONs.
 MODEL = ablation_label("BPR")
 
 
 def cell_configs(ds_name: str, seed: int):
-    """`{recipe: kwargs}` for one dataset -- the single source for both the model
-    and its provenance stamp, so the config recorded in a result file cannot
-    drift from the one that produced it.
-
-    Every hyperparameter comes off `lib/tuning_config.py`, which is where each
-    one's provenance is recorded -- including the NewBPR §5.2 protocol (up to
-    1000 epochs, early stopping on NDCG@20 with patience=13; the actual stop
-    epoch is data-dependent). BPR_EARLY_STOP is merged in rather than passed
-    separately at the call site, because patience changes the result and so
-    belongs in what gets compared on resume.
-    """
     return {r: {**bpr_kwargs(ds_name, r, seed), **BPR_EARLY_STOP} for r in RECIPES}
 
 
@@ -83,8 +53,6 @@ def run_one(ds_name: str, seed: int) -> None:
             save_dir=logs_dir(),
         )
         exp.run()
-        # BPR owns its sampler, so the probe comes off the model here rather
-        # than off the training split.
         metrics = extract_metrics(exp, probe=model)
         recipes_out[recipe] = metrics
         write_partial(MODEL, ds_name, seed, recipes_out, configs)

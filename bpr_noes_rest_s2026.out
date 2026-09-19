@@ -1,0 +1,6 @@
+nohup: ignoring input
+[run_tuning] bpr | env=leakage24 | data=/mnt/c/Users/nguye/uniyear/causal-isolated-training/data | Fri Sep 18 23:45:46 +07 2026
+[run_tuning] cornac 2.6.0 | torch 2.4.1+cu121
+[run_tuning] musical/uniform/seed2026 -> tune_bpr_musical_uniform_s2026.log  (23:45)
+[run_tuning] musical/causal/seed2026 -> tune_bpr_musical_causal_s2026.log  (08:31)
+[run_tuning] baby/uniform/seed2026 -> tune_bpr_baby_uniform_s2026.log  (17:22)

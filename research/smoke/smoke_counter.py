@@ -1,11 +1,3 @@
-"""Smoke test: verify the counterfactual-negative-rate counter on real data.
-
-Needs the baby CSV under RESEARCH_DATA_DIR. The equivalent assertion runs on
-synthetic data in `test_cornac_causal.py`, which is the one CI should use; this
-is here to see the rate on an actual dataset.
-
-Usage:  python -m research.smoke.smoke_counter
-"""
 from ..lib.bpr_cpu import BPRMiniBatch
 from ..lib.data import build_eval_method
 

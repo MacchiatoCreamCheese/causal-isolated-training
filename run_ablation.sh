@@ -1,14 +1,4 @@
 #!/usr/bin/env bash
-# Run the ablation ladder for one model over every dataset x seed.
-#
-# Rungs 1-2 are reused from the tuning winners (no training) when tuning for that
-# dataset/seed has finished; rungs 3-4 are trained. So run this *after* a seed's
-# tuning is done, or rungs 1-2 get trained here instead.
-#
-# From Windows (keep the window open -- WSL stops with its last session):
-#     wsl.exe -d Ubuntu -- bash /mnt/c/Users/nguye/uniyear/causal-isolated-training/run_ablation.sh neumf pretrain
-#
-# Usage:  [SEEDS='42'] [DATASETS='musical'] bash run_ablation.sh <bpr|neumf|lightgcn> [pretrain]
 set -u
 
 MODEL="${1:?usage: run_ablation.sh <bpr|neumf|lightgcn> [pretrain]}"
@@ -21,7 +11,6 @@ conda activate "$CONDA_ENV"
 
 cd "$(dirname "$(readlink -f "$0")")"
 export RESEARCH_DATA_DIR="$PWD/data"
-# Rung 1 at the uniform winners, rungs 2-4 at the causal winners.
 export RESEARCH_TUNED_ARM=per_arm
 
 LABEL="$MODEL"

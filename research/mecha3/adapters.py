@@ -1,38 +1,9 @@
-"""Per-model drivers for the prequential stream.
-
-`prequential.py` owns the protocol -- score a batch, then train on it, walking
-forward in time. What differs per model is only three operations, and this module
-supplies them:
-
-    prepare(train_set)   build parameters
-    score(users)         scores over the whole catalogue, for evaluation
-    observe(rows)        one training step on these rows
-
-Nothing here reimplements a model. cornac's architectures and losses are
-imported and used as-is -- `NeuMF._build_model_pt()`, LightGCN's `Model` and
-`Model.loss_fn`, its `construct_graph`. What is written here is the five-line
-"forward, loss, backward, step" that cornac keeps *inside* `fit()`, because
-prequential has to interrupt between batches and `fit()` offers no seam. The part
-that must not drift from cornac -- the model definition -- still comes from
-cornac, so the repo's "imported, never vendored" rule holds.
-
-Negatives come from `NumpyCausalSampler` for every model here, rather than from
-the dataset iterators cornac's models normally use. That is a different code path
-from the ablation's, so `test_prequential.py` checks rho on it rather than
-assuming; both read the same per-item first-seen index, so "causal" means one
-thing across the project.
-"""
-
 import numpy as np
 
 from ..lib.causal_negative_sampler import NumpyCausalSampler
 
 
 class Adapter:
-    """Common plumbing: row arrays and the shared negative sampler."""
-
-    #: Rows scored per batch. `None` means all of them. NeuMF overrides this --
-    #: see its docstring.
     eval_sample = None
 
     def __init__(self, model, sampler_kind):
@@ -54,8 +25,6 @@ class Adapter:
 
 
 class BPRAdapter(Adapter):
-    """Our NumPy BPR. The only model whose training loop we already own."""
-
     def prepare(self, train_set):
         self.bind(train_set)
         m = self.model
@@ -76,20 +45,6 @@ class BPRAdapter(Adapter):
 
 
 class NeuMFAdapter(Adapter):
-    """cornac's NeuMF, stepped one batch at a time.
-
-    The architecture is cornac's `_build_model_pt()`; the loss is `nn.BCELoss`,
-    as in `NCFBase._fit_pt`. Only the loop is written here.
-
-    **Scoring is sampled.** NeuMF is an MLP over a concatenated (user, item)
-    pair, not a dot product, so scoring one user against the catalogue costs
-    `num_items` forward passes rather than one matrix row. Scoring every row of a
-    4096-row batch against 22k items would be ~93M forwards per point. So a
-    random subset of each batch is scored instead: the metric is an unbiased
-    estimate either way, just noisier, and the curve is smoothed for reading
-    anyway. `eval_sample` is the knob.
-    """
-
     eval_sample = 256
 
     def __init__(self, model, sampler_kind, device=None):
@@ -134,8 +89,6 @@ class NeuMFAdapter(Adapter):
         torch = self.torch
         m = self.model
         u, pos = self.u_arr[rows], self.i_arr[rows]
-        # cornac's uir_iter layout: positives first, then num_neg negatives per
-        # positive, labelled 0. Reproduced so the loss sees what it normally sees.
         u_rep = np.repeat(u, m.num_neg)
         neg = self.negatives(rows, m.num_neg).reshape(-1)
         users = np.concatenate([u, u_rep])
@@ -153,26 +106,6 @@ class NeuMFAdapter(Adapter):
 
 
 class LightGCNAdapter(Adapter):
-    """cornac's LightGCN, stepped one batch at a time.
-
-    Architecture, loss and graph construction are all cornac's (`Model`,
-    `Model.loss_fn`, `construct_graph`).
-
-    **The graph is training data.** `construct_graph` builds a dgl graph from a
-    dataset's entire `uir_tuple`, and LightGCN's whole mechanism is propagating
-    signal along those edges. Handing it the full training graph would let
-    information from *future* interactions reach a current prediction through
-    convolution -- leakage of exactly the kind this project exists to remove, and
-    invisible in the output because the curve would simply look good.
-
-    So the graph is rebuilt from the rows seen so far as the stream advances.
-    `graph_every` trades precision for speed: with `graph_every > 1` the graph
-    lags by up to that many batches, which is *safe* -- a stale graph holds fewer
-    past edges, never future ones -- but slightly understates what the model
-    could know. Rebuilding is a dgl heterograph construction, so it is the
-    dominant cost of a LightGCN prequential run.
-    """
-
     def __init__(self, model, sampler_kind, graph_every=1, device=None):
         super().__init__(model, sampler_kind)
         self.graph_every = max(1, int(graph_every))
@@ -200,13 +133,10 @@ class LightGCNAdapter(Adapter):
                                           np.random.default_rng(m.seed))
 
     def _build_graph(self):
-        """A dgl graph over the rows observed so far, and only those."""
         from cornac.models.lightgcn.lightgcn import construct_graph
 
         rows = (np.concatenate(self._seen_rows) if self._seen_rows
                 else np.empty(0, dtype=np.int64))
-        # construct_graph only reads `.uir_tuple`, so a stand-in is enough and
-        # avoids rebuilding a whole cornac Dataset per rebuild.
         view = type("RowView", (), {"uir_tuple": (self.u_arr[rows],
                                                   self.i_arr[rows],
                                                   None)})()

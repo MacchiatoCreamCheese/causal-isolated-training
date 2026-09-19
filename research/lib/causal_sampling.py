@@ -1,20 +1,10 @@
-"""Mechanism 1 faithfulness probes (evaluation-time).
-
-Training-time causal negative sampling now lives at the data-loader layer
-(`timeaware_data.TimeAwareDataset` + `causal_negative_sampler`). What remains
-here are the *evaluation-time* probes that quantify residual leakage — how many
-recommended items did not yet exist at the moment of the test interaction
-(`future_items_pct`) — plus `item_first_seen`, shared by the recency analysis.
-"""
-
 from typing import Dict
 
 import numpy as np
 
-from .data import load_uirt, dataset_path  # re-export the canonical UIRT reader
+from .data import load_uirt, dataset_path
 
 
-# Retained for single-dataset probe scripts that still reference them directly.
 DATASET_CSV = dataset_path("baby")
 VAL_TIMESTAMP = 1628643414042
 TEST_TIMESTAMP = 1658002729837
@@ -59,21 +49,12 @@ def future_items_pct(model, eval_method, item_first, k):
 
 
 def future_items_pct_batched(model, eval_method, item_first, k, chunk=512):
-    """Vectorized version of future_items_pct.
-
-    Calls model.score(u_idx) (length num_items vector) in user chunks, takes
-    top-K via argpartition, checks future-item count via item_first array.
-    Identical integer counts to the per-user-recommend loop above except for
-    the negligible-probability case of exact float-score ties on the K/K+1
-    boundary.
-    """
     test_set = eval_method.test_set
     iid2raw = {v: k_ for k_, v in test_set.iid_map.items()}
     u_indices, _, _ = test_set.uir_tuple
     ts_by_row = np.asarray(list(test_set.timestamps), dtype=np.int64)
     u_arr = np.asarray(u_indices, dtype=np.int64)
 
-    # Precompute first-seen timestamp per item INDEX (mapped via iid2raw).
     num_items = test_set.num_items
     item_first_arr = np.zeros(num_items, dtype=np.int64)
     for idx in range(num_items):
@@ -102,17 +83,16 @@ def future_items_pct_batched(model, eval_method, item_first, k, chunk=512):
             keep.append(i)
         if not scores_rows:
             continue
-        scores = np.stack(scores_rows, axis=0)  # (b, num_items)
+        scores = np.stack(scores_rows, axis=0)
         ts_kept = ts_chunk[keep]
 
-        # top-K item indices per row (unsorted; set membership only).
         if k >= scores.shape[1]:
             topk = np.tile(np.arange(scores.shape[1]), (scores.shape[0], 1))
         else:
             topk = np.argpartition(scores, -k, axis=1)[:, -k:]
-        first_seen_topk = item_first_arr[topk]                 # (b, k)
-        future_mask = first_seen_topk > ts_kept[:, None]       # (b, k)
-        per_row_future = future_mask.sum(axis=1)               # (b,)
+        first_seen_topk = item_first_arr[topk]
+        future_mask = first_seen_topk > ts_kept[:, None]
+        per_row_future = future_mask.sum(axis=1)
 
         n_future += int(per_row_future.sum())
         n_total += int(topk.size)

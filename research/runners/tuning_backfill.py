@@ -1,33 +1,3 @@
-"""Recover validation scores for tuning runs made before the test-selection fix.
-
-Until 2026-09-11 `runners/tuning.py` selected on the test set. Its trial files
-kept test metrics only, but its stdout logs printed cornac's VALIDATION and TEST
-tables for every trial, so validation can be recovered without retraining.
-
-For every tuning cell a log covers, this:
-
-  1. writes `val_metrics` into `baseline.json` and each trial file, but only when
-     the log's test NDCG@20 matches the file's (4 d.p.) -- proof the two
-     describe the same run;
-  2. re-runs the coordinate-descent selection on validation, with the tuner's
-     own rule (default first, first maximum wins);
-  3. if every knob picks the same value as before, stamps `winner.json` as
-     validation-selected -- nothing to re-run;
-  4. if the picks first differ at knob K, deletes the trial folders of every
-     knob *after* K (they were trained around the test-picked value) and
-     `winner.json`. Trials up to and including K stay: they were trained at
-     configs both selections agree on. Re-running the tuner then trains only
-     the knobs after K.
-
-Validation scores recovered this way have 4 decimals (the logs' precision), and
-the files say so. Cells no log covers are untouched; the tuner re-runs their
-files because they lack `val_metrics`.
-
-Usage (from the repo root, on each machine, over that machine's logs):
-    python -m research.runners.tuning_backfill tune_*.log            # dry run
-    python -m research.runners.tuning_backfill tune_*.log --apply
-"""
-
 import argparse
 import json
 import shutil
@@ -40,13 +10,11 @@ COLS = ("HitRatio@20", "NDCG@20", "Recall@20")
 
 
 def _table_row(line):
-    """(model/tune/... name, {metric: value}) from one cornac result row."""
     cols = [c.strip() for c in line.split("|")]
     return cols[0], {k: float(v) for k, v in zip(COLS, cols[1:4])}
 
 
 def parse_log(path):
-    """[(kind, knob, value_str, val, test, name)] for every trial the log ran."""
     events, mode, val, test, name = [], None, None, None, None
     for raw in Path(path).read_text(encoding="utf-8", errors="replace").splitlines():
         s = raw.strip()
@@ -71,14 +39,6 @@ def parse_log(path):
 
 
 def cell_dir(log_path, name):
-    """results/tuning/<model dir>/<dataset>/<recipe>/seed<n> for one log.
-
-    Dataset, recipe and seed come from the table row (`NeuMF/tune/<dataset>/
-    <recipe>/s<seed>`), so any log name works, including one with a seed suffix
-    or several cells in one file. Only the model *directory* (e.g.
-    `neumf-pretrain`, which the row does not show) comes from the filename:
-    whatever sits between `tune_` and `_<dataset>_`.
-    """
     parts = name.split("/")
     dataset, recipe, seed = parts[2], parts[3], parts[4][1:]
     stem = Path(log_path).stem
@@ -98,7 +58,6 @@ def _stamp(payload, val, source):
 
 
 def backfill(d, events, source, apply):
-    """Attach validation metrics to the cell's files. Returns {path: payload}."""
     loaded = {}
     for kind, knob, value, val, test, _ in events:
         if kind == "baseline":
@@ -111,7 +70,7 @@ def backfill(d, events, source, apply):
             if kind == "run" and str(payload.get("value")) != value:
                 continue
             if "val_metrics" in payload and p not in loaded:
-                continue                                  # already validation
+                continue
             if _matches(payload.get("test_metrics", payload["metrics"]), test):
                 _stamp(payload, val, source)
                 loaded[p] = payload
@@ -122,7 +81,6 @@ def backfill(d, events, source, apply):
 
 
 def _validated_winner(d):
-    """True when `winner.json` was written by the fixed (validation) tuner."""
     wpath = d / "winner.json"
     if not wpath.exists():
         return False
@@ -131,11 +89,6 @@ def _validated_winner(d):
 
 
 def _carried_value(d, model, knob):
-    """The value of `knob` the tuner carried into later knobs, or None.
-
-    Read off the stored config of any trial from a later knob -- every one of
-    them was trained with `knob` fixed at whatever the tuner picked.
-    """
     order = [k for k, _ in TUNE_ORDER[model]]
     for later in order[order.index(knob) + 1:]:
         for p in sorted((d / later).glob("*.json")) if (d / later).is_dir() else []:
@@ -144,11 +97,6 @@ def _carried_value(d, model, knob):
 
 
 def reselect(model, d, loaded):
-    """Replay coordinate descent on validation and on test; find the divergence.
-
-    Returns (status, knob, config) where status is one of
-    'agree', 'diverge', 'incomplete'.
-    """
     def read(p):
         if p in loaded:
             return loaded[p]
@@ -175,10 +123,6 @@ def reselect(model, d, loaded):
         by_val = max(cands, key=lambda c: c[1])
         by_test = max(cands, key=lambda c: c[2])
         if by_val[0] != by_test[0]:
-            # Disagreement alone proves nothing: what matters is which value
-            # the tuner actually carried forward, since later trials were
-            # trained around it. A cell tuned *after* the fix followed
-            # validation, so its later trials are valid and must be kept.
             taken = _carried_value(d, model, knob)
             if taken is None:
                 return "repick", knob, config
@@ -202,8 +146,6 @@ def main():
         if not events:
             print(f"{log}: no trials with both tables, skipped")
             continue
-        # One log can hold several seeds (a loop appending to the same file), so
-        # group by the cell named in each table row, never by the first one.
         by_name = {}
         for e in events:
             by_name.setdefault(e[5], []).append(e)
@@ -221,8 +163,6 @@ def main():
             wpath = d / "winner.json"
             if wpath.exists():
                 w = json.loads(wpath.read_text(encoding="utf-8"))
-                # A winner the fixed tuner wrote is already validation-selected
-                # and may carry more (users_run); leave it exactly as it is.
                 if w.get("select_split") != "validation":
                     assert _canon(w["config"]) == _canon(config), (wpath, w["config"], config)
                     w.update(select_split="validation", metric=v, test_metric=t,
@@ -232,9 +172,6 @@ def main():
             print(f"{rel}: KEEP  (validation picks the same values; "
                   f"{len(loaded)} files backfilled)")
         elif status == "repick" and _validated_winner(d):
-            # The fixed tuner already picked this winner on validation, at full
-            # precision; the log's 4-d.p. scores cannot overrule it. Deleting it
-            # would also drop its users_run and force a retrain of the winner.
             print(f"{rel}: KEEP  (winner already selected on validation by the "
                   f"fixed tuner; {len(loaded)} files backfilled)")
         elif status == "repick":

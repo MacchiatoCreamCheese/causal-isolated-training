@@ -299,3 +299,88 @@ BPR/tune/baby/uniform/s2026 |      0.0258 |  0.0058 |    0.0138 | 1488.5400 |  1
 
 === bpr [baby x uniform x seed=2026] winner: {'k_embed_dim': 256, 'learning_rate': 0.05, 'lambda_shared': 1e-06, 'batch_size': 4096, 'n_epochs': 1000}  val NDCG@20=0.0086  test=0.0058 ===
 
+
+=== Tuning bpr on baby x uniform x seed=2026, selecting on validation NDCG@20 ===
+    -> /mnt/c/Users/nguye/uniyear/causal-isolated-training/research/results/tuning/bpr/baby/uniform/seed2026
+[stale] baseline: selected on test or trained at another config; re-running
+[baseline] running with defaults: {'k_embed_dim': 64, 'learning_rate': 0.05, 'lambda_shared': 0.0001, 'batch_size': 4096, 'n_epochs': 1000, 'early_stopping': 'off'}
+
+VALIDATION:
+...
+                            |    AUC | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------- + ------ + ----------- + ------- + --------- + --------
+BPR/tune/baby/uniform/s2026 | 0.6741 |      0.0214 |  0.0049 |    0.0108 |  23.9864
+
+TEST:
+...
+                            |    AUC | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------- + ------ + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/uniform/s2026 | 0.6476 |      0.0140 |  0.0034 |    0.0077 | 2502.1267 |  14.1307
+
+[baseline] val NDCG@20=0.0049  test=0.0034  (2540.9s)
+
+--- knob: k_embed_dim  grid=[32, 128, 256]  (default carries metric=0.0049) ---
+[stale] k_embed_dim=32: selected on test or trained at another config; re-running
+
+VALIDATION:
+...
+                            |    AUC | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------- + ------ + ----------- + ------- + --------- + --------
+BPR/tune/baby/uniform/s2026 | 0.6660 |      0.0209 |  0.0047 |    0.0102 |  17.2086
+
+TEST:
+...
+                            |    AUC | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------- + ------ + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/uniform/s2026 | 0.6397 |      0.0142 |  0.0037 |    0.0080 | 1505.4924 |   9.9079
+
+[run]  k_embed_dim=32  val NDCG@20=0.0047  test=0.0037  (1533.2s)
+[stale] k_embed_dim=128: selected on test or trained at another config; re-running
+
+VALIDATION:
+...
+                            |    AUC | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------- + ------ + ----------- + ------- + --------- + --------
+BPR/tune/baby/uniform/s2026 | 0.6965 |      0.0269 |  0.0061 |    0.0129 |  41.9960
+
+TEST:
+...
+                            |    AUC | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------- + ------ + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/uniform/s2026 | 0.6682 |      0.0177 |  0.0044 |    0.0101 | 4619.4140 |  23.9308
+
+[run]  k_embed_dim=128  val NDCG@20=0.0061  test=0.0044  (4686.2s)
+[stale] k_embed_dim=256: selected on test or trained at another config; re-running
+
+VALIDATION:
+...
+                            |    AUC | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------- + ------ + ----------- + ------- + --------- + --------
+BPR/tune/baby/uniform/s2026 | 0.7119 |      0.0300 |  0.0073 |    0.0154 |  65.8380
+
+TEST:
+...
+                            |    AUC | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------- + ------ + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/uniform/s2026 | 0.6810 |      0.0203 |  0.0051 |    0.0117 | 8854.9913 |  36.9940
+
+[run]  k_embed_dim=256  val NDCG@20=0.0073  test=0.0051  (8959.9s)
+[winner@k_embed_dim] k_embed_dim=256  NDCG@20=0.0073
+
+--- knob: learning_rate  grid=[0.001, 0.01, 0.1]  (default carries metric=0.0073) ---
+[stale] learning_rate=0.001: selected on test or trained at another config; re-running
+
+VALIDATION:
+...
+                            |    AUC | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+--------------------------- + ------ + ----------- + ------- + --------- + --------
+BPR/tune/baby/uniform/s2026 | 0.7113 |      0.0384 |  0.0087 |    0.0183 |  64.8585
+
+TEST:
+...
+                            |    AUC | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+--------------------------- + ------ + ----------- + ------- + --------- + --------- + --------
+BPR/tune/baby/uniform/s2026 | 0.6798 |      0.0251 |  0.0058 |    0.0124 | 8838.6271 |  37.2680
+
+[run]  learning_rate=0.001  val NDCG@20=0.0087  test=0.0058  (8943.4s)
+[stale] learning_rate=0.01: selected on test or trained at another config; re-running

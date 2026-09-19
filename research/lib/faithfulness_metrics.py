@@ -1,31 +1,8 @@
-"""Direct faithfulness metrics.
-
-These probe whether a recommender's training or inference behavior
-uses information that wouldn't be available in production. Higher
-values indicate worse faithfulness.
-
-- counterfactual_rate(model): training-time counter that lives on
-  BPRMiniBatch. Read it after fit() via `model.counterfactual_rate`.
-  Defined here only for completeness — the work happens inside the
-  sampler.
-
-- future_items_pct(): inference-time. For each test instance, what
-  fraction of top-K recommendations weren't released yet at the test
-  timestamp. (Defined in causal_sampling.py — re-exported here for
-  one-stop shopping.)
-
-- recommendation_recency_distribution(): inference-time. For each
-  test instance, look at the recency of every top-K recommendation
-  (test_ts - first_seen). Returns the distribution + summary stats.
-  Lets us catch the "model over-recommends recently-released items"
-  failure mode that future_items_pct misses under TimestampSplit.
-"""
-
 from typing import Dict, List
 
 import numpy as np
 
-from .causal_sampling import future_items_pct  # re-export
+from .causal_sampling import future_items_pct
 
 
 def recommendation_recency_distribution(
@@ -35,15 +12,6 @@ def recommendation_recency_distribution(
     k: int = 20,
     return_raw: bool = False,
 ):
-    """For each test instance at time t, compute `t - first_seen(rec)` for
-    each of the top-K recommendations. Return aggregated distribution.
-
-    A faithful model's recency distribution should be broad — recommending
-    a mix of recently-released and long-available items, proportional to
-    what was actually available before time t. A leaky model concentrates
-    on recently-released items (because those items received the most
-    parameter updates during training).
-    """
     test_set = eval_method.test_set
     uid2raw = {v: k_ for k_, v in test_set.uid_map.items()}
     u_indices, _, _ = test_set.uir_tuple
@@ -75,7 +43,6 @@ def recommendation_recency_distribution(
         return out
 
     arr = np.asarray(recencies, dtype=np.int64)
-    # Convert ms -> days for readability (timestamps are ms-epoch).
     days = arr / (1000 * 60 * 60 * 24)
     out = {
         "evaluated_recs": int(arr.size),

@@ -1,11 +1,3 @@
-"""Aggregate per-seed ablation JSONs into mean+/-std markdown tables.
-
-Inputs:  research/results/ablation/<model>_<dataset>_seed<n>.json (written by
-         research.runners.ablation_bpr / ablation_neumf / ablation_lightgcn).
-Outputs: research/reports/RESULTS_ablation.md  (markdown tables)
-         research/results/ablation_summary.csv (tidy CSV for figures)
-"""
-
 import csv
 import json
 from collections import defaultdict
@@ -18,12 +10,9 @@ IN_DIR = RESULTS_DIR / "ablation"
 OUT_MD = REPORTS_DIR / "RESULTS_ablation.md"
 OUT_CSV = RESULTS_DIR / "ablation_summary.csv"
 
-#: Canonical order for the report. Variant runs (e.g. "NeuMF-pretrain",
-#: "BPR-tunedper-arm" -- see tuning_config.ablation_label) carry their own
-#: label and are appended after these, so a variant appears as its own
-#: section instead of being dropped for not being on this list.
 MODELS = ["BPR", "NeuMF", "LightGCN"]
 DATASETS = ["musical", "baby", "cellphone", "healthcare"]
+SEEDS = (42, 123, 2026)
 METRICS = [("HR@20", "HitRatio@20"), ("NDCG@20", "NDCG@20"), ("Recall@20", "Recall@20")]
 DATASET_LABEL = {"musical": "Musical Instruments", "baby": "Baby Products",
                  "cellphone": "Cell Phones \\& Acc.",
@@ -31,45 +20,51 @@ DATASET_LABEL = {"musical": "Musical Instruments", "baby": "Baby Products",
 
 
 def load_all():
-    # data[(model, dataset, recipe, display_metric)] -> list[float]
-    data = defaultdict(list)
-    # rho[(model, dataset, recipe)] -> list[float]
-    rho = defaultdict(list)
+    data = defaultdict(dict)
+    rho = defaultdict(dict)
     for path in sorted(IN_DIR.glob("*.json")):
-        # utf-8-sig tolerates a BOM if a file was ever hand-edited on Windows.
         with open(path, encoding="utf-8-sig") as f:
             payload = json.load(f)
         model = payload["model"]
         dataset = payload["dataset"]
+        seed = int(payload["seed"])
         for recipe, metrics in payload["recipes"].items():
             for disp, key in METRICS:
                 if key in metrics:
-                    data[(model, dataset, recipe, disp)].append(float(metrics[key]))
+                    data[(model, dataset, recipe, disp)][seed] = float(metrics[key])
             if "counterfactual_rate" in metrics:
-                rho[(model, dataset, recipe)].append(
-                    float(metrics["counterfactual_rate"]))
+                rho[(model, dataset, recipe)][seed] = float(metrics["counterfactual_rate"])
     return data, rho
 
 
+def missing(by_seed):
+    return [f"seed{s}" for s in SEEDS if s not in by_seed]
+
+
+def missing_label(by_seed):
+    return f"missing [{', '.join(missing(by_seed))}]"
+
+
 def models_present(data):
-    """Canonical models first, then any variant labels found on disk."""
     seen = {key[0] for key in data}
     return ([m for m in MODELS if m in seen]
             + sorted(seen - set(MODELS)))
 
 
-def fmt_cell(values):
-    if not values:
-        return "TBD"
-    if len(values) == 1:
-        return f"{values[0]:.4f}"
+def fmt_cell(by_seed):
+    if missing(by_seed):
+        return missing_label(by_seed)
+    values = [by_seed[s] for s in SEEDS]
     return f"{mean(values):.4f} ± {stdev(values):.4f}"
 
 
-def fmt_pct(values):
-    if not values:
+def fmt_pct(by_seed):
+    if not by_seed:
         return "–"
-    return f"{mean(values) * 100:.2f}%"
+    if missing(by_seed):
+        return missing_label(by_seed)
+    values = [by_seed[s] for s in SEEDS]
+    return f"{mean(values) * 100:.2f} ± {stdev(values) * 100:.2f}%"
 
 
 def render_markdown(data, rho):
@@ -81,12 +76,11 @@ def render_markdown(data, rho):
 
     for model in models_present(data):
         lines.append(f"\n## {model}\n")
-        # Find best mean per (dataset, metric) for bolding.
         best = {}
         for ds in DATASETS:
             for disp, _ in METRICS:
-                means = [(r, mean(v)) for r in RECIPES
-                         for v in [data[(model, ds, r, disp)]] if v]
+                means = [(r, mean(v.values())) for r in RECIPES
+                         for v in [data[(model, ds, r, disp)]] if v and not missing(v)]
                 if means:
                     best[(ds, disp)] = max(means, key=lambda x: x[1])[0]
 
@@ -100,7 +94,7 @@ def render_markdown(data, rho):
                     vals = data[(model, ds, recipe, disp)]
                     n_seeds = max(n_seeds, len(vals))
                     cell = fmt_cell(vals)
-                    if best.get((ds, disp)) == recipe and vals:
+                    if best.get((ds, disp)) == recipe and not missing(vals):
                         cell = f"**{cell}**"
                     row_vals.append(cell)
                 lines.append(f"| {DATASET_LABEL[ds]} | {recipe} | "
@@ -109,7 +103,8 @@ def render_markdown(data, rho):
 
     lines.append("\nρ is the counterfactual-negative rate: the fraction of training "
                  "negatives whose first-seen timestamp post-dates their paired "
-                 "positive. It is 0 by construction under `causal`.\n")
+                 "positive. It is 0 by construction under `causal`. A cell lacking "
+                 "any of seeds 42, 123, 2026 shows only which seeds are missing.\n")
     return "\n".join(lines) + "\n"
 
 
@@ -117,19 +112,18 @@ def write_csv(data, rho):
     OUT_CSV.parent.mkdir(parents=True, exist_ok=True)
     with open(OUT_CSV, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
-        w.writerow(["model", "dataset", "recipe", "metric", "mean", "std", "n"])
-        for (model, ds, recipe, disp), vals in sorted(data.items()):
-            if not vals:
+        w.writerow(["model", "dataset", "recipe", "metric", "mean", "std", "n",
+                    "missing_seeds"])
+        rows = sorted(data.items())
+        rows += [((m, d, r, "rho"), v) for (m, d, r), v in sorted(rho.items())]
+        for (model, ds, recipe, disp), by_seed in rows:
+            if not by_seed:
                 continue
+            vals = list(by_seed.values())
             m = mean(vals)
             s = stdev(vals) if len(vals) > 1 else 0.0
-            w.writerow([model, ds, recipe, disp, f"{m:.6f}", f"{s:.6f}", len(vals)])
-        for (model, ds, recipe), vals in sorted(rho.items()):
-            if not vals:
-                continue
-            m = mean(vals)
-            s = stdev(vals) if len(vals) > 1 else 0.0
-            w.writerow([model, ds, recipe, "rho", f"{m:.6f}", f"{s:.6f}", len(vals)])
+            w.writerow([model, ds, recipe, disp, f"{m:.6f}", f"{s:.6f}", len(vals),
+                        " ".join(missing(by_seed))])
     print(f"[aggregate_ablation] wrote {OUT_CSV}")
 
 

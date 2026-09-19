@@ -1,21 +1,8 @@
-"""Per-user test scores: the input to every paired significance test.
-
-Three things would make a paired t-test silently wrong, and each is checked:
-
-  - scores that do not average to the number in the table (a test on the wrong
-    run's scores);
-  - two rungs scored on different users (nothing to pair);
-  - the tuner not returning them, so a tuning winner could not stand in for a
-    ladder rung.
-
-Runs on the synthetic fixture in a few seconds; no dataset needed.
-"""
-
 import numpy as np
 import pytest
 
 import cornac
-from cornac.metrics import NDCG, HitRatio, Recall
+from cornac.metrics import AUC, NDCG, HitRatio, Recall
 
 from ..lib import user_scores
 from ..lib.ablation_harness import PROBE_METRICS
@@ -29,7 +16,7 @@ def _experiment(eval_method, sampler, tmp_path):
                          learning_rate=0.05, n_epochs=3, sampler=sampler,
                          seed=0, verbose=False)
     exp = cornac.Experiment(eval_method=eval_method, models=[model],
-                            metrics=[HitRatio(k=20), NDCG(k=20), Recall(k=20)],
+                            metrics=[HitRatio(k=20), NDCG(k=20), Recall(k=20), AUC()],
                             user_based=True, save_dir=str(tmp_path),
                             verbose=False)
     exp.run()
@@ -80,6 +67,4 @@ def test_tuner_trial_returns_scores_and_probes(tmp_path, monkeypatch):
 
     assert np.isclose(users["NDCG@20"].mean(), test["NDCG@20"])
     assert set(probes) == set(PROBE_METRICS)
-    # The uniform arm draws not-yet-existing items on this fixture; a zero here
-    # would mean the probe was read off an object that never sampled.
     assert probes["counterfactual_rate"] > 0.0

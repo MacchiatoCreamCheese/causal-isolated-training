@@ -1,17 +1,3 @@
-"""Mechanism 3 runner: one prequential pass per arm, checkpointed.
-
-Two arms, `uniform` and `causal`, each a single chronological pass over the
-training rows with evaluation interleaved (see `prequential.py`). Both arms walk
-the *same* rows in the *same* order and get the same budget, so the only thing
-that differs between their curves is the negative pool.
-
-Output: `results/prequential/<model>_<dataset>_seed<n>.json`, one record per
-batch per arm. `analysis/make_figures.py` turns that into the timeline figure.
-
-Usage:
-    python -m research.mecha3.runner --datasets musical --seeds 42
-"""
-
 import argparse
 import json
 import os
@@ -29,9 +15,6 @@ from .prequential import run_prequential
 
 OUT_DIR = RESULTS_DIR / "prequential"
 
-#: Temporal batching is not an arm here: prequential *requires* chronological
-#: batches, so Mechanism 2's ordering is part of the protocol rather than a
-#: variable within it. The only axis left is the negative pool.
 ARMS = ("uniform", "causal")
 
 DEFAULT_DATASETS = ("musical", "baby", "cellphone")
@@ -46,12 +29,8 @@ def out_path(label, dataset, seed):
 
 
 def _make_model(model_name, kwargs, ds_name, arm, seed):
-    """A model at `kwargs`, built the same way the ablation runners build it."""
     if model_name == "bpr":
         from ..lib.bpr_cpu import BPRMiniBatch
-        # BPR_EARLY_STOP is dropped: early stopping needs a validation set and
-        # repeated epochs, and a prequential pass has neither -- each row is seen
-        # once, in order.
         return BPRMiniBatch(name=f"BPR-m3/{ds_name}/{arm}/s{seed}",
                             **kwargs, sampler=arm, seed=seed, verbose=False)
     if model_name == "neumf":
@@ -78,9 +57,6 @@ def run_one(model_name, label, ds_name, seed, batch_size, warmup_frac,
 
     arms, configs = {}, {}
     for arm in ARMS:
-        # Each arm's own tuned winner when RESEARCH_TUNED_ARM=per_arm, so the
-        # curves compare each method at its best; under the default both resolve
-        # to the uniform arm's winners and the comparison stays single-variable.
         kwargs = KWARGS_FOR[model_name](ds_name, arm, seed)
         if model_name == "bpr":
             kwargs = {**kwargs, "batch_size": batch_size}

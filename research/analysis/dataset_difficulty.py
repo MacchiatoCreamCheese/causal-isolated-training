@@ -1,37 +1,3 @@
-"""Is a low NDCG the dataset or the model? A fast check with cornac's own models.
-
-NDCG@20 on the Amazon sets is far lower than on Philadelphia. This runs two
-cornac built-ins -- no tuning, no GPU, same split and evaluator as every other
-result -- on each active dataset, next to facts about the split itself:
-
-    MostPop   recommends the most-interacted training items. No personalisation,
-              so its score is a measure of how hard the *data* is.
-    MF        cornac's matrix factorisation (SGD on observed ratings, with
-              biases), at cornac's defaults: the fastest personalised model.
-
-Split facts, computed without training:
-    items / random HR   20 / items: what guessing scores; a big catalogue alone
-                        pushes every metric down
-    test users, pos/user  users evaluated and test positives per user
-    top-20 share        share of test positives landing on the 20 most popular
-                        training items -- roughly MostPop's ceiling
-    gap days            last training interaction to median test interaction:
-                        how far into the future the model must predict
-    rho                 closed-form future-negative rate (paper, Prop. 3.1)
-
-How to read it:
-  - MostPop low on Amazon, high on Philadelphia -> the data/split is harder
-    (big sparse catalogue, drift, few positives per user), not the models.
-  - MostPop similar everywhere but MF low only on Amazon -> look at the models.
-  - MF / MostPop is how much personalisation adds, comparable across datasets.
-    cornac's MF regresses ratings rather than ranking items, so it can sit below
-    MostPop on top-20 ranking; that is informative, not a bug.
-
-Usage:
-    python -m research.analysis.dataset_difficulty
-    python -m research.analysis.dataset_difficulty --datasets philadelphia --seed 42
-"""
-
 import argparse
 import json
 import os
@@ -53,14 +19,12 @@ DAY_MS = 86_400_000
 
 
 def split_facts(em):
-    """Facts about the split itself -- no model involved."""
     tr, te = em.train_set, em.test_set
     tr_u, tr_i, _ = (np.asarray(a) for a in tr.uir_tuple)
     te_u, te_i, te_r = (np.asarray(a) for a in te.uir_tuple)
     tr_ts = np.asarray(tr.timestamps, dtype=np.int64)
     te_ts = np.asarray(getattr(te, "timestamps", []), dtype=np.int64)
 
-    # Positives exactly as cornac's ranking evaluation counts them.
     pos = te_r >= 1.0
     test_users = np.unique(te_u[pos])
     top20 = np.argsort(-np.bincount(tr_i, minlength=tr.num_items))[:TOP_K]
@@ -84,7 +48,6 @@ def split_facts(em):
 
 
 def run_models(em, seed):
-    """MostPop and cornac MF at defaults, in one experiment."""
     models = [MostPop(), MF(seed=seed)]
     exp = cornac.Experiment(eval_method=em, models=models,
                             metrics=[HitRatio(k=TOP_K), NDCG(k=TOP_K), Recall(k=TOP_K)],

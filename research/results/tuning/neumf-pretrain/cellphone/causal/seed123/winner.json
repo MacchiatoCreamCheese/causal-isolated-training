@@ -1,0 +1,39 @@
+{
+  "model": "neumf",
+  "variant": "neumf-pretrain",
+  "dataset": "cellphone",
+  "seed": 123,
+  "recipe": "causal",
+  "select_metric": "NDCG@20",
+  "select_split": "validation",
+  "config": {
+    "num_factors": 32,
+    "mlp_hidden_count": 3,
+    "learning_rate": 0.0001,
+    "num_neg": 4,
+    "batch_size": 1024
+  },
+  "metric": 0.0092391372387143,
+  "test_metric": 0.007835514991001316,
+  "users_run": {
+    "source": "trial",
+    "trial": "batch_size/1024.json",
+    "val_metrics": {
+      "HitRatio@20": 0.03344496057037917,
+      "NDCG@20": 0.0092391372387143,
+      "Recall@20": 0.022173843788337325,
+      "Time (s)": 650.4616236686707
+    },
+    "test_metrics": {
+      "HitRatio@20": 0.027455389525605688,
+      "NDCG@20": 0.007835514991001316,
+      "Recall@20": 0.020032254083102795,
+      "Train (s)": 2141.952455997467,
+      "Test (s)": 393.99737334251404
+    },
+    "probes": {
+      "counterfactual_rate": 0.0,
+      "collision_rate": 1.8278494078446997e-06
+    }
+  }
+}

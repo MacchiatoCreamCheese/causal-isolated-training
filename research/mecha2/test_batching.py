@@ -1,22 +1,3 @@
-"""Prove that temporal batching regroups rows without changing which rows run.
-
-The mechanism's whole claim is that `shuffle`, `coherent` and `temporal` differ in
-**grouping and visit order only**. If any mode consumed a different set of rows --
-dropped a tail batch, double-counted, silently truncated -- then the arms would
-also differ in training volume, and every accuracy comparison between them would
-be measuring that instead. That is the check this file exists for; the rest are
-supporting.
-
-Runs on the synthetic fixture, so it needs no dataset CSVs and finishes in
-seconds.
-
-Named `test_batching.py`, not `smoke.py`: pytest collects `test_*.py`, and the
-wrappers at the bottom are silently never run under any other name -- which is
-how this file first shipped.
-
-Usage:  python -m research.mecha2.test_batching
-"""
-
 import sys
 
 import numpy as np
@@ -29,8 +10,6 @@ BATCH = 256
 
 
 class Results:
-    """Tally of what actually ran, so the summary cannot overstate it."""
-
     def __init__(self):
         self.passed = []
         self.failed = []
@@ -47,13 +26,11 @@ def make(batch_order, neg_sampling="causal", seed=0):
 
 
 def batches_of(train_set):
-    """One epoch of `uij_iter` batches, as lists of row indices."""
     n = len(train_set.uir_tuple[0])
     return [np.asarray(b) for b in train_set.idx_iter(n, BATCH, shuffle=True)]
 
 
 def check_same_rows(res):
-    """Every mode must consume the same rows -- the load-bearing check."""
     print("\n=== all three orders consume identical rows ===")
     seen = {}
     for order in BATCH_ORDERS:
@@ -70,7 +47,6 @@ def check_same_rows(res):
 
 
 def check_contiguous_in_time(res):
-    """`temporal` batches must be bands: no batch may start before the last ended."""
     print("\n=== temporal batches are contiguous bands of the timeline ===")
     train_set = make("temporal")
     ts = train_set._ts_array
@@ -86,8 +62,6 @@ def check_contiguous_in_time(res):
     res.record("temporal: batches are non-overlapping and in time order",
                violations == 0,
                f": {len(spans)} batches, {violations} out of order")
-    # A band must also be *narrow* relative to the whole span, or "coherent"
-    # means nothing. Compare the median batch span to the full training span.
     full = ts.max() - ts.min()
     median_span = float(np.median([hi - lo for lo, hi in spans]))
     res.record("temporal: a batch spans a small slice of the timeline",
@@ -96,7 +70,6 @@ def check_contiguous_in_time(res):
 
 
 def check_coherent_is_same_bands(res):
-    """`coherent` must be `temporal`'s bands in a different visit order."""
     print("\n=== coherent = same bands, shuffled visit order ===")
     temporal = {tuple(sorted(b.tolist())) for b in batches_of(make("temporal"))}
     coh_batches = batches_of(make("coherent"))
@@ -105,7 +78,6 @@ def check_coherent_is_same_bands(res):
                temporal == coherent,
                f": {len(temporal)} bands, {len(temporal & coherent)} shared")
 
-    # ...and genuinely reordered, or it is just `temporal` under another name.
     order_differs = [tuple(sorted(b.tolist())) for b in coh_batches] != \
         [tuple(sorted(b.tolist())) for b in batches_of(make("temporal"))]
     res.record("coherent: visit order actually differs from temporal",
@@ -113,7 +85,6 @@ def check_coherent_is_same_bands(res):
 
 
 def check_sampler_untouched(res):
-    """Mechanism 2 must not disturb Mechanism 1: rho depends on neg_sampling only."""
     print("\n=== batch_order does not touch the negative sampler ===")
     for neg_sampling, expect_zero in (("uniform", False), ("causal", True)):
         rates = {}
@@ -134,7 +105,6 @@ def check_sampler_untouched(res):
 
 
 def check_shuffle_matches_cornac(res):
-    """`shuffle` must delegate, not reimplement."""
     print("\n=== shuffle mode is cornac's own path ===")
     split = build_split("causal", seed=0)
     plain = TimeAwareDataset.from_dataset(split.train_set, neg_sampling="causal")
@@ -147,15 +117,6 @@ def check_shuffle_matches_cornac(res):
 
 
 def check_bpr_gets_bands(res):
-    """Our BPR batches itself, so it needs the `_epoch_batches` seam.
-
-    Two things must hold. With a temporal split, `TemporalBPR` must actually
-    receive time bands -- otherwise a cell labelled "temporal" trained on
-    shuffled rows, the exact silent no-op this suite exists to catch. And with a
-    `shuffle` split it must fall back to the parent's own permutation, so the
-    baseline arm stays bit-identical to a plain `BPRMiniBatch` rather than
-    quietly switching which RNG shuffles it.
-    """
     print("\n=== BPR reaches Mechanism 2 through _epoch_batches ===")
     from ..lib.bpr_cpu import BPRMiniBatch
     from .bpr import TemporalBPR
@@ -180,7 +141,6 @@ def check_bpr_gets_bands(res):
                len(rows) == n and len(np.unique(rows)) == n,
                f": {len(np.unique(rows)):,}/{n:,} distinct")
 
-    # Fallback must match the parent exactly, same seed, same RNG stream.
     shuffled = make("shuffle")
     a = TemporalBPR(name="a", k=8, batch_size=BATCH, seed=42, verbose=False)
     b = BPRMiniBatch(name="b", k=8, batch_size=BATCH, seed=42, verbose=False)
@@ -208,11 +168,6 @@ def main():
     print(f"ALL CHECKS PASSED ({ran}/{ran}) — temporal batching regroups rows "
           f"without changing which rows train.")
 
-
-# ---------------------------------------------------------------------------
-# pytest entry points. No import-time pytest dependency: a bare `def test_*()`
-# is all pytest needs, so this module still runs with pytest absent.
-# ---------------------------------------------------------------------------
 
 def test_all_orders_consume_identical_rows():
     res = Results()

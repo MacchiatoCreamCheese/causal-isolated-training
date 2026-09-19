@@ -1,16 +1,3 @@
-"""Synthetic UIRT splits shared by the smoke tests.
-
-Both fixtures generate a log whose catalog *grows over time*, so a time-blind
-sampler demonstrably draws items that did not yet exist. They need no dataset
-CSVs and build in a second or two.
-
-`build_split` is the original all-1.0-ratings fixture: implicit feedback, where
-cornac's two rejection rules (`>= pos_rating` and `> 0`) coincide.
-`build_rated_split` varies the ratings, which is what makes the two rules
-diverge — see the rule table in `lib/timeaware_data.py`. Any check on the
-per-model filter has to use the latter; on the former it would pass either way.
-"""
-
 import numpy as np
 
 from ..lib.timeaware_data import CausalTimestampSplit
@@ -20,20 +7,11 @@ TEST_TS = 1_625_000_000_000
 
 
 def negatives_only(batch_users, batch_items, num_zeros):
-    """The negatives half of a `uir_iter` batch.
-
-    cornac's layout is every positive first, then `num_zeros` negatives per
-    positive, so the split point is `len / (num_zeros + 1)`. Kept here because
-    both smoke tests need it: the layout is cornac's to change, and it should
-    not be re-derived in each caller.
-    """
     split = len(batch_users) // (num_zeros + 1)
     return batch_users[split:], batch_items[split:]
 
 
 def _generate(rng, rating_fn, n_users, per_block):
-    """Four blocks of interactions; block `b` may use the first `(b+1)*40`
-    items, so the catalog grows from 40 to 160 as time advances."""
     rows = []
     for block in range(4):
         base_ts = 1_600_000_000_000 + block * 10_000_000_000
@@ -57,30 +35,17 @@ def _split(rows, neg_sampling):
 
 
 def build_split(neg_sampling, seed=0):
-    """Implicit-feedback fixture: every rating is 1.0."""
     rng = np.random.default_rng(seed)
     return _split(_generate(rng, lambda _rng: 1.0, 300, 4000), neg_sampling)
 
 
 def build_rated_split(neg_sampling, seed=0):
-    """Explicit-rating fixture: ratings drawn from {1..5}.
-
-    Deliberately dense — 150 users over at most 160 items — so a user owns a
-    large slice of the catalog and a uniform draw lands on one of their own
-    items often enough for the two rejection rules to visibly differ.
-    """
     rng = np.random.default_rng(seed)
     rows = _generate(rng, lambda r: float(r.integers(1, 6)), 150, 5000)
     return _split(rows, neg_sampling)
 
 
 def uij_batches(train_set, batch_size):
-    """`uij_iter` batches as `(users, negatives, positives)`.
-
-    Note the reordering: `uij_iter` yields `(users, positives, negatives)`, and
-    the checks want the drawn negative first with the positive as the rejection
-    threshold beside it.
-    """
     return ((bu, bj, bi)
             for bu, bi, bj in train_set.uij_iter(batch_size=batch_size,
                                                  shuffle=True))

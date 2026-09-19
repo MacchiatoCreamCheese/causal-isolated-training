@@ -45,3 +45,175 @@ NeuMF/tune/cellphone/causal/s123 |      0.0117 |  0.0030 |    0.0083 | 4920.3912
 
 --- knob: num_factors  grid=[16, 32, 64]  (default carries metric=0.0029) ---
 [skip] num_factors=16  val NDCG@20=0.0045  [cached]
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/cellphone/causal/s123 |      0.0218 |  0.0061 |    0.0142 | 642.1608
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/cellphone/causal/s123 |      0.0147 |  0.0045 |    0.0106 | 8047.9624 | 383.0903
+
+[run]  num_factors=32  val NDCG@20=0.0061  test=0.0045  (9078.1s)
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 |  Time (s)
+-------------------------------- + ----------- + ------- + --------- + ---------
+NeuMF/tune/cellphone/causal/s123 |      0.0188 |  0.0052 |    0.0121 | 1286.8836
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + ---------- + --------
+NeuMF/tune/cellphone/causal/s123 |      0.0143 |  0.0045 |    0.0105 | 14386.7843 | 764.6633
+
+[run]  num_factors=64  val NDCG@20=0.0052  test=0.0045  (16443.0s)
+[winner@num_factors] num_factors=32  NDCG@20=0.0061
+
+--- knob: mlp_hidden_count  grid=[4]  (default carries metric=0.0061) ---
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 |  Time (s)
+-------------------------------- + ----------- + ------- + --------- + ---------
+NeuMF/tune/cellphone/causal/s123 |      0.0185 |  0.0052 |    0.0121 | 1230.5709
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + ---------- + --------
+NeuMF/tune/cellphone/causal/s123 |      0.0122 |  0.0036 |    0.0086 | 13108.1209 | 737.5218
+
+[run]  mlp_hidden_count=4  val NDCG@20=0.0052  test=0.0036  (15080.2s)
+[winner@mlp_hidden_count] mlp_hidden_count=3  NDCG@20=0.0061 (kept default)
+
+--- knob: learning_rate  grid=[0.0001, 0.0005, 0.005]  (default carries metric=0.0061) ---
+
+=== Tuning neumf on cellphone x causal x seed=123, selecting on validation NDCG@20 ===
+    -> /mnt/c/Users/nguye/uniyear/causal-isolated-training/research/results/tuning/neumf-pretrain/cellphone/causal/seed123
+[baseline] cached: val NDCG@20=0.0029
+
+--- knob: num_factors  grid=[16, 32, 64]  (default carries metric=0.0029) ---
+[skip] num_factors=16  val NDCG@20=0.0045  [cached]
+[skip] num_factors=32  val NDCG@20=0.0061  [cached]
+[skip] num_factors=64  val NDCG@20=0.0052  [cached]
+[winner@num_factors] num_factors=32  NDCG@20=0.0061
+
+--- knob: mlp_hidden_count  grid=[4]  (default carries metric=0.0061) ---
+[skip] mlp_hidden_count=4  val NDCG@20=0.0052  [cached]
+[winner@mlp_hidden_count] mlp_hidden_count=3  NDCG@20=0.0061 (kept default)
+
+--- knob: learning_rate  grid=[0.0001, 0.0005, 0.005]  (default carries metric=0.0061) ---
+
+=== Tuning neumf on cellphone x causal x seed=123, selecting on validation NDCG@20 ===
+    -> /mnt/c/Users/nguye/uniyear/causal-isolated-training/research/results/tuning/neumf-pretrain/cellphone/causal/seed123
+[baseline] cached: val NDCG@20=0.0029
+
+--- knob: num_factors  grid=[16, 32, 64]  (default carries metric=0.0029) ---
+[skip] num_factors=16  val NDCG@20=0.0045  [cached]
+[skip] num_factors=32  val NDCG@20=0.0061  [cached]
+[skip] num_factors=64  val NDCG@20=0.0052  [cached]
+[winner@num_factors] num_factors=32  NDCG@20=0.0061
+
+--- knob: mlp_hidden_count  grid=[4]  (default carries metric=0.0061) ---
+[skip] mlp_hidden_count=4  val NDCG@20=0.0052  [cached]
+[winner@mlp_hidden_count] mlp_hidden_count=3  NDCG@20=0.0061 (kept default)
+
+--- knob: learning_rate  grid=[0.0001, 0.0005, 0.005]  (default carries metric=0.0061) ---
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/cellphone/causal/s123 |      0.0253 |  0.0071 |    0.0164 | 627.7376
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/cellphone/causal/s123 |      0.0171 |  0.0052 |    0.0126 | 7645.9252 | 378.4820
+
+[run]  learning_rate=0.0001  val NDCG@20=0.0071  test=0.0052  (8654.8s)
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/cellphone/causal/s123 |      0.0244 |  0.0070 |    0.0161 | 642.1599
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/cellphone/causal/s123 |      0.0162 |  0.0049 |    0.0117 | 7614.8085 | 376.7455
+
+[run]  learning_rate=0.0005  val NDCG@20=0.0070  test=0.0049  (8636.4s)
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/cellphone/causal/s123 |      0.0200 |  0.0054 |    0.0126 | 628.9625
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/cellphone/causal/s123 |      0.0141 |  0.0041 |    0.0100 | 7616.7491 | 375.9291
+
+[run]  learning_rate=0.005  val NDCG@20=0.0054  test=0.0041  (8624.1s)
+[winner@learning_rate] learning_rate=0.0001  NDCG@20=0.0071
+
+--- knob: batch_size  grid=[128, 512, 1024]  (default carries metric=0.0071) ---
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/cellphone/causal/s123 |      0.0265 |  0.0076 |    0.0170 | 650.4501
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + ---------- + --------
+NeuMF/tune/cellphone/causal/s123 |      0.0186 |  0.0058 |    0.0137 | 15140.0331 | 389.6295
+
+[run]  batch_size=128  val NDCG@20=0.0076  test=0.0058  (16183.9s)
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/cellphone/causal/s123 |      0.0321 |  0.0090 |    0.0210 | 649.8183
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/cellphone/causal/s123 |      0.0260 |  0.0079 |    0.0190 | 3988.7782 | 388.4947
+
+[run]  batch_size=512  val NDCG@20=0.0090  test=0.0079  (5030.1s)
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------- + ----------- + ------- + --------- + --------
+NeuMF/tune/cellphone/causal/s123 |      0.0334 |  0.0092 |    0.0222 | 650.4616
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + --------- + --------
+NeuMF/tune/cellphone/causal/s123 |      0.0275 |  0.0078 |    0.0200 | 2141.9525 | 393.9974
+
+[run]  batch_size=1024  val NDCG@20=0.0092  test=0.0078  (3189.3s)
+[winner@batch_size] batch_size=1024  NDCG@20=0.0092
+[users] winner per-user scores from batch_size/1024.json
+
+=== neumf [cellphone x causal x seed=123] winner: {'num_factors': 32, 'mlp_hidden_count': 3, 'learning_rate': 0.0001, 'num_neg': 4, 'batch_size': 1024}  val NDCG@20=0.0092  test=0.0078 ===
+

@@ -1,11 +1,3 @@
-"""Compare future_items_pct (per-user loop) vs future_items_pct_batched.
-
-Uses a stub model with a deterministic score function so we can construct
-a scenario where top-K contains items with future first-seen timestamps,
-making the future-item count non-zero. Both functions should return
-identical integer counts.
-"""
-
 import sys
 
 import numpy as np
@@ -20,12 +12,9 @@ from ..lib.causal_sampling import (
 
 
 class StubModel(Recommender):
-    """score(u) returns a deterministic per-(u,i) vector."""
-
     def __init__(self, num_items):
         super().__init__(name="stub", trainable=False, verbose=False)
         self._num_items = num_items
-        # Deterministic scores: distinct per (u, i) so no ties.
         rng = np.random.default_rng(7)
         self._S = rng.standard_normal((10000, num_items)).astype(np.float32)
 
@@ -44,18 +33,11 @@ K = 10
 
 
 def build_case():
-    """Synthetic UIRT log plus a stub model, as `(model, eval_method, item_first)`.
-
-    200 users over 100 items in three time blocks, so later items have a larger
-    first-seen and can look "future" to an earlier test timestamp — without that
-    the future-item count is zero and comparing the two implementations proves
-    nothing.
-    """
     rng = np.random.default_rng(0)
     rows = []
     for t_block in range(3):
-        base_ts = 1_600_000_000_000 + t_block * 10_000_000_000  # ~115d apart
-        items_avail = (t_block + 1) * 30  # block 0: 30 items, block 1: 60, block 2: 90
+        base_ts = 1_600_000_000_000 + t_block * 10_000_000_000
+        items_avail = (t_block + 1) * 30
         for _ in range(2000):
             u = int(rng.integers(0, 200))
             i = int(rng.integers(0, items_avail))
@@ -82,7 +64,6 @@ def build_case():
 
 
 def compare(k=K, chunk=64):
-    """Run both implementations over the same case; returns `(old, new)`."""
     model, eval_method, item_first = build_case()
     old = future_items_pct(model, eval_method, item_first, k=k)
     new = future_items_pct_batched(model, eval_method, item_first, k=k, chunk=chunk)
@@ -107,11 +88,6 @@ def main():
         print("(test inconclusive: global_pct is 0)")
     sys.exit(0 if ok else 1)
 
-
-# ---------------------------------------------------------------------------
-# pytest entry point. See the note in test_cornac_causal.py — no import-time
-# pytest dependency, and `python -m` keeps working unchanged.
-# ---------------------------------------------------------------------------
 
 def test_batched_matches_per_user_loop():
     old, new = compare()
