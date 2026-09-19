@@ -2,3 +2,4 @@ nohup: ignoring input
 [run_tuning] bpr | env=leakage24 | data=/home/reno/causal-isolated-training/data | Thu Sep 17 11:59:04 UTC 2026
 [run_tuning] cornac 2.6.0 | torch 2.4.0+cu121
 [run_tuning] cellphone/uniform/seed42 -> tune_bpr_cellphone_uniform_s42.log  (11:59)
+[run_tuning] cellphone/causal/seed42 -> tune_bpr_cellphone_causal_s42.log  (00:41)

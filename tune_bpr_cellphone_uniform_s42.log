@@ -272,3 +272,37 @@ BPR/tune/cellphone/uniform/s42 |      0.0139 |  0.0047 |    0.0099 | 14127.4805 
 
 [run]  lambda_shared=1e-05  val NDCG@20=0.0059  test=0.0047  (14795.0s)
 [stale] lambda_shared=0.001: selected on test or trained at another config; re-running
+
+VALIDATION:
+...
+                               | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------------ + ----------- + ------- + --------- + --------
+BPR/tune/cellphone/uniform/s42 |      0.0249 |  0.0077 |    0.0162 | 412.0955
+
+TEST:
+...
+                               | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+------------------------------ + ----------- + ------- + --------- + ---------- + --------
+BPR/tune/cellphone/uniform/s42 |      0.0176 |  0.0059 |    0.0128 | 14030.7406 | 250.0439
+
+[run]  lambda_shared=0.001  val NDCG@20=0.0077  test=0.0059  (14693.8s)
+[stale] lambda_shared=0.01: selected on test or trained at another config; re-running
+
+VALIDATION:
+...
+                               | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+------------------------------ + ----------- + ------- + --------- + --------
+BPR/tune/cellphone/uniform/s42 |      0.0284 |  0.0088 |    0.0188 | 450.6957
+
+TEST:
+...
+                               | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+------------------------------ + ----------- + ------- + --------- + ---------- + --------
+BPR/tune/cellphone/uniform/s42 |      0.0197 |  0.0065 |    0.0145 | 14024.7549 | 271.6623
+
+[run]  lambda_shared=0.01  val NDCG@20=0.0088  test=0.0065  (14748.2s)
+[winner@lambda_shared] lambda_shared=0.01  NDCG@20=0.0088
+[users] winner per-user scores from lambda_shared/0p01.json
+
+=== bpr [cellphone x uniform x seed=42] winner: {'k_embed_dim': 256, 'learning_rate': 0.1, 'lambda_shared': 0.01, 'batch_size': 4096, 'n_epochs': 1000, 'early_stopping': 'off'}  val NDCG@20=0.0088  test=0.0065 ===
+
