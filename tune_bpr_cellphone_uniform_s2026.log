@@ -157,3 +157,73 @@ BPR/tune/cellphone/uniform/s2026 |      0.0133 |  0.0043 |    0.0094 | 11941.238
 [winner@learning_rate] learning_rate=0.1  NDCG@20=0.0055
 
 --- knob: lambda_shared  grid=[1e-06, 1e-05, 0.001, 0.01]  (default carries metric=0.0055) ---
+
+=== Tuning bpr on cellphone x uniform x seed=2026, selecting on validation NDCG@20 ===
+    -> /home/thinh/causal-isolated-training/research/results/tuning/bpr/cellphone/uniform/seed2026
+[stale] baseline: selected on test or trained at another config; re-running
+[baseline] running with defaults: {'k_embed_dim': 64, 'learning_rate': 0.05, 'lambda_shared': 0.0001, 'batch_size': 4096, 'n_epochs': 1000, 'early_stopping': 'off'}
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/cellphone/uniform/s2026 |      0.0135 |  0.0043 |    0.0088 | 264.6840
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/cellphone/uniform/s2026 |      0.0106 |  0.0035 |    0.0078 | 6216.2797 | 162.3838
+
+[baseline] val NDCG@20=0.0043  test=0.0035  (6644.3s)
+
+--- knob: k_embed_dim  grid=[32, 128, 256]  (default carries metric=0.0043) ---
+[stale] k_embed_dim=32: selected on test or trained at another config; re-running
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/cellphone/uniform/s2026 |      0.0117 |  0.0036 |    0.0075 | 217.4523
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + --------- + --------
+BPR/tune/cellphone/uniform/s2026 |      0.0094 |  0.0032 |    0.0067 | 3625.8194 | 129.3769
+
+[run]  k_embed_dim=32  val NDCG@20=0.0036  test=0.0032  (3973.5s)
+[stale] k_embed_dim=128: selected on test or trained at another config; re-running
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/cellphone/uniform/s2026 |      0.0176 |  0.0054 |    0.0113 | 331.3699
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + ---------- + --------
+BPR/tune/cellphone/uniform/s2026 |      0.0135 |  0.0046 |    0.0099 | 11342.0083 | 200.2841
+
+[run]  k_embed_dim=128  val NDCG@20=0.0054  test=0.0046  (11874.7s)
+[stale] k_embed_dim=256: selected on test or trained at another config; re-running
+
+VALIDATION:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 | Time (s)
+-------------------------------- + ----------- + ------- + --------- + --------
+BPR/tune/cellphone/uniform/s2026 |      0.0199 |  0.0062 |    0.0129 | 512.6718
+
+TEST:
+...
+                                 | HitRatio@20 | NDCG@20 | Recall@20 |  Train (s) | Test (s)
+-------------------------------- + ----------- + ------- + --------- + ---------- + --------
+BPR/tune/cellphone/uniform/s2026 |      0.0146 |  0.0049 |    0.0105 | 21268.2275 | 307.9144
+
+[run]  k_embed_dim=256  val NDCG@20=0.0062  test=0.0049  (22090.1s)
+[winner@k_embed_dim] k_embed_dim=256  NDCG@20=0.0062
+
+--- knob: learning_rate  grid=[0.001, 0.01, 0.1]  (default carries metric=0.0062) ---
+[stale] learning_rate=0.001: selected on test or trained at another config; re-running
